@@ -1,2 +1,3 @@
 # PhD
-Simulation and real-data analyses scripts for doctoral dissertation
+Precision Medicine simulation and real-data analyses for doctoral dissertation
+Implementing ITRsurv and XX R packages
