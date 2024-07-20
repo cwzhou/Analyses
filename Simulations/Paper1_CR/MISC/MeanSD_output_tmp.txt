@@ -1,0 +1,1133 @@
+ [1] "CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n1_critS1_critE1.rds"
+ [2] "CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n1_critS2_critE2.rds"
+ [3] "CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n2_critS1_critE1.rds"
+ [4] "CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n2_critS2_critE2.rds"
+ [5] "CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop2_n1_critS1_critE1.rds"
+ [6] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n1_critS1_critE1.rds"
+ [7] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n1_critS2_critE2.rds"
+ [8] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n2_critS1_critE1.rds"
+ [9] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n2_critS2_critE2.rds"
+[10] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n1_critS1_critE1.rds"
+[11] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n1_critS2_critE2.rds"
+[12] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n2_critS1_critE1.rds"
+[13] "CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n2_critS2_critE2.rds"
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 138.8646  2.481792
+czmk     128.9908 26.329550
+zom      191.6540  4.037126
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 262.6972  4.687322
+czmk     243.5664 31.870216
+zom      298.0309 45.145623
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 147.5905  2.662311
+czmk     149.8118 33.733115
+zom      208.6531  8.437001
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 268.2976  4.761876
+czmk     265.8087 43.890811
+zom      325.9711 59.313716
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop2_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 192.2396  2.719198
+czmk     130.4330 27.957463
+zom      191.9866  4.021110
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 300.9998  4.527493
+czmk     247.4749 33.652351
+zom      301.3750 45.154775
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 208.4183  2.931843
+czmk     153.5972 37.067197
+zom      208.6287  8.328105
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 320.6888  4.745897
+czmk     271.6863 46.881295
+zom      327.4775 58.713586
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n2_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 138.8646  2.481792
+czmk     106.0703 19.251710
+zom      191.9023  4.071164
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 262.6972  4.687322
+czmk     214.9327 25.585546
+zom      301.1930 45.402676
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n2_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 147.5905  2.662311
+czmk     124.1427 24.757684
+zom      209.3550  8.622574
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 268.2976  4.761876
+czmk     237.9407 35.383433
+zom      332.2728 59.068640
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n2_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 208.4183  2.931843
+czmk     130.8202 24.994646
+zom      210.2380  8.305809
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 320.6888  4.745897
+czmk     245.5830 36.463229
+zom      338.9387 57.011960
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n1_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7494005 0.004849064
+czmk     0.7466585 0.068991053
+zom      0.8298915 0.119308139
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.03415143 0.003102687
+czmk     0.04224561 0.010229268
+zom      0.02151090 0.003417558
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n1_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7450245 0.004916718
+czmk     0.7410770 0.068603642
+zom      0.8317435 0.117058594
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.04906770 0.003511846
+czmk     0.05837637 0.014455382
+zom      0.02940261 0.005308784
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "_TMP.RDS exists: CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop2_n1_critS2_critE2.rds"
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n1_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.8235820 0.003538131
+czmk     0.7378190 0.060376991
+zom      0.8291035 0.117463500
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.02901275 0.002269274
+czmk     0.05839916 0.014412730
+zom      0.02943998 0.005186032
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n2_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 1000
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7494005 0.004849064
+czmk     0.6891250 0.020435664
+zom      0.8002530 0.116628790
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 1000
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.03415143 0.003102687
+czmk     0.05864451 0.006689495
+zom      0.02087934 0.003235757
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n2_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7450245 0.004916718
+czmk     0.7076440 0.043249499
+zom      0.7998750 0.115318402
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.04906770 0.003511846
+czmk     0.07044607 0.012374546
+zom      0.02818644 0.005125784
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n2_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.8235820 0.003538131
+czmk     0.7116725 0.035330817
+zom      0.7908025 0.112949104
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.02901275 0.002269274
+czmk     0.06878680 0.011353968
+zom      0.02777208 0.005072221
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 138.8646  2.481792
+czmk     128.9908 26.329550
+zom      191.6540  4.037126
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 262.6972  4.687322
+czmk     243.5664 31.870216
+zom      298.0309 45.145623
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 147.5905  2.662311
+czmk     149.8118 33.733115
+zom      208.6531  8.437001
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 268.2976  4.761876
+czmk     265.8087 43.890811
+zom      325.9711 59.313716
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop2_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 192.2396  2.719198
+czmk     130.4330 27.957463
+zom      191.9866  4.021110
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 300.9998  4.527493
+czmk     247.4749 33.652351
+zom      301.3750 45.154775
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n1_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 208.4183  2.931843
+czmk     153.5972 37.067197
+zom      208.6287  8.328105
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 320.6888  4.745897
+czmk     271.6863 46.881295
+zom      327.4775 58.713586
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n2_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 138.8646  2.481792
+czmk     106.0703 19.251710
+zom      191.9023  4.071164
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 262.6972  4.687322
+czmk     214.9327 25.585546
+zom      301.1930 45.402676
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n2_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 147.5905  2.662311
+czmk     124.1427 24.757684
+zom      209.3550  8.622574
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 268.2976  4.761876
+czmk     237.9407 35.383433
+zom      332.2728 59.068640
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n2_critS1_critE1.rds exists"
+Mean and SD of Truncated Survival Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 208.4183  2.931843
+czmk     130.8202 24.994646
+zom      210.2380  8.305809
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of Truncated CIF Means across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): truncated survival mean E[T]
+Second Endpoint (CR): truncated CIF mean CIF[T]
+
+            means       sds
+observed 320.6888  4.745897
+czmk     245.5830 36.463229
+zom      338.9387 57.011960
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n1_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7494005 0.004849064
+czmk     0.7466585 0.068991053
+zom      0.8298915 0.119308139
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.03415143 0.003102687
+czmk     0.04224561 0.010229268
+zom      0.02151090 0.003417558
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n1_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7450245 0.004916718
+czmk     0.7410770 0.068603642
+zom      0.8317435 0.117058594
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.04906770 0.003511846
+czmk     0.05837637 0.014455382
+zom      0.02940261 0.005308784
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "_TMP.RDS exists: CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop2_n1_critS2_critE2.rds"
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n1_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.8235820 0.003538131
+czmk     0.7378190 0.060376991
+zom      0.8291035 0.117463500
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 200
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.02901275 0.002269274
+czmk     0.05839916 0.014412730
+zom      0.02943998 0.005186032
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob1_beta1_prop1_n2_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 1000
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7494005 0.004849064
+czmk     0.6891250 0.020435664
+zom      0.8002530 0.116628790
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 1000
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.3
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.03415143 0.003102687
+czmk     0.05864451 0.006689495
+zom      0.02087934 0.003235757
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop1_n2_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.7450245 0.004916718
+czmk     0.7076440 0.043249499
+zom      0.7998750 0.115318402
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.04906770 0.003511846
+czmk     0.07044607 0.012374546
+zom      0.02818644 0.005125784
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+[1] "file CR/output/simResult_2023-11-27_nCauses1_cause1prob2_beta1_prop2_n2_critS2_critE2.rds exists"
+Mean and SD of S(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+             means         sds
+observed 0.8235820 0.003538131
+czmk     0.7116725 0.035330817
+zom      0.7908025 0.112949104
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+Mean and SD of CIF(T_0)s across 200 simulations
+
+Simulation Setting:
+Number of Subjects in Training Set: 500
+Number of Subjects in Testing Set: 10000
+Number of Causes: 2
+Cause1prob: 0.6
+Number of Covariates: 3
+Covariate Coefficient for Cause 1 Treatment 0: beta1.hazard0: 0, 1, 1, 1
+Covariate Coefficient for Cause 1 Treatment 1: beta1.hazard1: 0, -2, -2, -2
+Covariate Coefficient for Cause 2 Treatment 0: beta2.hazard0: 0, 1.1, 1.3, 1.1
+Covariate Coefficient for Cause 2 Treatment 1: beta2.hazard1: 0, -4.2, -4.4, -4.2
+First Endpoint (Survival): S(t_0)
+Second Endpoint (CR): CIF(t_0)
+
+              means         sds
+observed 0.02901275 0.002269274
+czmk     0.06878680 0.011353968
+zom      0.02777208 0.005072221
+
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
