@@ -3,9 +3,9 @@
 # Author: Christina Zhou
 # Date: 07.02.2023
 if (local == 1){
-  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Github/Paper_1/Paper1_Code/1_code/0_simulations")
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Paper_1/Paper1_Code/1_code/0_simulations")
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
 }
 source("F00.Simulation_Libraries.R")
 source("F02.ComparatorMethod_Functions.R")

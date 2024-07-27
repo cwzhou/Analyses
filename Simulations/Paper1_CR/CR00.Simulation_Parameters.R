@@ -1,11 +1,12 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-local = 0 #0 # local = 0 for cluster
+local = 1 #0 # local = 0 for cluster
 #### libraries and functions
 source("F01.Simulation_Functions.R") # calls libraries
 
-date_folder = "2024-02-27"; #Sys.Date(); #"2024-02-18"
+# date_folder = "2024-02-27"; # very old date: "2024-02-18"
+date_folder = Sys.Date()
 n.eval = 5000 #n.eval = 10000
 n.sim = 500 #n.sim = 200
 mean_tol1 = c(0.12,0)
@@ -24,8 +25,8 @@ if (generate_failure_method == "simple_exp"){
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
-skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-
+# skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+skip_method <- c(!TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 savingrds = FALSE
 
 #### Run this Script FOR CR. Change name later.
