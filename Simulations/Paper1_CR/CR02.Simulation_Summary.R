@@ -2,7 +2,7 @@ source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cl
 
 saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
-testing_out = 0
+testing_out = 1
 
 # crit.no = 1
 # critS.no = 1
@@ -15,10 +15,10 @@ testing_out = 0
 # generate_failure_method = c("simple_exp","fine_gray");
 # generate_failure_method = generate_failure_method[1]
 lab.date = "2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
-dir_rds = sprintf("./%s/output/%s/%s", endpoint, generate_failure_method, lab.date)
+dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 
-files <- list.files(path = sprintf("%s/output/%s/%s", endpoint, generate_failure_method, lab.date),
+files <- list.files(path = sprintf("output/%s/%s", generate_failure_method, lab.date),
                     pattern = paste0(lab.date, ".*\\.rds"), full.names = TRUE)
 # if (testing_out == 1){
 #   files = files[grepl("_tmp", files) == FALSE]
@@ -30,8 +30,8 @@ method.nm.abc =
 method.nm.simple =
   c("czmk", "csk", "pmcr", "aipwe", "zom", "obs") # this is important for selecting variables below.
 method.nm.formal =
-  c("the proposed method", "Cho et al (2022)", 
-    "PMCR (2021)", "AIPWE (2021)", 
+  c("the proposed method", "dtrSurv (2023)",
+    "PMCR (2021)", "AIPWE (2021)",
     "zero-order model", "observed policy")
 # "Goldberg & Kosorok (2012), RF", "Goldberg & Kosorok (2012), linear", "Simoneau et al. (2019)",
 
@@ -174,7 +174,7 @@ for (crit.no in 1:crit.tot){
           NULL
         } else {
           print("a is not null")
-          
+
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
           beginning <- as.data.frame(a) %>%
             dplyr::select(rep = sim,
@@ -287,12 +287,12 @@ for (crit.no in 1:crit.tot){
         facet_grid(setting ~ n + design)
     }
     p = p +
-      geom_point() + 
+      geom_point() +
       geom_boxplot() +
       geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
       scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
-      ylab(ylabs) + 
-      theme_bw() + 
+      ylab(ylabs) +
+      theme_bw() +
       theme(legend.position = "bottom")
     rng = suppressWarnings(layer_scales(p)$y$range$range)
     rng[3] = rng[2] - rng[1]
@@ -301,18 +301,18 @@ for (crit.no in 1:crit.tot){
 
       p.list[[Phase.no]] <-
         p +
-        stat_summary(aes(x = as.numeric(method), 
+        stat_summary(aes(x = as.numeric(method),
                          y = value),
-                     fun = mean, 
-                     geom = 'point',  
-                     col = "black", 
-                     shape = "square", 
+                     fun = mean,
+                     geom = 'point',
+                     col = "black",
+                     shape = "square",
                      size = 1) +
         stat_summary(aes(x = as.numeric(method),
                          y = value,
                          label = round(..y.., 4),
-                         vjust = ifelse(as.numeric(method) %% 2 == 0, 
-                                        2, 
+                         vjust = ifelse(as.numeric(method) %% 2 == 0,
+                                        2,
                                         -1)),
                      fun = mean,
                      geom = 'text',

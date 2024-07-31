@@ -3,9 +3,9 @@
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
 local = 1 #0 # local = 0 for cluster
 #### libraries and functions
-source("F01.Simulation_Functions.R") # calls libraries
+source("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/F01.Simulation_Functions.R") # calls libraries
 
-# date_folder = "2024-02-27"; # very old date: "2024-02-18"
+# date_folder = "2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 date_folder = Sys.Date()
 n.eval = 5000 #n.eval = 10000
 n.sim = 500 #n.sim = 200
@@ -258,7 +258,7 @@ list2env(setting, envir = globalenv())
 beta.propensity <- beta.propensity(ncov)
 
 
-dir_rds = sprintf("./%s/output/%s/%s", endpoint, generate_failure_method, date_folder)
+dir_rds = sprintf("./output/%s/%s", generate_failure_method, date_folder)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 if (local == 0){
   dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_1/output/%s/%s",

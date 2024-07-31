@@ -299,6 +299,15 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
     dplyr::select(obs_time, Trt, status, D.0, D.1, D.2, contains("Z"))
     # dplyr::select(-c(Time_Censor, Time_Failure1, Time_Failure2, Time_Tau, obs_time_failureCR,indD))
 
+  # create unique observed failure times for survival phase 1
+  timePointsSurvival = data.df %>%
+    filter(D.0 == 1) %>%
+    dplyr::select(obs_time) %>%
+    unlist(use.names = FALSE) %>%
+    unique()
+  timePointsEndpoint = timePointsSurvival # we can do this bc CR is subset of OS failure times
+  # create unique observed endpoint times for endpoint phase 2
+
   data.df.pmcr <<- data.df %>%
     dplyr::select(obs_time, Trt, status, starts_with("Z")) %>%
     mutate(Trt = ifelse(Trt == -1, 0, Trt)) # Trt has to be 0/1
@@ -357,9 +366,14 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
     })
     # print(crit.value_phase1)
     arg.czmk2 = list(data = data.df,
+                     endPoint = "CR",
                     txName = paste("Trt"),
                     models = models_itr,
-                    tau = tau, timePoints = "uni", nTimes = 100,
+                    timePointsSurvival = timePointsSurvival,
+                    timePointsEndpoint = timePointsEndpoint,
+                    tau = tau,
+                    timePoints = "uni",
+                    nTimes = 100,
                     criticalValue1 = criterion_phase1,
                     criticalValue2 = criterion_phase2,
                     evalTime = crit.value_phase1,
