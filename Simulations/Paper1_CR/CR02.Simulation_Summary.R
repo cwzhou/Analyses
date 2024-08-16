@@ -344,26 +344,27 @@ for (crit.no in 1:crit.tot){
                       nrow = 1, ncol = 2,
                       common.legend = FALSE)
   p.grid1 <- plot_grid(p.grid,
-                      get_legend(p.list[[1]]),
+                      get_legend(p.list[[1]] + theme(legend.position = "bottom")),
                       align = "vh",
                       axis = "tblr",
+                      ncol = 1,
                       nrow = 2,
                       rel_heights = c(1, 0.1))
   
-  # Extract the legend from one plot
-  legend <- get_legend(p.list[[1]] + theme(legend.position = "right"))
-  
-  # Combine plots side by side
-  combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
-  
-  # Add the legend underneath
-  final_plot <- plot_grid(combined, 
-                          legend, 
-                          ncol = 1, 
-                          rel_heights = c(1, 0.1))
-  
-  # Display the plot
-  print(final_plot)
+  # # Extract the legend from one plot
+  # legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
+  # 
+  # # Combine plots side by side
+  # combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
+  # 
+  # # Add the legend underneath
+  # final_plot <- plot_grid(combined, 
+  #                         legend, 
+  #                         ncol = 1, 
+  #                         rel_heights = c(1, 0.1))
+  # 
+  # # Display the plot
+  # print(final_plot)
   
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
