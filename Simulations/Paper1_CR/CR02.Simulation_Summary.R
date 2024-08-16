@@ -274,30 +274,30 @@ for (crit.no in 1:crit.tot){
       result.stat %>% filter(design %in% design.filter, crit %in% crit.no, crit.label %in% crit.label[crit.no])
     # message('LINE 213: facet_grid is most common cause for: Error in `combine_vars()`')
     if (generate_failure_method == "fine_gray"){
-      p <-
+      p0 <-
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
         facet_grid(cause1prob + setting ~ n + design)
     } else{
-      p <-
+      p0 <-
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
         facet_grid(setting ~ n + design)
     }
-    p = p +
+    p = p0 +
       geom_point() +
       geom_boxplot() +
-      geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
+      # geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
       scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
       ylab(ylabs) +
-      theme_bw() +
-      theme(legend.position = "bottom")
+      theme_bw() #+
+      # theme(legend.position = "bottom")
     rng = suppressWarnings(layer_scales(p)$y$range$range)
     rng[3] = rng[2] - rng[1]
-    rng[4] = rng[3] * 0.4 + rng[2] # y coordiate for censoring %
-    rng[5] = rng[3] * 0.2 + rng[2] # y coordiate for flowchart
+    rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
+    rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
 
       p.list[[Phase.no]] <-
         p +
@@ -310,46 +310,55 @@ for (crit.no in 1:crit.tot){
                      size = 1) +
         stat_summary(aes(x = as.numeric(method),
                          y = value,
-                         label = round(..y.., 4),
-                         vjust = ifelse(as.numeric(method) %% 2 == 0,
-                                        2,
-                                        -1)),
+                         label = round(..y.., 2),
+                         #below is code for alternating. if you use this, comment out vjust=-1.1 below
+                         # vjust = ifelse(as.numeric(method) %% 2 == 0,
+                         #                2,
+                         #                -1)
+                         ),
                      fun = mean,
                      geom = 'text',
                      col = "black",
-                     # position = position_nudge(y = 1),
-                     # vjust = -1.1,
+                     vjust = -1.1,
                      size = 2.5)
       if (saving_eps == TRUE){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
-        ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
-               p.list[[Phase.no]],
-               width = 12, height = 10)
       }
+      ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
+             p.list[[Phase.no]],
+             width = 12, height = 10)
 
     } # end of Phase.no for-loop
 
 
   p.1 = p.list[[1]] +
-    theme(legend.position = "none") #+
+    theme(legend.position = "none",
+          axis.title.x=element_blank()) #+
     # ylim(y_limits)
   p.2 = p.list[[2]] +
-    theme(legend.position = "none") #+
+    theme(legend.position = "none",
+          axis.title.x=element_blank()) #+
     # ylim(y_limits)
 
   p.grid <- plot_grid(p.1,
                       p.2,
                       align = "vh", 
                       axis = "tblr",
-                      nrow = 1, ncol = 2,
-                      common.legend = FALSE)
+                      nrow = 1, ncol = 2)#,
+                      # common.legend = FALSE)
   p.grid1 <- plot_grid(p.grid,
-                      get_legend(p.list[[1]] + theme(legend.position = "bottom")),
+                       get_legend(p.list[[2]] + 
+                                    theme(legend.direction = "horizontal",
+                                          legend.key.size = unit(0.5, "cm"),    # Adjust the size of the legend keys
+                                          legend.text = element_text(size = 8), # Adjust the size of the legend text
+                                          legend.spacing.x = unit(0.1, "cm")) +
+                                    guides(color = guide_legend(nrow = 1, title = "Methods"))),
                       align = "vh",
                       axis = "tblr",
                       ncol = 1,
                       nrow = 2,
                       rel_heights = c(1, 0.1))
+  #we can ignore the warning message about return_all
   
   # # Extract the legend from one plot
   # legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
