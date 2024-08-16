@@ -1,11 +1,11 @@
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 
-library(caret); 
-library(purrr); 
-library(dplyr); 
+library(caret);
+library(purrr);
+library(dplyr);
 library(survival)
 library(DTRreg);
-library(randomForestSRC); 
+library(randomForestSRC);
 library(dtrSurv)
 library(itrSurv);library(ggplot2); library(tidyverse);
 library(MASS); library(dplyr);
@@ -25,9 +25,9 @@ criterion_phase1 = "area"
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 rda_methods = c("CZMK", "CSK", "PMCR", "AIPWE",
                 "ZOM", "CSKzom", "observed")
-skip_method <- c(TRUE,TRUE,TRUE,TRUE,
-                 TRUE,TRUE,TRUE);
-skip_function(rda_methods, skip_method)
+skip_method <- c(!TRUE,!TRUE,!TRUE,!TRUE,
+                 !TRUE,TRUE,!TRUE);
+assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
 loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
 
@@ -37,7 +37,7 @@ loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
 t0_crit = 365/2 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
 tau = 365
-K = 300 # number of CV
+K = 1 #300 # number of CV
 endpoint = "CR" # endpoint
 Tx.nm = "Trt"
 timepoints = seq(0, sqrt(tau), length.out = 1000)^2
@@ -64,6 +64,19 @@ data = pad_df %>%
   rename_with(~ gsub(" ", "_", .x), contains(" ")) %>%
   rename_with(~ gsub("-", "_", .x), contains("-"))
 
+# get survialtimes
+s.times = data %>%
+  filter(D.0 == 1) %>%
+  dplyr::select(obs_time) %>%
+  arrange(obs_time) %>%
+  unlist() %>% as.numeric()
+# get CR priority cause times
+pc.times = data %>%
+  filter(D.1 == 1) %>%
+  dplyr::select(obs_time) %>%
+  arrange(obs_time) %>%
+  unlist() %>% as.numeric()
+
 # Get all column names of the dataframe
 all_column_names <- colnames(data)
 # Define the column names you want to exclude
@@ -84,7 +97,7 @@ dat0 = data %>%
                 !!!covariate_names)
 # head(dat0);range(dat0$obs_time)
 
-covars = dat0 %>% dplyr::select(-c(D.0, D.1, D.2, status, Trt, obs_time)) %>% names() 
+covars = dat0 %>% dplyr::select(-c(D.0, D.1, D.2, status, Trt, obs_time)) %>% names()
 paste0(paste(covars, collapse = ", "))
 ############################################################
 ###################### 0.2 criterion #######################
@@ -202,10 +215,10 @@ paste0(paste(covars, collapse = ", "))
         mutate(across(everything(), convert_factors_to_numeric))
     }
     if (skip.AIPWE != TRUE){
-      train_aipwe0 = train %>% 
+      train_aipwe0 = train %>%
         dplyr::select(-c("ischemia", "woundClass", "maxRutherfordClass", "Race"))
       train_aipwe = aipwe_data_format(train_aipwe0)
-      test_aipwe = test %>% 
+      test_aipwe = test %>%
         dplyr::select(-c("ischemia", "woundClass", "maxRutherfordClass", "Race"))
       # account for factors
     }
@@ -221,7 +234,7 @@ paste0(paste(covars, collapse = ", "))
     if (skip.CZMK != TRUE){
       print(sprintf("Running CZMK for %s CV", cv))
       priority_vector <- c(0, priority_cause)
-      
+
       # Use lapply to create a list of sprintf statements
       models_itr <- lapply(priority_vector, function(x) {
         paste0(sprintf("Surv(obs_time, D.%s) ~ ",
@@ -229,9 +242,13 @@ paste0(paste(covars, collapse = ", "))
                gsub(".*~\\s*", "", modelOS)) %>% as.formula
         })
       args.CZMK <- list(data = train,
+                        endPoint = "CR",
                         txName = Tx.nm,
                         models = models_itr,
-                        tau = tau, timePoints = timepoints,
+                        tau = tau,
+                        # timePoints = timepoints,
+                        timePointsSurvival = s.times,
+                        timePointsEndpoint = pc.times,
                         criticalValue1 = criterion_phase1[1],
                         criticalValue2 = criterion_phase2[1],
                         evalTime = as.numeric(criterion_phase1[2]),
@@ -251,7 +268,7 @@ paste0(paste(covars, collapse = ", "))
       } else{
         err.CZMK = TRUE
         }
-    
+
     ### A2. Cho et al (2022)
     if (skip.CSK != TRUE){
       print(sprintf("Running CSK for %s CV", cv))
@@ -275,12 +292,12 @@ paste0(paste(covars, collapse = ", "))
       } else{
         err.CSK = TRUE
         }
-    
+
     ### A3. PMCR - 2021
     if (skip.PMCR != TRUE){
       print(sprintf("Running PMCR for %s CV", cv))
       message("unrestricted regime")
-      args.PMCR <- args.PMCR2 <- 
+      args.PMCR <- args.PMCR2 <-
         list(Time="obs_time",
              Event="status",
              formula=modelPr_PMCR, #trt needs to be 0/1
@@ -331,10 +348,10 @@ paste0(paste(covars, collapse = ", "))
 
     ### A4. AIPWE
     if (skip.AIPWE != TRUE){
-      
+
       ### A4. AIPWE - 2022
       print(sprintf("Running AIPWE for %s CV", cv))
-      
+
       args.AIPWE = list(data_list = train_aipwe,
                         pp.v = (ncol(train_aipwe$Z1)-1)/2, #minus trt; divided by 2 b/c of interactions
                         tau1 = as.numeric(t0_aipwe),
@@ -345,7 +362,7 @@ paste0(paste(covars, collapse = ", "))
         try(do.call(aipwe.fit,
                     c(args.AIPWE)))
       err.AIPWE = class(AIPWE.i)[1] == "try-error"
-      
+
       # aif = aipwe.fit(data_list = train_aipwe,
       #                 pp.v = (ncol(train_aipwe$Z1)-1)/2, #minus trt; divided by 2 b/c of interactions
       #                 tau1 = as.numeric(t0_aipwe),
