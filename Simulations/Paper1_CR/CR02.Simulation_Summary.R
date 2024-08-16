@@ -1,6 +1,6 @@
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
-saving_eps = TRUE
+saving_eps = FALSE#TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -30,7 +30,7 @@ method.nm.abc =
 method.nm.simple =
   c("czmk", "csk", "pmcr", "aipwe", "zom", "obs") # this is important for selecting variables below.
 method.nm.formal =
-  c("the proposed method", "dtrSurv (2023)",
+  c("our proposed method", "dtrSurv (2023)",
     "PMCR (2021)", "AIPWE (2021)",
     "zero-order model", "observed policy")
 # "Goldberg & Kosorok (2012), RF", "Goldberg & Kosorok (2012), linear", "Simoneau et al. (2019)",
@@ -229,32 +229,32 @@ for (crit.no in 1:crit.tot){
     print("end of result.comb")
 
     if (generate_failure_method == "fine_gray"){
-      result.comb = result.comb %>%
+      result.comb1 = result.comb %>%
         mutate(cause1prob = factor(cause1prob,
                                    levels = cause1prob.levels,
                                    labels = cause1prob.labels))
       result.stat <-
-        result.comb %>%
+        result.comb1 %>%
         aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method + ncauses + cause1prob +
                     setting + n + design + crit + crit.label , data = .,
                   FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
         mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
       result.stat.sd <-
-        result.comb %>%
+        result.comb1 %>%
         aggregate(value ~ method + ncauses + cause1prob + setting + n + design +
                     crit + crit.label , data = .,
                   FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
         rename(sd = value)
       } else{
-        result.comb <- result.comb
+        result.comb1 <- result.comb
         result.stat <-
-          result.comb %>%
+          result.comb1 %>%
           aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method + ncauses +
                       setting + n + design + crit + crit.label , data = .,
                     FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
           mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
         result.stat.sd <-
-          result.comb %>%
+          result.comb1 %>%
           aggregate(value ~ method + ncauses + setting + n + design +
                       crit + crit.label , data = .,
                     FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
@@ -275,13 +275,13 @@ for (crit.no in 1:crit.tot){
     # message('LINE 213: facet_grid is most common cause for: Error in `combine_vars()`')
     if (generate_failure_method == "fine_gray"){
       p <-
-        result.comb %>%
+        result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
         facet_grid(cause1prob + setting ~ n + design)
     } else{
       p <-
-        result.comb %>%
+        result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
         facet_grid(setting ~ n + design)
@@ -322,6 +322,9 @@ for (crit.no in 1:crit.tot){
                      size = 2.5)
       if (saving_eps == TRUE){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
+        ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
+               p.list[[Phase.no]],
+               width = 12, height = 10)
       }
 
     } # end of Phase.no for-loop
@@ -336,7 +339,8 @@ for (crit.no in 1:crit.tot){
 
   p.grid <- plot_grid(p.1,
                       p.2,
-                      align = "vh", axis = "tblr",
+                      align = "vh", 
+                      axis = "tblr",
                       nrow = 1, ncol = 2,
                       common.legend = FALSE)
   p.grid1 <- plot_grid(p.grid,
@@ -345,9 +349,28 @@ for (crit.no in 1:crit.tot){
                       axis = "tblr",
                       nrow = 2,
                       rel_heights = c(1, 0.1))
+  
+  # Extract the legend from one plot
+  legend <- get_legend(p.list[[1]] + theme(legend.position = "right"))
+  
+  # Combine plots side by side
+  combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
+  
+  # Add the legend underneath
+  final_plot <- plot_grid(combined, 
+                          legend, 
+                          ncol = 1, 
+                          rel_heights = c(1, 0.1))
+  
+  # Display the plot
+  print(final_plot)
+  
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
   }
+  ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
+         p.grid1,
+         width = 20, height = 10)
   } # end of crit.tot for-loop
 
 # EXPLORING PROPOPRTION OF PEOPLE DYING FROM CAUSE 1 (crit = 1: truncated mean)
