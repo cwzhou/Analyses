@@ -9,7 +9,7 @@ library(ggplot2); library(cowplot)
 date = "2024-03-05";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
 
 mthd0 = c("CZMK", "CSK", "PMCR", "AIPWE", "ZOM", "CSKzom", "observed")
-labs0 = c("the proposed method", "Cho et al (2022)", "PMCR (2021)", "AIPWE (2022)",
+labs0 = c("our proposed model", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
          "zero-order model", "Cho zero-order model", "observed")
 cols0 <- c("#800091", "#619CFF", "#00BFC4", "#00BA38","#F8766D", "#FFA500", "#F564E3")
 names(cols0) = labs0
@@ -100,13 +100,13 @@ for (crit1 in 1:length(possible_crits)) {
         if (endpoint_type == "OS"){
           "Truncated mean overall survival time"
         } else{
-          sprintf("Truncated mean cause %s survival time", priority_cause)
+          "Truncated mean death cumulative incidence time"
         }
         } else{
           if (endpoint_type == "PC"){
             "Truncated overall survival probability"
           } else{
-            sprintf("Truncated cause %s survival probability", priority_cause)
+            "Truncated death cumulative incidence probability"
           }
           }) +
       guides(col = "none", group = "none")
