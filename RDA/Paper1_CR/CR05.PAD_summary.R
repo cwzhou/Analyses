@@ -6,7 +6,7 @@ library(ggplot2); library(cowplot)
 # add in other comparator methods
 
 # Specify date of the outputs and all_cause (T/F)
-date = "2024-03-05";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
+date = Sys.Date()#"2024-03-05";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
 
 mthd0 = c("CZMK", "CSK", "PMCR", "AIPWE", "ZOM", "CSKzom", "observed")
 labs0 = c("our proposed model", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
@@ -44,7 +44,7 @@ for (crit1 in 1:length(possible_crits)) {
   crit = possible_crits[crit1]
   # OSValues_20CV_mean_rulemean_tau32_2024-01-26.rds
   nm.tmp =
-    sprintf("../3_output/%s/%s/%s/Values_%sCV_%s_tau%s_%s.rds",
+    sprintf("./3_output/%s/%s/%s/Values_%sCV_%s_tau%s_%s.rds",
             endpoint, dataset_name, date, K,
             if (crit == "mean") "mean_rulemean" else if (crit == "area") "area_rulemean" else sprintf("mean.prob.combo%s_ruleLRGray",t0_crit), #"surv.mean2200_rulelogrank",
             tau, date)
@@ -70,7 +70,7 @@ for (crit1 in 1:length(possible_crits)) {
                            labels = labs),
            crit = crit)
   # note: AIPWE and PMCR have some NaN; AIPWE is missing sometimes
-  
+
   plot_RDA <- function(data, endpoint_type) {
     ggplot(data) +
       geom_boxplot(aes(method, !!sym(endpoint_type), col = method)) +
@@ -98,15 +98,15 @@ for (crit1 in 1:length(possible_crits)) {
       # ylim(c(if (crit == "mean") { if (all_cause) 2000 else 2200} else { if (all_cause) 0.45 else 0.6}, NA)) +
       ylab(if (crit == "mean" | crit == "area"){
         if (endpoint_type == "OS"){
-          "Truncated mean overall survival time"
+          "Mean truncated \noverall survival (days)"
         } else{
-          "Truncated mean death cumulative incidence time"
+          "Mean truncated \ndeath survival (days)"
         }
         } else{
           if (endpoint_type == "PC"){
             "Truncated overall survival probability"
           } else{
-            "Truncated death cumulative incidence probability"
+            "Truncated death survival probability?"
           }
           }) +
       guides(col = "none", group = "none")

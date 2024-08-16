@@ -37,7 +37,7 @@ loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
 t0_crit = 365/2 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
 tau = 365
-K = 4 #300 # number of CV
+K = 300 #300 # number of CV
 endpoint = "CR" # endpoint
 Tx.nm = "Trt"
 timepoints = seq(0, sqrt(tau), length.out = 1000)^2
