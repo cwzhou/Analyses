@@ -1,13 +1,18 @@
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 
-library(caret); library(purrr); library(dplyr); library(survival)
-library(DTRreg); library(randomForestSRC); library(dtrSurv)
+library(caret); 
+library(purrr); 
+library(dplyr); 
+library(survival)
+library(DTRreg);
+library(randomForestSRC); 
+library(dtrSurv)
 library(itrSurv);library(ggplot2); library(tidyverse);
 library(MASS); library(dplyr);
 local = 1
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Github/Paper_1/Paper1_Code/1_code")
-source("0_simulations/F01.Simulation_Functions.R") # includes F02.ComparatorMethod_Functions.R
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Github/Paper_1/Paper1_Code/1_code")
+setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/RDA")
+source("../Simulations/Paper1_CR/F01.Simulation_Functions.R") # includes F02.ComparatorMethod_Functions.R
+setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/RDA/Paper1_CR/")
 source("F03.RDA_Functions.R")    # All the library and source files
 ############################################################
 ######### temporary testing things out parameters ##########
@@ -172,11 +177,11 @@ paste0(paste(covars, collapse = ", "))
   nm = paste0(criterion_phase1[1],
               crit_tmp, "_rule",
               rule, "_tau", tau)
-  fnm = paste0("../3_output/", endpoint, "/",dataset_name,"/", Sys.Date(), "/") # folder name
-  if (!dir.exists(sprintf("../3_output/%s", endpoint))) dir.create(sprintf("../3_output/%s", endpoint))
-  if (!dir.exists(sprintf("../3_output/%s/%s", endpoint, dataset_name))) dir.create(sprintf("../3_output/%s/%s", endpoint, dataset_name))
-  if (!dir.exists(sprintf("../3_figure/%s", endpoint))) dir.create(sprintf("../3_figure/%s", endpoint))
-  if (!dir.exists(sprintf("../3_figure/%s/%s", endpoint, dataset_name))) dir.create(sprintf("../3_figure/%s/%s", endpoint, dataset_name))
+  fnm = paste0("./3_output/", endpoint, "/",dataset_name,"/", Sys.Date(), "/") # folder name
+  if (!dir.exists(sprintf("./3_output/%s", endpoint))) dir.create(sprintf("./3_output/%s", endpoint))
+  if (!dir.exists(sprintf("./3_output/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./3_output/%s/%s", endpoint, dataset_name))
+  if (!dir.exists(sprintf("./3_figure/%s", endpoint))) dir.create(sprintf("./3_figure/%s", endpoint))
+  if (!dir.exists(sprintf("./3_figure/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./3_figure/%s/%s", endpoint, dataset_name))
   if (!dir.exists(fnm)) dir.create(fnm)
   rds = paste0("_", Sys.Date(), ".rds")
 
