@@ -18,15 +18,15 @@ source("F03.RDA_Functions.R")    # All the library and source files
 ######### temporary testing things out parameters ##########
 ############################################################
 criterion_phase1 = "area"
-
+rule2 = "gray_cr" # other option: csh_cr
 ############################################################
 ################# methods for comparison ###################
 ############################################################
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 rda_methods = c("CZMK", "CSK", "PMCR", "AIPWE",
                 "ZOM", "CSKzom", "observed")
-skip_method <- c(!TRUE,!TRUE,!TRUE,!TRUE,
-                 !TRUE,TRUE,!TRUE);
+skip_method <- c(!TRUE,TRUE,TRUE,TRUE,
+                 TRUE,TRUE,TRUE);
 assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
 loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
@@ -37,7 +37,7 @@ loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
 t0_crit = 365/2 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
 tau = 365
-K = 300 #300 # number of CV
+K = 1 #300 # number of CV
 endpoint = "CR" # endpoint
 Tx.nm = "Trt"
 timepoints = seq(0, sqrt(tau), length.out = 1000)^2
@@ -115,11 +115,13 @@ paste0(paste(covars, collapse = ", "))
   if (!(criterion_phase1[1] %in% c("mean", "area"))) {
     criterion_phase1[2] = t0_crit
     dtr_criterion[2] = criterion_phase1[2]
-    rule = "LRGray"
+    rule1 = "logrank_surv"
   } else {
-    rule = "mean"
+    rule1 = "mean_surv"
     criterion_phase1[2] = NA
   }
+  # rule1 =  ifelse(criterion_phase1[1] == "mean" | criterion_phase1[1] == "area", "mean_surv", "logrank_surv")
+
   if (!(criterion_phase2[1] %in% c("mean", "area"))) {
     criterion_phase2[2] = t0_crit
   } else {
@@ -252,7 +254,8 @@ paste0(paste(covars, collapse = ", "))
                         criticalValue1 = criterion_phase1[1],
                         criticalValue2 = criterion_phase2[1],
                         evalTime = as.numeric(criterion_phase1[2]),
-                        splitRule = ifelse(criterion_phase1[1] == "mean", "mean", "logrank"),
+                        splitRule1 = rule1,
+                        splitRule2 = rule2,
                         ERT = ert, uniformSplit = ert, replace = !ert,
                         randomSplit = rs, nTree = Ntree, mTry = 6,
                         pooled = pooled1,
@@ -587,7 +590,8 @@ paste0(paste(covars, collapse = ", "))
                                       criterion2 = criterion_phase2[1],
                                       criterion1.s = as.numeric(criterion_phase1[2]),
                                       criterion2.s = as.numeric(criterion_phase2[2]),
-                                      rule = rule,
+                                      rule1 = rule1,
+                                      rule2 = rule2,
                                       tau = tau,
                                       ert = ert,
                                       rs = rs,
