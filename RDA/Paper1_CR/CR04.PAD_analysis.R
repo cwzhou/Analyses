@@ -44,9 +44,9 @@ timepoints = seq(0, sqrt(tau), length.out = 1000)^2
 
 ## other parameters
 priority_cause = 1 # death
-nodesize = 50
+nodesize = 5#50
 mindeath = round(sqrt(c(nodesize)), 0)
-Ntree = 300
+Ntree = 3#300
 ert = TRUE;
 rs = 0.2 # randomSplit = 0.2
 
@@ -245,6 +245,7 @@ paste0(paste(covars, collapse = ", "))
         })
       args.CZMK <- list(data = train,
                         endPoint = "CR",
+                        epName = "status",
                         txName = Tx.nm,
                         models = models_itr,
                         tau = tau,
