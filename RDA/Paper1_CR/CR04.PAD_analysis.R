@@ -46,7 +46,7 @@ timepoints = seq(0, sqrt(tau), length.out = 1000)^2
 priority_cause = 1 # death
 nodesize = 5#50
 mindeath = round(sqrt(c(nodesize)), 0)
-Ntree = 3#300
+Ntree = 1#300
 ert = TRUE;
 rs = 0.2 # randomSplit = 0.2
 
@@ -158,7 +158,8 @@ paste0(paste(covars, collapse = ", "))
   form.weight <- list(modelPr %>% as.formula)
 
   #################### 1. data preprocessing
-  dat = as.data.frame(dat0)
+  # sorting dataset by obs_time (ascending response time)
+  dat = as.data.frame(dat0) %>% arrange(obs_time)
   # dat = dat0 %>%
   #   mutate(time = pmin(time, tau),
   #      last.fu = ifelse(time == tau, 1, last.fu),
@@ -190,8 +191,8 @@ paste0(paste(covars, collapse = ", "))
   train_eval_result_list = train_eval_result_list_tmp = list()
 
   nm = paste0(criterion_phase1[1],
-              crit_tmp, "_rule",
-              rule, "_tau", tau)
+              crit_tmp, "_rule1",
+              rule1, "_rule2", rule2, "_tau", tau)
   fnm = paste0("./3_output/", endpoint, "/",dataset_name,"/", Sys.Date(), "/") # folder name
   if (!dir.exists(sprintf("./3_output/%s", endpoint))) dir.create(sprintf("./3_output/%s", endpoint))
   if (!dir.exists(sprintf("./3_output/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./3_output/%s/%s", endpoint, dataset_name))
@@ -204,7 +205,8 @@ paste0(paste(covars, collapse = ", "))
                    # s2 = NA,
                    total = NA)
 
-  for (cv in 1:K) {
+  # for (cv in 1:K) {
+  cv=1
     cat(cv, "th cv.\n")
     set.seed(cv)
     in.cv = cv.insample[, cv]   # insample index
