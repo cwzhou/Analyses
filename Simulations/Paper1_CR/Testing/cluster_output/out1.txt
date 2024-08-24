@@ -1,0 +1,365 @@
+setting (endpoint, ncauses, beta, propensity,
+    size, crit_phase1, crit_phase2, cause1_prob)  1 1 1 1 1 1 1 1 
+[1] "./output/fine_gray/2024-08-24/simResult_fine_gray_nCauses1_cause1prob1_beta1_prop1_n1_critS1_critE1.rds"
+[1] "./output/fine_gray/2024-08-24/simResult_fine_gray_nCauses1_cause1prob1_beta1_prop1_n1_critS1_critE1.rds"
+[1] "2024-08-24 09:50:12 EDT"
+
+
+#################################
+######### Simulation  1 #########
+Endpoint:  CR
+Number of CR:  2
+#################################
+1. Data for Simulation 1 : fine_gray 
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "!!!!! no censoring. !!!!!"
+
+******************************
+2. czmk for simulation 1 
+  2. czmk - Policy estimation for Simulation 1 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  
+ 2. czmk - Evaluation for Simulation 1 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+
+******************************
+3. csk - Cho et al for Simulation 1 : fine_gray 
+  3. csk - Policy estimation for Simulation 1 : fine_gray 
+  
+ 3. csk - Evaluation for Simulation 1 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from DTRSurv estimation (Cho)"
+
+******************************
+4. pmcr for Simulation 1 : fine_gray 
+
+******************************
+4. aipwe for Simulation 1 : fine_gray 
+
+******************************
+6. Estimation - zero-order model for Simulation 1 : fine_gray 
+  6. zero-order model - Policy estimation for Simulation 1 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  6. zero-order model - Evaluation for Simulation 1 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+--- End of Simulation 1 ---
+
+
+#################################
+######### Simulation  2 #########
+Endpoint:  CR
+Number of CR:  2
+#################################
+1. Data for Simulation 2 : fine_gray 
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "!!!!! no censoring. !!!!!"
+
+******************************
+2. czmk for simulation 2 
+  2. czmk - Policy estimation for Simulation 2 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  
+ 2. czmk - Evaluation for Simulation 2 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+
+******************************
+3. csk - Cho et al for Simulation 2 : fine_gray 
+  3. csk - Policy estimation for Simulation 2 : fine_gray 
+  
+ 3. csk - Evaluation for Simulation 2 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from DTRSurv estimation (Cho)"
+
+******************************
+4. pmcr for Simulation 2 : fine_gray 
+
+******************************
+4. aipwe for Simulation 2 : fine_gray 
+
+******************************
+6. Estimation - zero-order model for Simulation 2 : fine_gray 
+  6. zero-order model - Policy estimation for Simulation 2 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  6. zero-order model - Evaluation for Simulation 2 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+--- End of Simulation 2 ---
+
+
+#################################
+######### Simulation  3 #########
+Endpoint:  CR
+Number of CR:  2
+#################################
+1. Data for Simulation 3 : fine_gray 
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "!!!!! no censoring. !!!!!"
+
+******************************
+2. czmk for simulation 3 
+  2. czmk - Policy estimation for Simulation 3 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  
+ 2. czmk - Evaluation for Simulation 3 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+
+******************************
+3. csk - Cho et al for Simulation 3 : fine_gray 
+  3. csk - Policy estimation for Simulation 3 : fine_gray 
+  
+ 3. csk - Evaluation for Simulation 3 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from DTRSurv estimation (Cho)"
+
+******************************
+4. pmcr for Simulation 3 : fine_gray 
+
+******************************
+4. aipwe for Simulation 3 : fine_gray 
+
+******************************
+6. Estimation - zero-order model for Simulation 3 : fine_gray 
+  6. zero-order model - Policy estimation for Simulation 3 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  6. zero-order model - Evaluation for Simulation 3 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+--- End of Simulation 3 ---
+
+
+#################################
+######### Simulation  4 #########
+Endpoint:  CR
+Number of CR:  2
+#################################
+1. Data for Simulation 4 : fine_gray 
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "!!!!! no censoring. !!!!!"
+
+******************************
+2. czmk for simulation 4 
+  2. czmk - Policy estimation for Simulation 4 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  
+ 2. czmk - Evaluation for Simulation 4 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+
+******************************
+3. csk - Cho et al for Simulation 4 : fine_gray 
+  3. csk - Policy estimation for Simulation 4 : fine_gray 
+  
+ 3. csk - Evaluation for Simulation 4 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from DTRSurv estimation (Cho)"
+
+******************************
+4. pmcr for Simulation 4 : fine_gray 
+
+******************************
+4. aipwe for Simulation 4 : fine_gray 
+
+******************************
+6. Estimation - zero-order model for Simulation 4 : fine_gray 
+  6. zero-order model - Policy estimation for Simulation 4 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  6. zero-order model - Evaluation for Simulation 4 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+--- End of Simulation 4 ---
+
+
+#################################
+######### Simulation  5 #########
+Endpoint:  CR
+Number of CR:  2
+#################################
+1. Data for Simulation 5 : fine_gray 
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is null: generating treatment from rbinom with propensity"
+[1] "!!!!! no censoring. !!!!!"
+[1] "!!!!! no censoring. !!!!!"
+
+******************************
+2. czmk for simulation 5 
+  2. czmk - Policy estimation for Simulation 5 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  
+ 2. czmk - Evaluation for Simulation 5 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+
+******************************
+3. csk - Cho et al for Simulation 5 : fine_gray 
+  3. csk - Policy estimation for Simulation 5 : fine_gray 
+  
+ 3. csk - Evaluation for Simulation 5 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from DTRSurv estimation (Cho)"
+
+******************************
+4. pmcr for Simulation 5 : fine_gray 
+
+******************************
+4. aipwe for Simulation 5 : fine_gray 
+
+******************************
+6. Estimation - zero-order model for Simulation 5 : fine_gray 
+  6. zero-order model - Policy estimation for Simulation 5 : fine_gray 
+[1] "Survival Parameters for Survival Mean"
+[1] "EndPoint Parameters for CIF Mean"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 1: Survival"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "Phase 2: Endpoint: CR"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+[1] ""
+[1] ""
+  6. zero-order model - Evaluation for Simulation 5 : fine_gray 
+[1] "!!!!! no censoring. !!!!!"
+[1] "policy is from ITRSurv estimation"
+--- End of Simulation 5 ---
