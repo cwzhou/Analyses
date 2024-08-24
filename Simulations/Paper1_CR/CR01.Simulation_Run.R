@@ -1,7 +1,14 @@
 ## This is the script used to run the simulations ##
 ## Edit parameters in CR00.Simulation_Parameters.R script
 ## Plots in CR02.Simulation_Summary.R script
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+# setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+local = 0
+if (local == 1){
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+}
+
 # call on parameters which calls on library
 source("CR00.Simulation_Parameters.R")
 

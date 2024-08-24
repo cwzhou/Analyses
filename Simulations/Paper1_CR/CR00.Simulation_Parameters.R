@@ -1,13 +1,13 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-local = 0 #0 # local = 0 for cluster
+# local = 0 #0 # local = 0 for cluster
 #### libraries and functions
-if (local == 1){
-  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-} else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
-}
+# if (local == 1){
+#   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+# } else{
+#   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+# }
 source("F01.Simulation_Functions.R") # calls libraries
 
 date_folder = Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
