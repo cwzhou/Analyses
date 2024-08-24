@@ -13,7 +13,7 @@
 #### libraries and functions
 source("F01.Simulation_Functions.R") # calls libraries
 
-date_folder = Sys.Date() #"2024-08-20" #Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
+date_folder = "2024-08-20" #Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
 n.sim = 200
@@ -62,8 +62,8 @@ if (length(arg) < 9) {
 names(arg)[1:9] = c("endpoint", "censor", "ncauses", "beta",
                     "propensity", "size", "crit_surv",
                     "crit_endpoint", "cause1prob")
-# print("arg:")
-# print(arg)
+print("arg:")
+print(arg)
 
 arg1 <- as.numeric(arg[1]) # 1..3 # 1=CR,2=RE,3=MC
 arg2 <- as.numeric(arg[2]) # 1,2 #censoring = 20%, censoring = 50%
@@ -298,6 +298,8 @@ beta.propensity <- beta.propensity(ncov)
 
 dir_rds = sprintf("./output/%s/%s", generate_failure_method, date_folder)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
+print(dir_rds)
+print(dir_fig)
 if (local == 0){
   dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_1/output/%s/%s",
                         generate_failure_method,
@@ -311,10 +313,6 @@ if (savingrds == TRUE){
   if (!dir.exists(dir_rds)) dir.create(dir_rds)
   if (!dir.exists(dir_fig)) dir.create(dir_fig)
 }
-
-names(arg)[1:9] = c("endpoint", "censor", "ncauses", "beta",
-                    "propensity", "size", "crit_surv",
-                    "crit_endpoint", "cause1prob")
 
 if (endpoint == "CR"){
   if (generate_failure_method == "fine_gray"){
