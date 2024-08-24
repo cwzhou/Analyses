@@ -268,7 +268,7 @@ if (endpoint == "CR"){
                 n.methods = n.methods,
                 arg = list(arg), default, ncauses[[arg3]],
                 censor[[arg2]],
-                # cause1_prob[[arg8]],
+                # cause1_prob[[arg9]],
                 betas[[arg4]], 
                 ncov = ncov.list[[arg4]],
                 propensity[[arg5]], 
