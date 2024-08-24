@@ -7,9 +7,9 @@ source("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/
 
 date_folder = Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
-n.eval = 10000 #n.eval = 10000
-n.sim = 1#500 #n.sim = 200
-mean_tol1 = c(0.5,0)
+n.eval = 1000 #n.eval = 10000
+n.sim = 2#500 #n.sim = 200
+mean_tol1 = c(0.3,0)
 prob_tol1 = c(0.3, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"

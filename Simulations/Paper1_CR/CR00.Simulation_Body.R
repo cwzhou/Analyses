@@ -325,7 +325,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
   # # # obs policy value
   message("using train_seed+10 to generate obs testing data")
   set.seed(train_seed + 10)
-  obs.data.rep <- do.call(gdata_CR, arg.obs.no.censor)
+  obs.data.rep <- do.call(gdata_CR, arg.obs.no.censor) # no censoring for eval sets
   rep_obs <<- obs.data.rep
 
   result[sim, "obs_survival"] <- overall_survival_val.fn(obs.data.rep)#val.fn_phase1(obs.data.rep$event.time)
