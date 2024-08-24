@@ -3,7 +3,12 @@
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
 local = 1 #0 # local = 0 for cluster
 #### libraries and functions
-source("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/F01.Simulation_Functions.R") # calls libraries
+if (local == 1){
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+}
+source("F01.Simulation_Functions.R") # calls libraries
 
 date_folder = Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()

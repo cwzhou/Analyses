@@ -391,7 +391,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
                     pooled = FALSE,
                     stratifiedSplit = 0.1)
     set.seed(train_seed + 1)
-    optimal.czmk <- do.call(itrSurv, c(arg.czmk2, 
+    optimal.czmk <- do.call(itrSurv::itrSurv, c(arg.czmk2, 
                                        list(mTry = sqrt(ncov),
                                             nodeSize = nodesize, 
                                             minEvent = mindeath)))
@@ -482,7 +482,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
                     pooled = FALSE,
                     stratifiedSplit = 0.1)
     set.seed(train_seed + 2)
-    optimal.csk <- do.call(dtrSurv, c(arg.csk2, list(nodeSize = nodesize, minEvent = mindeath )))
+    optimal.csk <- do.call(dtrSurv::dtrSurv, c(arg.csk2, list(nodeSize = nodesize, minEvent = mindeath )))
     csk.error <- class(optimal.csk)[1] == "try-error"
     arg.csk$policy <- if (!csk.error) optimal.csk
     policy_csk <<- arg.csk$policy
@@ -731,7 +731,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
   if (!skip.zom) {
     cat ("  6. zero-order model - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     set.seed(train_seed + 5)
-    optimal.zom <- do.call(itrSurv, c(arg.czmk2,
+    optimal.zom <- do.call(itrSurv::itrSurv, c(arg.czmk2,
                                       list(mTry = 1,
                                            nodeSize = 1e+9,
                                            minEvent = 1)))

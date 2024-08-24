@@ -2,11 +2,7 @@
 # Description: [Brief description of the purpose and objectives of the simulation]
 # Author: Christina Zhou
 # Date: 07.02.2023
-if (local == 1){
-  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-} else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
-}
+
 source("F00.Simulation_Libraries.R")
 source("F02.ComparatorMethod_Functions.R")
 source("F01.multiPhaseDynamicsCR.R")
