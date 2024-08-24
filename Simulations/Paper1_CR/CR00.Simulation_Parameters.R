@@ -13,7 +13,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 date_folder = Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
-n.sim = 200 #500 #n.sim = 200
+n.sim = 200
 mean_tol1 = c(0.15,0)
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
@@ -31,7 +31,7 @@ if (generate_failure_method == "simple_exp"){
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
 # skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-skip_method <- c(!TRUE, !TRUE, !TRUE, !TRUE, !TRUE, !TRUE);
+skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 savingrds = TRUE
 
 #### Run this Script FOR CR. Change name later.
@@ -51,26 +51,27 @@ assign_skip_function(all_methods, skip_method)
 
 ### 0. Get the setting number.
 arg <- commandArgs(trailingOnly = TRUE)
-if (length(arg) < 8) {
-  arg = c(1, 1, 1, 1, 1, 1, 1, 1) # by default
+if (length(arg) < 9) {
+  arg = c(1, 1, 1, 1, 1, 1, 1, 1, 1) # by default
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))
 }
-names(arg)[1:8] = c("endpoint", "ncauses", "beta",
+names(arg)[1:9] = c("endpoint", "censor", "ncauses", "beta",
                     "propensity", "size", "crit_surv",
                     "crit_endpoint", "cause1prob")
 # print("arg:")
 # print(arg)
 
 arg1 <- as.numeric(arg[1]) # 1..3 # 1=CR,2=RE,3=MC
-arg2 <- as.numeric(arg[2]) # 1..inf, number of causes
-arg3 <- as.numeric(arg[3]) # 1..4 4 possible beta combinations
-arg4 <- as.numeric(arg[4]) # 1..2 2 possible propensity combinations
-arg5 <- as.numeric(arg[5]) # 1..2 2 possible size combinations
-arg6 <- as.numeric(arg[6]) # 1..3 3 possible crit for surv (mean, mean.prob.combo, prob)
-arg7 <- as.numeric(arg[7]) # 1..3 3 possible crit for ep (mean, mean.prob.combo, prob)
-arg8 <- as.numeric(arg[8]) # 1..2 2 possible probabilities for cause1prob
-arg.date <- if (is.na(arg[9]) | arg[9] == "") date_folder else as.character(arg[9])
+arg2 <- as.numeric(arg[2]) # 1,2 #censoring = 20%, censoring = 50%
+arg3 <- as.numeric(arg[3]) # 1..inf, number of causes
+arg4 <- as.numeric(arg[4]) # 1..4 4 possible beta combinations
+arg5 <- as.numeric(arg[5]) # 1..2 2 possible propensity combinations
+arg6 <- as.numeric(arg[6]) # 1..2 2 possible size combinations
+arg7 <- as.numeric(arg[7]) # 1..3 3 possible crit for surv (mean, mean.prob.combo, prob)
+arg8 <- as.numeric(arg[8]) # 1..3 3 possible crit for ep (mean, mean.prob.combo, prob)
+arg9 <- as.numeric(arg[9]) # 1..2 2 possible probabilities for cause1prob
+arg.date <- if (is.na(arg[10]) | arg[10] == "") date_folder else as.character(arg[10])
 
 ### 1. setup
 
@@ -84,30 +85,22 @@ if (arg1 == 1){
   endpoint = "MC"
   # ncauses = 1
 } else{
-  stop("Endpoint must be 1=CR,2=RE, or 3=MC")
+  stop("Endpoint must be 1=CR, 2=RE, or 3=MC")
 }
 
 if (generate_failure_method == "simple_exp"){
   # message("IN F01.multiPhaseDynamicsCR.R: we have f2_constant = 0.3 to make cause2 prevalance less and f1_constant.")
-  message("simple_exp with exp censoring")
+  # message("simple_exp with exp censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
                   tau = 2,#2.5,
-                  ctype = 0, # exp censoring
-                  censor_min = 0,
-                  censor_max = 0.5,
-                  censor_rate = 0.8,#0.6, # lower is less censoring for exp
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else if (generate_failure_method == "fine_gray"){
-  message("fine_gray with uniform censoring")
+  # message("fine_gray with uniform censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
                   tau = 4,
-                  ctype = 1, # uniform censoring
-                  censor_min = 0,
-                  censor_max = 3, # higher is less censoring for unif
-                  censor_rate = 0.1,
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else{
@@ -115,7 +108,7 @@ if (generate_failure_method == "simple_exp"){
 }
 
 
-# arg6 and 7 crit
+# arg7 and 8 crit
 crit_surv <- list(crit1 = list(criterion_phase1 = "mean",  #"area"
                                crit.value_phase1 = crit_t0_eval,#NULL,
                                value_phase1 = "truncated overall survival mean E[T]",
@@ -138,7 +131,7 @@ if (endpoint == "CR"){
                         crit2 = crit4)
 }
 
-# arg8
+# arg9
 if (endpoint == "CR" & generate_failure_method == "fine_gray"){
   cause1_prob <- list(small.cause1prob = list(cause1prob = 0.3),
                       large.cause1prob = list(cause1prob = 0.7))
@@ -146,7 +139,7 @@ if (endpoint == "CR" & generate_failure_method == "fine_gray"){
   cause1_prob <- list(cause1.prob = list(cause1prob = 1))
 }
 
-# arg2 ncauses
+# arg3 ncauses
 if (endpoint == "CR"){
   ncauses <- list(small.ncauses = list(M = 2))#,
   # large.ncauses = list(M = 4))
@@ -154,16 +147,45 @@ if (endpoint == "CR"){
   ncauses = list(ncauses = list(M = 1L))
 }
 
-# arg5 size
+# arg6 size
 size <- list(small.sample.size = list(n = 300),
              large.sample.size = list(n = 700))
 
-# arg4 propensity
+# arg2 size
+if (generate_failure_method == "fine_gray"){
+  censor <- list(low.censoring = list(
+    ctype = 1, # uniform censoring
+    censor_min = 0,
+    # we want about 20% censoring
+    censor_max = 4, # higher is less censoring for unif
+    censor_rate = 0.1),
+  high.censoring = list(
+    ctype = 1, # uniform censoring
+    censor_min = 0,
+    # we want about 50% censoring
+    censor_max = 0.7, # lower is more censoring for unif
+    censor_rate = 0.1))
+  } else if (generate_failure_method == "simple_exp"){
+    censor <- list(low.censoring = list(ctype = 0, # exp censoring
+                                      censor_min = 0,
+                                      censor_max = 0.5,
+                                      censor_rate = 0.5 # lower is less censoring for exp
+                                  ),
+                   high.censoring = list(ctype = 0, # exp censoring
+                                         censor_min = 0,
+                                         censor_max = 0.5,
+                                         censor_rate = 2.3 # higher is more censoring for exp
+                                   ))
+  } else{
+    stop("generate_failure_method is only coded up for simple exponential and fine-gray setting right now.")
+  }
+
+# arg5 propensity
 propensity <-   # (int), covariate (1~5)
   list(obs = list(beta.propensity = function(p) c(0, -rep(0.5, p))), #no unmeasured confounder
        rct  = list(beta.propensity = function(p) c(0, rep(0, p))))  # RCT
 
-# arg3 beta
+# arg4 beta
 if (endpoint == "CR"){
 
   if (default$generate_failure_method == "simple_exp"){
@@ -223,41 +245,49 @@ if (endpoint == "CR"){
 
 # setting1 n.boot 50 / n 300
 # this setting is for the first of each thing, since arg = all 1s
-# args 1- 7: "endpoint", "ncauses", "beta", "propensity",
-# "size", "crit_surv", "crit_endpoint"
+# args 1- 9: "endpoint", "censor", "ncauses", "beta", "propensity",
+# "size", "crit_surv", "crit_endpoint", "cause1prob" (for CR)
 if (endpoint == "CR"){
   if (generate_failure_method == "fine_gray"){
     setting = c(all_methods = list(all_methods),
                 n.methods = n.methods,
-                arg = list(arg), default, ncauses[[arg2]],
-                cause1_prob[[arg8]],
-                betas[[arg3]], ncov = ncov.list[[arg3]],
-                propensity[[arg4]], size[[arg5]],
-                crit_surv[[arg6]], crit_endpoint[[arg7]])
+                arg = list(arg), default, ncauses[[arg3]],
+                censor[[arg2]],
+                cause1_prob[[arg9]],
+                betas[[arg4]], 
+                ncov = ncov.list[[arg4]],
+                propensity[[arg5]], 
+                size[[arg6]],
+                crit_surv[[arg7]], 
+                crit_endpoint[[arg8]])
   } else if (generate_failure_method == "simple_exp"){
     setting = c(all_methods = list(all_methods),
                 n.methods = n.methods,
-                arg = list(arg), default, ncauses[[arg2]],
+                arg = list(arg), default, ncauses[[arg3]],
+                censor[[arg2]],
                 # cause1_prob[[arg8]],
-                betas[[arg3]], ncov = ncov.list[[arg3]],
-                propensity[[arg4]], size[[arg5]],
-                crit_surv[[arg6]], crit_endpoint[[arg7]])
+                betas[[arg4]], 
+                ncov = ncov.list[[arg4]],
+                propensity[[arg5]], 
+                size[[arg6]],
+                crit_surv[[arg7]], 
+                crit_endpoint[[arg8]])
   } else{
     stop ("generate failure method DNE")
   }
-
 } else{
   setting = c(all_methods = all_methods,
               n.methods = n.methods,
-              arg = list(arg), default, ncauses[[arg2]],
-              betas[[arg3]], ncov = ncov.list[[arg3]],
-              propensity[[arg4]], size[[arg5]],
-              crit_surv[[arg6]], crit_endpoint[[arg7]])
+              arg = list(arg), default, ncauses[[arg3]],
+              censor[[arg2]],
+              betas[[arg4]], ncov = ncov.list[[arg4]],
+              propensity[[arg5]], size[[arg6]],
+              crit_surv[[arg7]], crit_endpoint[[arg8]])
 }
 
 
 ### 2. put a selected setting into the global environment
-cat("setting (endpoint, ncauses, beta, propensity,
+cat("setting (endpoint, censor, ncauses, beta, propensity,
     size, crit_phase1, crit_phase2, cause1_prob) ", arg, "\n")
 list2env(setting, envir = globalenv())
 beta.propensity <- beta.propensity(ncov)
@@ -279,25 +309,32 @@ if (savingrds == TRUE){
   if (!dir.exists(dir_fig)) dir.create(dir_fig)
 }
 
+names(arg)[1:9] = c("endpoint", "censor", "ncauses", "beta",
+                    "propensity", "size", "crit_surv",
+                    "crit_endpoint", "cause1prob")
+
 if (endpoint == "CR"){
   if (generate_failure_method == "fine_gray"){
     filename = paste0(dir_rds,"/simResult_", generate_failure_method,
-                      "_nCauses", arg2, "_cause1prob", arg8,
-                      "_beta", arg3, "_prop", arg4,
-                      "_n", arg5, "_critS", arg6, "_critE", arg7, ".rds")
+                      "_censor", arg2,
+                      "_nCauses", arg3, "_cause1prob", arg9,
+                      "_beta", arg4, "_prop", arg5,
+                      "_n", arg6, "_critS", arg7, "_critE", arg8, ".rds")
   } else if (generate_failure_method == "simple_exp"){
     filename = paste0(dir_rds,"/simResult_", generate_failure_method,
-                      "_nCauses", arg2,
-                      "_beta", arg3, "_prop", arg4,
-                      "_n", arg5, "_critS", arg6, "_critE", arg7, ".rds")
+                      "_censor", arg2,
+                      "_nCauses", arg3,
+                      "_beta", arg4, "_prop", arg5,
+                      "_n", arg6, "_critS", arg7, "_critE", arg8, ".rds")
   } else{
     stop("we dont have this generate_failure_method coded yet.")
   }
 
 } else{
   filename = paste0(dir_rds, "/simResult_", generate_failure_method,
-                    "_beta", arg3, "_prop", arg4,
-                    "_n", arg5, "_critS", arg6, "_critE", arg7, ".rds")
+                    "_censor", arg2,
+                    "_beta", arg4, "_prop", arg5,
+                    "_n", arg6, "_critS", arg7, "_critE", arg8, ".rds")
 }
 
 print(filename)
