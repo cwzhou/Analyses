@@ -5,11 +5,11 @@ local = 1 #0 # local = 0 for cluster
 #### libraries and functions
 source("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/F01.Simulation_Functions.R") # calls libraries
 
-date_folder = "2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
+date_folder = Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
-n.eval = 5000 #n.eval = 10000
-n.sim = 500 #n.sim = 200
-mean_tol1 = c(0.12,0)
+n.eval = 10000 #n.eval = 10000
+n.sim = 1#500 #n.sim = 200
+mean_tol1 = c(0.5,0)
 prob_tol1 = c(0.3, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
@@ -26,7 +26,7 @@ if (generate_failure_method == "simple_exp"){
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
 # skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-skip_method <- c(!TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+skip_method <- c(!TRUE, !TRUE, TRUE, !TRUE, !TRUE, !TRUE);
 savingrds = FALSE
 
 #### Run this Script FOR CR. Change name later.
@@ -111,7 +111,7 @@ if (generate_failure_method == "simple_exp"){
 
 
 # arg6 and 7 crit
-crit_surv <- list(crit1 = list(criterion_phase1 = "area",
+crit_surv <- list(crit1 = list(criterion_phase1 = "mean",  #"area"
                                crit.value_phase1 = crit_t0_eval,#NULL,
                                value_phase1 = "truncated overall survival mean E[T]",
                                tol1 = mean_tol1),
@@ -121,7 +121,7 @@ crit_surv <- list(crit1 = list(criterion_phase1 = "area",
                                tol1 = combo_tol1)
                   )
 if (endpoint == "CR"){
-  crit3 = list(criterion_phase2 = "area",
+  crit3 = list(criterion_phase2 = "mean", #"area"
                crit.value_phase2 = crit_t0_eval, #NULL,
                value_phase2 = "truncated PC-CIF mean PC-CIF[T] \n or Years Lost due to PC"
   )

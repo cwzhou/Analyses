@@ -30,7 +30,7 @@ multiPhaseDynamics <-
            evaluate = FALSE
            # seed1 = seed1
   ) {
-    message("multiphasedynamics")
+    # message("multiphasedynamics")
     # N = arg.obs$N
     # at.risk = arg.obs$at.risk; ncov = arg.obs$ncov; corr = arg.obs$corr;
     # at.risk = rep(1, N)
@@ -252,9 +252,9 @@ multiPhaseDynamics <-
     failure_os = failure_t1 = failure_t2 = failure_t3 = obs_time_failureCR = numeric(0)
 
     if (generate_failure_method == "fine_gray"){
-      message("fine-gray")
+      # message("fine-gray")
       # View(pred.hazard1i)
-      message("mass_p:", mass_p)
+      # message("mass_p:", mass_p)
       # generating failure time from cause 1 based on Fine-Gray paper (1999):
       for (i in 1:N){
         u1i = u1[i]
@@ -271,7 +271,7 @@ multiPhaseDynamics <-
       failure_t2 <- -(1/rate2)*log(1-u2)
       failure_t2 <<- failure_t2
     } else if (generate_failure_method == "simple_exp"){
-      message("simple exponential method")
+      # message("simple exponential method")
       # Generate 2 exponential RV which depend on covariates,
       # one for the competing event of interest $E_1$
       # and one for other causes, $E_2$.If $E_1<E_2$,
@@ -403,8 +403,9 @@ backsolve_t1 <- function(u1i, mass_p, pred.hazard1) {
   value_at_upper <- solve_t(upper_boundary, u1i, mass_p, pred.hazard1)
   if (is.na(value_at_lower)){
     # Print the values
-    message("u1i:",u1i)
-    message("pred.hazard1:",pred.hazard1)}
+    # message("u1i:",u1i)
+    # message("pred.hazard1:",pred.hazard1)
+    }
   # cat("Value at lower boundary:", value_at_lower, "\n")
   # cat("Value at upper boundary:", value_at_upper, "\n")
 
@@ -480,7 +481,7 @@ eval_sims = function(generate_failure_method,
                      t0,
                      rate1, rate2,
                      mass_p){
-  message('EVALUATING: multiphasedynamicscr.r line 263')
+  # message('EVALUATING: multiphasedynamicscr.r line 263')
 
   if (eval_ep == "OS"){
     # overall survival
@@ -536,7 +537,7 @@ eval_sims = function(generate_failure_method,
 }
 
 
-message("End of F01.multiPhaseDynamicsCR.R")
+# message("End of F01.multiPhaseDynamicsCR.R")
 
 
 # End of script -------------------------------------------------------------

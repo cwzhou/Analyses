@@ -14,24 +14,26 @@ if (criterion_phase1 == "mean.prob.combo"){
 }
 
 overall_survival_val.fn <- function(data){
-  # mean truncated overall survival time or
+  # mean truncated overall survival time (from any cause) or
   # mean overall survival probability at t0 = crit.eval.os
   mean(data$OS_eval, na.rm = TRUE)
 }
 endpoint_val.fn <- function(data) {
-  # mean truncated years lost due to cause 1 or
+  # mean truncated years lost due to cause 1 (priorty cause) or
   # mean CIF probability at t0 = crit.eval.cif
   mean(data$CIF_eval, na.rm = TRUE)
 }
 
 if (criterion_phase1 %in% c("mean", "area", "surv.area")) {
   crit.eval.os = "mean"
+  splitRule = "mean_surv"# for itrSurv Phase 1
   # overall_survival_val.fn <- function(data){
   #   mean(subset(data$event.time, data$status > 0),
   #        na.rm = TRUE)
   #   }
 } else if (criterion_phase1 %in% c("prob", "mean.prob.combo")) {
   crit.eval.os = "prob"
+  splitRule = "logrank_surv" # for itrSurv Phase 1
   # overall_survival_val.fn <- function(data) {
   #   mean(subset(data$event.time,
   #               data$status > 0) >= crit.value_phase1,
@@ -296,7 +298,8 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
            D.2 = ifelse(status==2,1,0), # event from cause 2 indicator
            obs_time = event.time,
            Trt = action) %>%
-    dplyr::select(obs_time, Trt, status, D.0, D.1, D.2, contains("Z"))
+    dplyr::select(obs_time, Trt, status, D.0, D.1, D.2, contains("Z")) %>%
+    arrange(obs_time) # MUST SORT ASCENDING ORDER FOR OBS_TIME
     # dplyr::select(-c(Time_Censor, Time_Failure1, Time_Failure2, Time_Tau, obs_time_failureCR,indD))
 
   # create unique observed failure times for survival phase 1
@@ -305,6 +308,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
     dplyr::select(obs_time) %>%
     unlist(use.names = FALSE) %>%
     unique()
+  # for CR only
   timePointsEndpoint = timePointsSurvival # we can do this bc CR is subset of OS failure times
   # create unique observed endpoint times for endpoint phase 2
 
@@ -366,27 +370,31 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
     })
     # print(crit.value_phase1)
     arg.czmk2 = list(data = data.df,
-                     endPoint = "CR",
+                    endPoint = "CR",
                     txName = paste("Trt"),
+                    epName = "status", # status indicator (0 = censored, 1 = failure from cause 1 (PC), 2 = failure from cause 2)
                     models = models_itr,
                     timePointsSurvival = timePointsSurvival,
                     timePointsEndpoint = timePointsEndpoint,
                     tau = tau,
-                    timePoints = "uni",
-                    nTimes = 100,
                     criticalValue1 = criterion_phase1,
                     criticalValue2 = criterion_phase2,
-                    evalTime = crit.value_phase1,
-                    splitRule = NULL,
-                    ERT = TRUE, uniformSplit = TRUE, replace = FALSE,
-                    randomSplit = 0.2, nTree = 1,#300,
-                    pooled = FALSE,
                     tol1 = tol1,
+                    evalTime = crit.value_phase1,
+                    splitRule1 = splitRule,
+                    splitRule2 = "gray_cr",
+                    ERT = TRUE, 
+                    uniformSplit = TRUE, 
+                    replace = FALSE,
+                    randomSplit = 0.2, 
+                    nTree = 1,#300,
+                    pooled = FALSE,
                     stratifiedSplit = 0.1)
     set.seed(train_seed + 1)
-    optimal.czmk <- do.call(itrSurv, c(arg.czmk2, list(mTry = sqrt(ncov),
-                                                      nodeSize = nodesize,
-                                                      minEvent = mindeath )))
+    optimal.czmk <- do.call(itrSurv, c(arg.czmk2, 
+                                       list(mTry = sqrt(ncov),
+                                            nodeSize = nodesize, 
+                                            minEvent = mindeath)))
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk$policy <- if (!czmk.error) optimal.czmk
     # View(arg.czmk$policy)
@@ -917,8 +925,8 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
   # if (!skip.zom) {r00[sim, "zom_testing_os_trtprop"] = mean(test_truth$best.action == rep_zom$action)}
 
 
-  print("sourcing SM01.")
-  source("SM01.True_ContinueP2_Ratios_Eval.R")
+  # print("sourcing SM01.")
+  # source("SM01.True_ContinueP2_Ratios_Eval.R")
   # View(true2)
 
   ### saving and cleaning

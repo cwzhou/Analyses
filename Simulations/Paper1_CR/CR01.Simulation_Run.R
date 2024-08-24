@@ -13,10 +13,10 @@ source("CR00.Simulation_Body.R")
 # plot_values(combined_data, CIF_eval)
 
 if (local == 1){
-  beep()
+  # beep()
   # data.df%>%group_by(action) %>% summarize(mean = mean(event.time))
   # data.df%>%group_by(status,action) %>% summarize(mean = mean(event.time))
   print(result)
 }
 
-message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
+# message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")

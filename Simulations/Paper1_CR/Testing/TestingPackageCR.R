@@ -1,4 +1,4 @@
-samplesize.tmp = 300
+samplesize.tmp = 100
 
 # obs.data = read.csv("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/MISC/example_datadf.csv")
 
