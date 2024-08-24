@@ -14,7 +14,7 @@ testing_out = 1
 # endpoint = "CR"
 # generate_failure_method = c("simple_exp","fine_gray");
 # generate_failure_method = generate_failure_method[1]
-lab.date = "2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+lab.date = Sys.Date()#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
 dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 
@@ -387,7 +387,7 @@ for (crit.no in 1:crit.tot){
 # source("CR03.Simulation_Summary_Supplementary.R")
 
 if (local == 1){
-  beep()
+  # beep()
 }
 
 message("End of CR02.Simulation_Summary.R")
