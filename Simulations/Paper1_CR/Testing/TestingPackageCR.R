@@ -1,3 +1,5 @@
+samplesize.tmp = 300
+
 # obs.data = read.csv("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/MISC/example_datadf.csv")
 
 # things to note:
@@ -8,9 +10,9 @@ local = 1 #0 # local = 0 for cluster
 source("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/F01.Simulation_Functions.R") # calls libraries
 
 date_folder = Sys.Date()
-n.eval = 100 #n.eval = 10000
+n.eval = 1000 #n.eval = 10000
 n.sim = 1 #n.sim = 200
-mean_tol1 = c(0.12,0)
+mean_tol1 = c(0.10,0)
 prob_tol1 = c(0.3, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
@@ -122,7 +124,7 @@ crit_surv <- list(crit1 = list(criterion_phase1 = "area",
                                tol1 = combo_tol1)
 )
 if (endpoint == "CR"){
-  crit3 = list(criterion_phase2 = "area",
+  crit3 = list(criterion_phase2 = "mean",
                crit.value_phase2 = crit_t0_eval, #NULL,
                value_phase2 = "truncated PC-CIF mean PC-CIF[T] \n or Years Lost due to PC"
   )
@@ -151,7 +153,7 @@ if (endpoint == "CR"){
 }
 
 # arg5 size
-size <- list(small.sample.size = list(n = 10),
+size <- list(small.sample.size = list(n = samplesize.tmp),
              large.sample.size = list(n = 200))
 
 # arg4 propensity
@@ -482,7 +484,7 @@ if (endpoint == "CR"){
   )
 }
 
-nodesize = 2
+nodesize = 5
 mindeath = round(sqrt(c(nodesize)), 0)
 tau = tau
 
@@ -630,7 +632,7 @@ sim = 1
                      criticalValue1 = criterion_phase1,
                      criticalValue2 = criterion_phase2,
                      evalTime = crit.value_phase1,
-                     splitRule1 = "logrank_surv",
+                     splitRule1 = "mean_surv",
                      splitRule2 = "gray_cr",
                      ERT = TRUE, uniformSplit = TRUE, replace = FALSE,
                      randomSplit = 0.2, nTree = 1,#300,
@@ -638,6 +640,7 @@ sim = 1
                      tol1 = tol1,
                      stratifiedSplit = 0.1)
     set.seed(train_seed + 1)
-    optimal.czmk <- do.call(itrSurv, c(arg.czmk2, list(mTry = sqrt(ncov),
-                                                       nodeSize = nodesize,
-                                                       minEvent = mindeath )))
+optimal.czmk <- do.call(itrSurv, c(arg.czmk2, list(mTry = sqrt(ncov),
+                                                   nodeSize = nodesize,
+                                                   minEvent = mindeath )))
+# print(data.df)
