@@ -13,7 +13,7 @@
 #### libraries and functions
 source("F01.Simulation_Functions.R") # calls libraries
 
-date_folder = "2024-08-20" #Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
+date_folder = Sys.Date() #"2024-08-20" #Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
 n.sim = 200
