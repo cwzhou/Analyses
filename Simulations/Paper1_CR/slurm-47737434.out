@@ -2464,3 +2464,261 @@ we set pr2=pr since we don't use pr in this setting
 stratified analysis
   treatment level -1
   treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.816800460442156 AUS: 0.816800460442156 PropPhase2: 0.236666666666667 Et_cif: 1.84618414190898 AUC: 1.84618414190898evalTime is ignored if critical value is mean
+Stage 1
+model Surv(obs_time, D.0) ~ Z1 + Z2
+cases in stage: 300
+stratified analysis
+  treatment level -1
+sampleSize: 183
+  treatment level 1
+sampleSize: 117
+Estimated Value: Et: 0.778655600391778
+unrestricted regime
+restricted regime
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+end of aipwe
+Phase 1 and Phase 2 datasets are the same.
+Dataset sample size: N = 300
+Setting nCauses = 2 because there is one priority cause and everything else is lumped into Cause 2*
+Step: survival
+evalTime is ignored if critical value is mean
+Step: CR
+evalTime is ignored if critical value is mean
+mean ratio tolerance: 0.15
+mean diff tolerance: 0
+If this is wrong: enter the correct order of 'ratio', 'difference'.
+RSF Starting: Phase 1: look at survival
+model Surv(obs_time, D.0) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+RSF Starting: Phase 2: look at CR
+model_endpoint Surv(obs_time, D.1) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.627221356451245 AUS: 0.627221356451245 PropPhase2: 0 Et_cif: NaN AUC: NaNsaving rds tmp
+using train_seed for generating training data
+censoring: unif
+censor_max is3
+`summarise()` has grouped output by 'status'. You can override using the
+`.groups` argument.
+censoring: unif
+censor_max is3
+using train_seed+10 to generate obs testing data
+censoring: unif
+censor_max is3
+censoring: unif
+censor_max is3
+Phase 1 and Phase 2 datasets are the same.
+Dataset sample size: N = 300
+Setting nCauses = 2 because there is one priority cause and everything else is lumped into Cause 2*
+Step: survival
+evalTime is ignored if critical value is mean
+Step: CR
+evalTime is ignored if critical value is mean
+mean ratio tolerance: 0.15
+mean diff tolerance: 0
+If this is wrong: enter the correct order of 'ratio', 'difference'.
+RSF Starting: Phase 1: look at survival
+model Surv(obs_time, D.0) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+RSF Starting: Phase 2: look at CR
+model_endpoint Surv(obs_time, D.1) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.938482827861929 AUS: 0.938482827861929 PropPhase2: 0.2 Et_cif: 1.59617864874287 AUC: 1.59617864874287evalTime is ignored if critical value is mean
+Stage 1
+model Surv(obs_time, D.0) ~ Z1 + Z2
+cases in stage: 300
+stratified analysis
+  treatment level -1
+sampleSize: 193
+  treatment level 1
+sampleSize: 107
+Estimated Value: Et: 0.783643676832998
+unrestricted regime
+restricted regime
+end of aipwe
+Phase 1 and Phase 2 datasets are the same.
+Dataset sample size: N = 300
+Setting nCauses = 2 because there is one priority cause and everything else is lumped into Cause 2*
+Step: survival
+evalTime is ignored if critical value is mean
+Step: CR
+evalTime is ignored if critical value is mean
+mean ratio tolerance: 0.15
+mean diff tolerance: 0
+If this is wrong: enter the correct order of 'ratio', 'difference'.
+RSF Starting: Phase 1: look at survival
+model Surv(obs_time, D.0) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+RSF Starting: Phase 2: look at CR
+model_endpoint Surv(obs_time, D.1) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.607543353745246 AUS: 0.607543353745246 PropPhase2: 0 Et_cif: NaN AUC: NaNsaving rds tmp
+using train_seed for generating training data
+censoring: unif
+censor_max is3
+`summarise()` has grouped output by 'status'. You can override using the
+`.groups` argument.
+censoring: unif
+censor_max is3
+using train_seed+10 to generate obs testing data
+censoring: unif
+censor_max is3
+censoring: unif
+censor_max is3
+Phase 1 and Phase 2 datasets are the same.
+Dataset sample size: N = 300
+Setting nCauses = 2 because there is one priority cause and everything else is lumped into Cause 2*
+Step: survival
+evalTime is ignored if critical value is mean
+Step: CR
+evalTime is ignored if critical value is mean
+mean ratio tolerance: 0.15
+mean diff tolerance: 0
+If this is wrong: enter the correct order of 'ratio', 'difference'.
+RSF Starting: Phase 1: look at survival
+model Surv(obs_time, D.0) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+RSF Starting: Phase 2: look at CR
+model_endpoint Surv(obs_time, D.1) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.863293594958198 AUS: 0.863293594958198 PropPhase2: 0.0833333333333333 Et_cif: 2.88091819730175 AUC: 2.88091819730175evalTime is ignored if critical value is mean
+Stage 1
+model Surv(obs_time, D.0) ~ Z1 + Z2
+cases in stage: 300
+stratified analysis
+  treatment level -1
+sampleSize: 193
+  treatment level 1
+sampleSize: 107
+Estimated Value: Et: 0.849937060829078
+unrestricted regime
+restricted regime
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+weightAGB: returns weight calculated by bi-level weight lasso selection method
+end of aipwe
+Phase 1 and Phase 2 datasets are the same.
+Dataset sample size: N = 300
+Setting nCauses = 2 because there is one priority cause and everything else is lumped into Cause 2*
+Step: survival
+evalTime is ignored if critical value is mean
+Step: CR
+evalTime is ignored if critical value is mean
+mean ratio tolerance: 0.15
+mean diff tolerance: 0
+If this is wrong: enter the correct order of 'ratio', 'difference'.
+RSF Starting: Phase 1: look at survival
+model Surv(obs_time, D.0) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+RSF Starting: Phase 2: look at CR
+model_endpoint Surv(obs_time, D.1) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.714859767116783 AUS: 0.714859767116783 PropPhase2: 0 Et_cif: NaN AUC: NaNsaving rds tmp
+using train_seed for generating training data
+censoring: unif
+censor_max is3
+`summarise()` has grouped output by 'status'. You can override using the
+`.groups` argument.
+censoring: unif
+censor_max is3
+using train_seed+10 to generate obs testing data
+censoring: unif
+censor_max is3
+censoring: unif
+censor_max is3
+Phase 1 and Phase 2 datasets are the same.
+Dataset sample size: N = 300
+Setting nCauses = 2 because there is one priority cause and everything else is lumped into Cause 2*
+Step: survival
+evalTime is ignored if critical value is mean
+Step: CR
+evalTime is ignored if critical value is mean
+mean ratio tolerance: 0.15
+mean diff tolerance: 0
+If this is wrong: enter the correct order of 'ratio', 'difference'.
+RSF Starting: Phase 1: look at survival
+model Surv(obs_time, D.0) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+RSF Starting: Phase 2: look at CR
+model_endpoint Surv(obs_time, D.1) ~ Z1 + Z2
+we set pr2=pr since we don't use pr in this setting
+stratified analysis
+  treatment level -1
+  treatment level 1
+--- itrSurv: Value Functions ---
+Estimated Value: Et_surv: 0.920688813511163 AUS: 0.920688813511163 PropPhase2: 0.0966666666666667 Et_cif: 2.36562441033847 AUC: 2.36562441033847
