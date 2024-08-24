@@ -1,7 +1,7 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-local = 1 #0 # local = 0 for cluster
+local = 0 #0 # local = 0 for cluster
 #### libraries and functions
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
