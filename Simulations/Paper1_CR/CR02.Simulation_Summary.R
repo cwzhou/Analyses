@@ -184,10 +184,11 @@ for (crit.no in 1:crit.tot){
           print("a is not null")
 
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
-          print(head(a))
+          # print(head(a))
           beginning <- as.data.frame(a) %>%
             dplyr::select(rep = sim,
                           all_of(var_method),
+                          czmk_n_phase2, zom_n_phase2,
                           training_percent.censor, training_cause.1, training_cause.2)
 
           if (generate_failure_method == "fine_gray"){
@@ -249,7 +250,7 @@ for (crit.no in 1:crit.tot){
                                    labels = cause1prob.labels))
       result.stat <-
         result.comb1 %>%
-        aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method +
+        aggregate(cbind(value, czmk_n_phase2, zom_n_phase2, training_percent.censor, training_cause.1, training_cause.2) ~ method +
                     ncauses + censor + cause1prob +
                     setting + n + design + crit + crit.label , data = .,
                   FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
@@ -264,7 +265,7 @@ for (crit.no in 1:crit.tot){
         result.comb1 <- result.comb
         result.stat <-
           result.comb1 %>%
-          aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method +
+          aggregate(cbind(value, czmk_n_phase2, zom_n_phase2, training_percent.censor, training_cause.1, training_cause.2) ~ method +
                       ncauses + censor +
                       setting + n + design + crit + crit.label , data = .,
                     FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
