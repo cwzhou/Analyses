@@ -1,14 +1,15 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-# local = 0 # local = 0 for cluster
+local = 0 # local = 0 for cluster
 
 # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
-# if (local == 1){
-#   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-# } else{
-#   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
-# }
+# uncomment if running alone (aka for CR02.Simulation_Summary.R
+if (local == 1){
+   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+ } else{
+   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+ }
 
 #### libraries and functions
 source("F01.Simulation_Functions.R") # calls libraries
@@ -21,7 +22,7 @@ mean_tol1 = c(0.15,0)
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 # one year?
