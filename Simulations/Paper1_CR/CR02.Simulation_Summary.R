@@ -43,6 +43,9 @@ if (generate_failure_method == "fine_gray"){
   cause1prob.levels = cause1_prob$cause1.prob$cause1prob
   cause1prob.labels = " "
 }
+
+censor.levels = c(1,2)
+censor.labels = c("Low Censoring (20%)","High Censoring (50%)")
 n.levels = c(1,2)
 n.labels = c(sprintf("N=%s",size$small.sample.size$n),
              sprintf("N=%s",size$large.sample.size$n))
@@ -65,6 +68,7 @@ if (endpoint == "CR"){
   if (generate_failure_method == "fine_gray"){
     fn <-
       expand.grid(ncauses = 1,
+                  censor = 1:2,
                   cause1prob = 1:length(cause1prob.levels),
                   beta = 1:length(beta.levels),
                   prop = 1:2,
@@ -73,6 +77,7 @@ if (endpoint == "CR"){
                   critE.no = 1:2) %>%
       mutate(nm = paste0(beta, "-", prop, "-", n),
              fn = paste0(dir_rds,"/simResult_", generate_failure_method,
+                         "_censor", censor,
                          "_nCauses", ncauses,
                          "_cause1prob", cause1prob,
                          "_beta", beta, "_prop", prop,
@@ -81,6 +86,7 @@ if (endpoint == "CR"){
   } else if (generate_failure_method == "simple_exp"){
     fn <-
       expand.grid(ncauses = 1,
+                  censor = 1:2,
                   # cause1prob = 1:length(cause1prob.levels),
                   beta = 1:length(beta.levels),
                   prop = 1:2,
@@ -89,6 +95,7 @@ if (endpoint == "CR"){
                   critE.no = 1:2) %>%
       mutate(nm = paste0(beta, "-", prop, "-", n),
              fn = paste0(dir_rds,"/simResult_", generate_failure_method,
+                         "_censor", censor,
                          "_nCauses", ncauses,
                          # "_cause1prob", cause1prob,
                          "_beta", beta, "_prop", prop,
@@ -98,10 +105,11 @@ if (endpoint == "CR"){
 
 } else{
   fn <-
-    expand.grid(ncauses = 1, beta = 1:6, prop = 1:2,
+    expand.grid(ncauses = 1, censor = 1:2, beta = 1:6, prop = 1:2,
                 n = 1:2, critS.no = 1:2, critE.no = 1:2) %>%
     mutate(nm = paste0(beta, "-", prop, "-", n),
            fn = paste0(endpoint,"/output/simResult_", lab.date,
+                       "_censor", censor,
                        "_nCauses", ncauses,
                        "_beta", beta, "_prop", prop,
                        "_n", n, "_critS", critS.no,
@@ -176,6 +184,7 @@ for (crit.no in 1:crit.tot){
           print("a is not null")
 
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
+          View(a)
           beginning <- as.data.frame(a) %>%
             dplyr::select(rep = sim,
                           all_of(var_method),
@@ -184,6 +193,7 @@ for (crit.no in 1:crit.tot){
           if (generate_failure_method == "fine_gray"){
             middle = beginning %>%
               mutate(ncauses = fn$ncauses[i],
+                     censor = fn$censor[i],
                      cause1prob = fn$cause1prob[i], # this only exists if endpoint = CR
                      beta = fn$beta[i],
                      prop = fn$prop[i],
@@ -192,6 +202,7 @@ for (crit.no in 1:crit.tot){
           } else{ # simple_exp has no cause1prob
             middle = beginning %>%
               mutate(ncauses = fn$ncauses[i],
+                     censor = fn$censor[i],
                      # cause1prob = fn$cause1prob[i], # this only exists if endpoint = CR
                      beta = fn$beta[i],
                      prop = fn$prop[i],
@@ -208,6 +219,9 @@ for (crit.no in 1:crit.tot){
         method = factor(method,
                         levels = method.nm.simple1,
                         labels = method.nm.abc),
+        censor = factor(prop,
+                        levels = censor.levels,
+                        labels = censor.labels),
         ncauses = factor(ncauses,
                          levels = 1:max(ncauses),
                          labels = c("1" = "2 causes")),
@@ -235,13 +249,14 @@ for (crit.no in 1:crit.tot){
                                    labels = cause1prob.labels))
       result.stat <-
         result.comb1 %>%
-        aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method + ncauses + cause1prob +
+        aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method +
+                    ncauses + censor + cause1prob +
                     setting + n + design + crit + crit.label , data = .,
                   FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
         mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
       result.stat.sd <-
         result.comb1 %>%
-        aggregate(value ~ method + ncauses + cause1prob + setting + n + design +
+        aggregate(value ~ method + ncauses + censor + cause1prob + setting + n + design +
                     crit + crit.label , data = .,
                   FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
         rename(sd = value)
@@ -249,13 +264,14 @@ for (crit.no in 1:crit.tot){
         result.comb1 <- result.comb
         result.stat <-
           result.comb1 %>%
-          aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method + ncauses +
+          aggregate(cbind(value, training_percent.censor, training_cause.1, training_cause.2) ~ method +
+                      ncauses + censor +
                       setting + n + design + crit + crit.label , data = .,
                     FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
           mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
         result.stat.sd <-
           result.comb1 %>%
-          aggregate(value ~ method + ncauses + setting + n + design +
+          aggregate(value ~ method + ncauses + censor + setting + n + design +
                       crit + crit.label , data = .,
                     FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
           rename(sd = value)
@@ -278,13 +294,13 @@ for (crit.no in 1:crit.tot){
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
-        facet_grid(cause1prob + setting ~ n + design)
+        facet_grid(cause1prob + setting ~ censor + n + design)
     } else{
       p0 <-
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
-        facet_grid(setting ~ n + design)
+        facet_grid(setting ~ censor + n + design)
     }
     p = p0 +
       geom_point() +
@@ -342,12 +358,12 @@ for (crit.no in 1:crit.tot){
 
   p.grid <- plot_grid(p.1,
                       p.2,
-                      align = "vh", 
+                      align = "vh",
                       axis = "tblr",
                       nrow = 1, ncol = 2)#,
                       # common.legend = FALSE)
   p.grid1 <- plot_grid(p.grid,
-                       get_legend(p.list[[2]] + 
+                       get_legend(p.list[[2]] +
                                     theme(legend.direction = "horizontal",
                                           legend.key.size = unit(0.5, "cm"),    # Adjust the size of the legend keys
                                           legend.text = element_text(size = 8), # Adjust the size of the legend text
@@ -359,22 +375,22 @@ for (crit.no in 1:crit.tot){
                       nrow = 2,
                       rel_heights = c(1, 0.1))
   #we can ignore the warning message about return_all
-  
+
   # # Extract the legend from one plot
   # legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
-  # 
+  #
   # # Combine plots side by side
   # combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
-  # 
+  #
   # # Add the legend underneath
-  # final_plot <- plot_grid(combined, 
-  #                         legend, 
-  #                         ncol = 1, 
+  # final_plot <- plot_grid(combined,
+  #                         legend,
+  #                         ncol = 1,
   #                         rel_heights = c(1, 0.1))
-  # 
+  #
   # # Display the plot
   # print(final_plot)
-  
+
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
   }
