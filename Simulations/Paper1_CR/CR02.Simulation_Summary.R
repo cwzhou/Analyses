@@ -184,7 +184,7 @@ for (crit.no in 1:crit.tot){
           print("a is not null")
 
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
-          View(a)
+          print(head(a))
           beginning <- as.data.frame(a) %>%
             dplyr::select(rep = sim,
                           all_of(var_method),
