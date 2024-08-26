@@ -30,7 +30,7 @@ method.nm.abc =
 method.nm.simple =
   c("czmk", "csk", "pmcr", "aipwe", "zom", "obs") # this is important for selecting variables below.
 method.nm.formal =
-  c("our proposed method", "dtrSurv (2023)",
+  c("itrSurv", "dtrSurv (2023)",
     "PMCR (2021)", "AIPWE (2021)",
     "zero-order model", "observed policy")
 # "Goldberg & Kosorok (2012), RF", "Goldberg & Kosorok (2012), linear", "Simoneau et al. (2019)",
