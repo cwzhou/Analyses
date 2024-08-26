@@ -11,7 +11,7 @@ date = "2024-08-25";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
 mthd0 = c("CZMK", "CSK", "PMCR", "AIPWE", "ZOM", "CSKzom", "observed")
 labs0 = c("itrSurv", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
          "zero-order model", "Cho zero-order model", "observed")
-cols0 <- c("#800091", "#619CFF", "#00BFC4", "#00BA38","#F8766D", "#FFA500", "#F564E3")
+cols0 <- c("#614CFF", "#00BFC9", "#F8766D", "#00BA38", "#FFA500", "#F564E3", "#800040")
 names(cols0) = labs0
 
 keep_method <- c(TRUE,TRUE,TRUE,TRUE,TRUE,!TRUE,TRUE);
