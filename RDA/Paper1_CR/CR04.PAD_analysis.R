@@ -10,14 +10,14 @@ library(dtrSurv)
 library(itrSurv);library(ggplot2); library(tidyverse);
 library(MASS); library(dplyr);
 local = 1
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/RDA")
-source("../Simulations/Paper1_CR/F01.Simulation_Functions.R") # includes F02.ComparatorMethod_Functions.R
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/RDA/Paper1_CR/")
+setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR/")
+source("F01.Simulation_Functions.R") # includes F02.ComparatorMethod_Functions.R
+setwd("../../RDA/Paper1_CR/")
 source("F03.RDA_Functions.R")    # All the library and source files
 ############################################################
 ######### temporary testing things out parameters ##########
 ############################################################
-criterion_phase1 = "area"
+criterion_phase1 = "mean"
 rule2 = "gray_cr" # other option: csh_cr
 ############################################################
 ################# methods for comparison ###################
@@ -25,8 +25,8 @@ rule2 = "gray_cr" # other option: csh_cr
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 rda_methods = c("CZMK", "CSK", "PMCR", "AIPWE",
                 "ZOM", "CSKzom", "observed")
-skip_method <- c(!TRUE,TRUE,TRUE,TRUE,
-                 TRUE,TRUE,TRUE);
+skip_method <- !c(TRUE,TRUE,TRUE,TRUE,
+                 TRUE,!TRUE,TRUE);
 assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
 loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
@@ -37,16 +37,16 @@ loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
 t0_crit = 365/2 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
 tau = 365
-K = 1 #300 # number of CV
+K = 5 #300 # number of CV
 endpoint = "CR" # endpoint
 Tx.nm = "Trt"
-timepoints = seq(0, sqrt(tau), length.out = 1000)^2
+# timepoints = seq(0, sqrt(tau), length.out = 1000)^2
 
 ## other parameters
 priority_cause = 1 # death
-nodesize = 5#50
+nodesize = 5
 mindeath = round(sqrt(c(nodesize)), 0)
-Ntree = 1#300
+Ntree = 300
 ert = TRUE;
 rs = 0.2 # randomSplit = 0.2
 
@@ -84,6 +84,8 @@ excluded_column_names <- c("ID", "Trt", "obs_time",
                            "status", "D.0", "D.1", "D.2")
 # Exclude the specified column names
 covariate_names <- setdiff(all_column_names, excluded_column_names)
+# covar_names = dat0 %>% dplyr::select(-c(D.0, D.1, D.2, status, Trt, obs_time)) %>% names()
+# paste0(paste(covar_names, collapse = ", "))
 
 # manipulating dataset to obtain truncated status,D.0,D.1,D.2
 dat0 = data %>%
@@ -97,12 +99,26 @@ dat0 = data %>%
                 !!!covariate_names)
 # head(dat0);range(dat0$obs_time)
 
-covars = dat0 %>% dplyr::select(-c(D.0, D.1, D.2, status, Trt, obs_time)) %>% names()
-paste0(paste(covars, collapse = ", "))
-############################################################
-###################### 0.2 criterion #######################
-############################################################
-# for (criterion_phase1 in c("area", "mean", "mean.prob.combo")){ #for (criterion_phase1 in c("mean", "mean.prob.combo")){ # for (dtr_criterion in c("mean", "surv.mean")) {
+  #################### 1. data preprocessing
+  # sorting dataset by obs_time (ascending response time)
+  dat = as.data.frame(dat0) %>% arrange(obs_time) # required for CR
+  # dat = dat0 %>%
+  #   mutate(time = pmin(time, tau),
+  #      last.fu = ifelse(time == tau, 1, last.fu),
+  #      d.1 = ifelse(time == tau & last.fu == 1, 1, d.1),
+  #      d.2 = ifelse(time == tau, ifelse(last.fu == 1, NA, 1), d.2),
+  #      delta = ifelse(time == tau, 1, delta))
+
+  mean(dat$status==0, na.rm = TRUE)
+
+  lvls = lapply(Tx.nm, function(x) levels(dat[, x]))
+  for (x in 1:length(lvls)) {if (is.null(lvls[[x]])) lvls[[x]] = 0:1}
+
+
+  ############################################################
+  ###################### 0.2 criterion #######################
+  ############################################################
+  # for (criterion_phase1 in c("area", "mean", "mean.prob.combo")){ #for (criterion_phase1 in c("mean", "mean.prob.combo")){ # for (dtr_criterion in c("mean", "surv.mean")) {
   print(criterion_phase1)
   criterion_phase2 = criterion_phase1
   if (criterion_phase1 == "mean.prob.combo"){
@@ -138,9 +154,9 @@ paste0(paste(covars, collapse = ", "))
   }
 
   cat("\ncriterion_phase1 =",criterion_phase1[1],
-    "\nvalue.os =", criterion_phase1[2],
-    "\nvalue.cif =", criterion_phase2[2],
-    "\ntau =", tau, "\n")
+      "\nvalue.os =", criterion_phase1[2],
+      "\nvalue.cif =", criterion_phase2[2],
+      "\ntau =", tau, "\n")
 
   #################### Overall Survival PM models
   modelOS = create_model_formulas("Surv(obs_time, D.0)",
@@ -156,21 +172,6 @@ paste0(paste(covars, collapse = ", "))
                                   covariate_names,
                                   formula = FALSE)
   form.weight <- list(modelPr %>% as.formula)
-
-  #################### 1. data preprocessing
-  # sorting dataset by obs_time (ascending response time)
-  dat = as.data.frame(dat0) %>% arrange(obs_time)
-  # dat = dat0 %>%
-  #   mutate(time = pmin(time, tau),
-  #      last.fu = ifelse(time == tau, 1, last.fu),
-  #      d.1 = ifelse(time == tau & last.fu == 1, 1, d.1),
-  #      d.2 = ifelse(time == tau, ifelse(last.fu == 1, NA, 1), d.2),
-  #      delta = ifelse(time == tau, 1, delta))
-
-  mean(dat$status==0, na.rm = TRUE)
-
-  lvls = lapply(Tx.nm, function(x) levels(dat[, x]))
-  for (x in 1:length(lvls)) {if (is.null(lvls[[x]])) lvls[[x]] = 0:1}
 
   ## cross-validation
   K = K
@@ -205,8 +206,7 @@ paste0(paste(covars, collapse = ", "))
                    # s2 = NA,
                    total = NA)
 
-  # for (cv in 1:K) {
-  cv=1
+  for (cv in 1:K) {
     cat(cv, "th cv.\n")
     set.seed(cv)
     in.cv = cv.insample[, cv]   # insample index
@@ -253,7 +253,7 @@ paste0(paste(covars, collapse = ", "))
                         tau = tau,
                         # timePoints = timepoints,
                         timePointsSurvival = s.times,
-                        timePointsEndpoint = pc.times,
+                        timePointsEndpoint = s.times,
                         criticalValue1 = criterion_phase1[1],
                         criticalValue2 = criterion_phase2[1],
                         evalTime = as.numeric(criterion_phase1[2]),
@@ -267,7 +267,7 @@ paste0(paste(covars, collapse = ", "))
       values[cv, "ns.CZMK"] = nodesize
       set.seed(cv)
       CZMK.i <-
-        try(do.call(itrSurv,
+        try(do.call(itrSurv::itrSurv,
                     c(args.CZMK, list(nodeSize = nodesize,
                                       minEvent = mindeath))))
       err.CZMK = class(CZMK.i)[1] == "try-error"
@@ -291,7 +291,7 @@ paste0(paste(covars, collapse = ", "))
       # actual fitting
       values[cv, "ns.CSK"] = nodesize
       set.seed(cv)
-      CSK.i <- try(do.call(dtrSurv,
+      CSK.i <- try(do.call(dtrSurv::dtrSurv,
                            c(args.CSK, list(nodeSize = nodesize,
                                             minEvent = mindeath))))
       err.CSK = class(CSK.i)[1] == "try-error"
@@ -385,7 +385,7 @@ paste0(paste(covars, collapse = ", "))
     if (skip.ZOM != TRUE){
       print(sprintf("Running ZOM for %s CV", cv))
     ZOM.i <-
-      try(do.call(itrSurv, c(args.CZMK,
+      try(do.call(itrSurv::itrSurv, c(args.CZMK,
                              list(nodeSize = 1e+4,
                                   minEvent = 1e+4))))
     err.ZOM = class(ZOM.i)[1] == "try-error"
@@ -406,7 +406,7 @@ paste0(paste(covars, collapse = ", "))
     if (skip.CSKzom != TRUE){
       print(sprintf("Running CSKzom for %s CV", cv))
     CSKzom.i <-
-      try(do.call(dtrSurv, c(args.CSK,
+      try(do.call(dtrSurv::dtrSurv, c(args.CSK,
                              list(nodeSize = 1e+4,
                                   minEvent = 1e+4))))
     err.CSKzom = class(CSKzom.i)[1] == "try-error"

@@ -14,7 +14,7 @@ labs0 = c("our proposed model", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
 cols0 <- c("#800091", "#619CFF", "#00BFC4", "#00BA38","#F8766D", "#FFA500", "#F564E3")
 names(cols0) = labs0
 
-keep_method <- c(TRUE,TRUE,TRUE,TRUE,TRUE,!TRUE,TRUE);
+keep_method <- c(TRUE,TRUE,!TRUE,!TRUE,TRUE,!TRUE,TRUE);
 mthd <- mthd0[keep_method]
 labs <- labs0[keep_method]
 cols <- cols0[keep_method]
@@ -25,11 +25,11 @@ mthd.PC <- paste(mthd, "PC", sep = ".")
 # Combine the two vectors into endpoint vector
 mthd.ep <- c(mthd.OS, mthd.PC)
 
-possible_crits = c("area", "mean", "mean.prob.combo")
-possible_crits = possible_crits[1]
-crit1 = 1
+possible_crits1 = c("area", "mean", "mean.prob.combo", "prob")
+possible_crits1 = possible_crits1[2]
+# crit1 = 1
 
-nodesize = 50
+nodesize = 5#50
 Tx = "A"
 Tx.full = "Treatment"
 clipping = "5%"  # clipping at 5%
@@ -40,13 +40,18 @@ tau = tau
 p1 = p2 = list()
 
 
-for (crit1 in 1:length(possible_crits)) {
+for (crit1 in 1:length(possible_crits1)) {
   crit = possible_crits[crit1]
-  # OSValues_20CV_mean_rulemean_tau32_2024-01-26.rds
+  # Values_200CV_mean_rule1mean_surv_rule2gray_cr_tau365_2024-08-25.rds
+  # for now, this is fixed rule2 (gray's test)
+  # for now, this is fixed CR
   nm.tmp =
-    sprintf("./3_output/%s/%s/%s/Values_%sCV_%s_tau%s_%s.rds",
+    sprintf("./3_output/%s/%s/%s/Values_%sCV_%s_rule2gray_cr_tau%s_%s.rds",
             endpoint, dataset_name, date, K,
-            if (crit == "mean") "mean_rulemean" else if (crit == "area") "area_rulemean" else sprintf("mean.prob.combo%s_ruleLRGray",t0_crit), #"surv.mean2200_rulelogrank",
+            if (crit == "mean") "mean_rule1mean_surv"
+            else if (crit == "area") "area_rule1area_surv"
+            else if (crit == "prob") sprintf("prob%s_rule1logrank_surv",t0_crit)
+            else sprintf("mean.prob.combo%s_rule1logrank_surv",t0_crit), #"surv.mean2200_rulelogrank",
             tau, date)
   data.long =
     nm.tmp %>%
@@ -84,16 +89,34 @@ for (crit1 in 1:length(possible_crits)) {
                    geom = 'point',
                    col = "black",
                    shape = "square",
-                   size = 1) +
-      stat_summary(aes(x = as.numeric(method),
-                       y = !!sym(endpoint_type),
-                       label = sprintf( paste0("%3.", if (crit == "mean") 0 else 3, "f"), ..y..)),
-                   fun.y = mean,
-                   geom = 'text',
-                   col = "black",
-                   position = 'dodge',
-                   vjust = 1,
-                   size = 3) +
+                   size = 2) +
+      # stat_summary(aes(x = as.numeric(method),
+      #                  y = !!sym(endpoint_type),
+      #                  label = sprintf( paste0("%3.", if (crit == "mean") 0 else 3, "f"), ..y..)),
+      #              fun.y = mean,
+      #              geom = 'text',
+      #              col = "black",
+      #              position = 'dodge',
+      #              vjust = -10,
+      #              fontface = "bold",
+      #              size = 6) +
+      ggplot2::stat_summary(
+        aes(
+          x = as.numeric(method),
+          y = !!sym(endpoint_type),
+          label = sprintf(paste0("%3.", if (crit == "mean") 0 else 3, "f"), ..y..)
+        ),
+        fun.y = mean,
+        geom = 'label',  # Use geom_label for a background
+        col = "black",
+        fill = "white",  # White background
+        label.size = 0,  # No border
+        position = position_dodge(width = 0.9),  # Adjust the position to avoid overlap
+        vjust = -0.5,
+        size = 3,
+        fontface = "bold",  # Make the text bold
+        label.padding = unit(0.25, "lines")  # Padding around the label
+      ) +
       theme_bw() + theme(axis.title.x = element_blank()) +
       # ylim(c(if (crit == "mean") { if (all_cause) 2000 else 2200} else { if (all_cause) 0.45 else 0.6}, NA)) +
       ylab(if (crit == "mean" | crit == "area"){
@@ -121,10 +144,11 @@ for (crit1 in 1:length(possible_crits)) {
             nrow = 1, ncol = 2,
             common.legend = TRUE,
             axis = "v")
-  p.grid2 <- plot_grid(p.grid,
-                       get_legend(p1[[crit1]]),
-                       align = "v", nrow = 2,
-                       rel_heights = c(1, 0.1))
+  # p.grid2 <- plot_grid(p.grid,
+  #                      get_legend(p1[[crit1]]),
+  #                      align = "v", nrow = 2,
+  #                      rel_heights = c(1, 0.1))
+  # dont need above b/c no axis to share
   ggsave(nm.tmp %>%
            gsub("output/", "figure/", .) %>%
            gsub("Values", "Figure", .) %>%
