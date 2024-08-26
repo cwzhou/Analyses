@@ -6,7 +6,7 @@ library(ggplot2); library(cowplot)
 # add in other comparator methods
 
 # Specify date of the outputs and all_cause (T/F)
-date = Sys.Date()#"2024-03-05";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
+date = "2024-08-25";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
 
 mthd0 = c("CZMK", "CSK", "PMCR", "AIPWE", "ZOM", "CSKzom", "observed")
 labs0 = c("our proposed model", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
@@ -14,7 +14,7 @@ labs0 = c("our proposed model", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
 cols0 <- c("#800091", "#619CFF", "#00BFC4", "#00BA38","#F8766D", "#FFA500", "#F564E3")
 names(cols0) = labs0
 
-keep_method <- c(TRUE,TRUE,!TRUE,!TRUE,TRUE,!TRUE,TRUE);
+keep_method <- c(TRUE,TRUE,TRUE,TRUE,TRUE,!TRUE,TRUE);
 mthd <- mthd0[keep_method]
 labs <- labs0[keep_method]
 cols <- cols0[keep_method]

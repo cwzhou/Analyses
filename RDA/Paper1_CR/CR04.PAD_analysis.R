@@ -175,7 +175,7 @@ dat0 = data %>%
 
   ## cross-validation
   K = K
-  set.seed(100, kind="Mersenne-Twister")
+  set.seed(2024, kind="Mersenne-Twister")
   cv.insample  = createDataPartition(dat[, Tx.nm],
                                      p = 0.8, # aipwe requires a certain number of people to work (aka can't train on anything too little sample size)
                                      list = FALSE,
