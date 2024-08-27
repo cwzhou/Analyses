@@ -4,7 +4,7 @@
 #' @at.risk Availability at the beginning of the phase
 #' @covariates(Z1-Zp) covariate values at the beginning of the phase
 #'
-multiPhaseDynamics <-
+Dynamics <-
   function(N = 100,
            u1 = u1,  # Observed value
            u2 = u2,
@@ -30,7 +30,7 @@ multiPhaseDynamics <-
            evaluate = FALSE
            # seed1 = seed1
   ) {
-    # message("multiphasedynamics")
+    # message("Starting F01.DynamicsCR.R")
     # N = arg.obs$N
     # at.risk = arg.obs$at.risk; ncov = arg.obs$ncov; corr = arg.obs$corr;
     # at.risk = rep(1, N)
@@ -481,7 +481,7 @@ eval_sims = function(generate_failure_method,
                      t0,
                      rate1, rate2,
                      mass_p){
-  # message('EVALUATING: multiphasedynamicscr.r line 263')
+  # message('EVALUATING: DynamicsCR.r line 263')
 
   if (eval_ep == "OS"){
     # overall survival

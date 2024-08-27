@@ -371,6 +371,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
     # print(crit.value_phase1)
     arg.czmk2 = list(data = data.df,
                     endPoint = "CR",
+                    yName = "obs_time",
                     txName = paste("Trt"),
                     epName = "status", # status indicator (0 = censored, 1 = failure from cause 1 (PC), 2 = failure from cause 2)
                     models = models_itr,
@@ -383,17 +384,17 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
                     evalTime = crit.value_phase1,
                     splitRule1 = splitRule,
                     splitRule2 = "gray_cr",
-                    ERT = TRUE, 
-                    uniformSplit = TRUE, 
+                    ERT = TRUE,
+                    uniformSplit = TRUE,
                     replace = FALSE,
-                    randomSplit = 0.2, 
+                    randomSplit = 0.2,
                     nTree = 1,#300,
                     pooled = FALSE,
                     stratifiedSplit = 0.1)
     set.seed(train_seed + 1)
-    optimal.czmk <- do.call(itrSurv::itrSurv, c(arg.czmk2, 
+    optimal.czmk <- do.call(itrSurv::itrSurv, c(arg.czmk2,
                                        list(mTry = sqrt(ncov),
-                                            nodeSize = nodesize, 
+                                            nodeSize = nodesize,
                                             minEvent = mindeath)))
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk$policy <- if (!czmk.error) optimal.czmk

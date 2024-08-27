@@ -1,7 +1,7 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-local = 0 # local = 0 for cluster
+local = 1 # local = 0 for cluster
 
 # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
 # uncomment if running alone (aka for CR02.Simulation_Summary.R
@@ -14,10 +14,10 @@ if (local == 1){
 #### libraries and functions
 source("F01.Simulation_Functions.R") # calls libraries
 
-date_folder = "2024-08-20" #Sys.Date() #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
+date_folder = Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
-n.sim = 200
+n.sim = 1
 mean_tol1 = c(0.15,0)
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
@@ -35,7 +35,7 @@ if (generate_failure_method == "simple_exp"){
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
 # skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+skip_method <- !c(TRUE, TRUE, !TRUE, !TRUE, TRUE, TRUE);
 savingrds = TRUE
 
 #### Run this Script FOR CR. Change name later.
@@ -93,7 +93,7 @@ if (arg1 == 1){
 }
 
 if (generate_failure_method == "simple_exp"){
-  # message("IN F01.multiPhaseDynamicsCR.R: we have f2_constant = 0.3 to make cause2 prevalance less and f1_constant.")
+  # message("IN F01.DynamicsCR.R: we have f2_constant = 0.3 to make cause2 prevalance less and f1_constant.")
   # message("simple_exp with exp censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
@@ -258,11 +258,11 @@ if (endpoint == "CR"){
                 arg = list(arg), default, ncauses[[arg3]],
                 censor[[arg2]],
                 cause1_prob[[arg9]],
-                betas[[arg4]], 
+                betas[[arg4]],
                 ncov = ncov.list[[arg4]],
-                propensity[[arg5]], 
+                propensity[[arg5]],
                 size[[arg6]],
-                crit_surv[[arg7]], 
+                crit_surv[[arg7]],
                 crit_endpoint[[arg8]])
   } else if (generate_failure_method == "simple_exp"){
     setting = c(all_methods = list(all_methods),
@@ -270,11 +270,11 @@ if (endpoint == "CR"){
                 arg = list(arg), default, ncauses[[arg3]],
                 censor[[arg2]],
                 # cause1_prob[[arg9]],
-                betas[[arg4]], 
+                betas[[arg4]],
                 ncov = ncov.list[[arg4]],
-                propensity[[arg5]], 
+                propensity[[arg5]],
                 size[[arg6]],
-                crit_surv[[arg7]], 
+                crit_surv[[arg7]],
                 crit_endpoint[[arg8]])
   } else{
     stop ("generate failure method DNE")

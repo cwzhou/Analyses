@@ -5,7 +5,7 @@
 
 source("F00.Simulation_Libraries.R")
 source("F02.ComparatorMethod_Functions.R")
-source("F01.multiPhaseDynamicsCR.R")
+source("F01.DynamicsCR.R")
 # Functions -----------------------------------------------------------------
 gdata_CR <- function(N=10,
                      u1 = NULL,
@@ -116,7 +116,7 @@ gdata_CR <- function(N=10,
   # A = rbinom(N, num_A-1, 0.5)
   # print(sprintf("treatments A: %s",A))
   # print(N)
-  df_multi <<- multiPhaseDynamics(N=N, u1 = u1, u2=u2, u3 = u3,
+  df_multi <<- Dynamics(N=N, u1 = u1, u2=u2, u3 = u3,
                          tau=tau, covariate = z, ncov = ncov,
                          mass_p = mass_p,
                          censor_time = trunc_cens_time,
