@@ -2,7 +2,7 @@
 ## Edit parameters in CR00.Simulation_Parameters.R script
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-local = 0
+local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
@@ -25,9 +25,6 @@ if (local == 1){
   # data.df%>%group_by(status,action) %>% summarize(mean = mean(event.time))
   print(final_results)
   # View(final_results)
-
-  library(dplyr)
-  # Assuming your dataset is named 'df'
 }
 
 # message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
