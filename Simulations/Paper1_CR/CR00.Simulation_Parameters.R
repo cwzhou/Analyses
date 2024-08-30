@@ -17,12 +17,12 @@ source("F01.Simulation_Functions.R") # calls libraries
 date_folder = Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
-n.sim = 100
-mean_tol1 = c(0.1,0)
+n.sim = 20
+mean_tol1 = c(0.1,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
@@ -104,7 +104,7 @@ if (generate_failure_method == "simple_exp"){
   # message("fine_gray with uniform censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
-                  tau = 2,#365,
+                  tau = 3,#365,
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else{
@@ -137,7 +137,7 @@ if (endpoint == "CR"){
 
 # arg9
 if (endpoint == "CR" & generate_failure_method == "fine_gray"){
-  cause1_prob <- list(small.cause1prob = list(cause1prob = 0.1),
+  cause1_prob <- list(small.cause1prob = list(cause1prob = 0.2),
                       large.cause1prob = list(cause1prob = 0.8))
 } else{
   cause1_prob <- list(cause1.prob = list(cause1prob = 1))
@@ -160,22 +160,22 @@ if (generate_failure_method == "fine_gray"){
   censor <- list(low.censoring = list(
     # we want about 20% censoring
     ctype = 1, # uniform censoring
-    censor_min = tau/2,
-    censor_max = tau, # higher is less censoring for unif
+    censor_min = 0,
+    censor_max = tau+tau/2, # higher is less censoring for unif
     censor_rate = 0  # not used for unif
     ),
   high.censoring = list(
     # we want about 50% censoring
     ctype = 1, # uniform censoring
     censor_min = 0,
-    censor_max = 0.8*tau, # lower is more censoring for unif
+    censor_max = 0.7*tau, # lower is more censoring for unif
     censor_rate = 0 # not used for unif
     ))
   } else if (generate_failure_method == "simple_exp"){
     censor <- list(low.censoring = list(ctype = 0, # exp censoring
                                       censor_min = 0, # not used for exp
                                       censor_max = 0,# not used for exp
-                                      censor_rate = 0.5 # lower censoring: range 
+                                      censor_rate = 0.5 # lower censoring: range
                                   ),
                    high.censoring = list(ctype = 0, # exp censoring
                                          censor_min = 0, # not used for exp
@@ -227,10 +227,10 @@ if (endpoint == "CR"){
     # temporary while working on testing dataset
     betas <- list(
       beta1 = list(
-        beta1.hazard0 = c(0,-1,-1.4),
-        beta1.hazard1 = c(0,0.8,0.7),
-        beta2.hazard0 = c(0,-0.2,1.2), #c(0,0.2,0.8),
-        beta2.hazard1 = c(0,-0.3,-2)),
+        beta1.hazard0 = c(0,0.1,0.3),#c(0,-1,-1.4),
+        beta1.hazard1 = c(0,-0.8,-2),#c(0,0.8,0.7),
+        beta2.hazard0 = c(0,-2.1,-0.3),#c(0,-0.2,1.2), #c(0,0.2,0.8),
+        beta2.hazard1 = c(0,-0.2,1.2)),#c(0,-0.3,-2)),
       beta2 = list(
         beta1.hazard0 = c(0,-0.9,-0.7,-0.6,0.1,-0.5),
         beta1.hazard1 = c(0,0.5,-0.1,0.5,0.2,-0.2),

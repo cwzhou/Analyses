@@ -1,6 +1,6 @@
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
-saving_eps = !TRUE#TRUE
+saving_eps = TRUE#TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 

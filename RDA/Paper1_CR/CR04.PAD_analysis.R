@@ -34,13 +34,14 @@ loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
 ############################################################
 #################### 0. parameters ####################
 ############################################################
+tol1_param = c(0.1,0,0.3,0.01)
 t0_crit = 365/2 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
 tau = 365
 K = 10 #300 # number of CV
 endpoint = "CR" # endpoint
 Tx.nm = "Trt"
-# timepoints = seq(0, sqrt(tau), length.out = 1000)^2
+timepoints = seq(0, sqrt(tau), length.out = 1000)^2
 
 ## other parameters
 priority_cause = 1 # death
@@ -262,8 +263,8 @@ dat0 = data %>%
                         ERT = ert, uniformSplit = ert, replace = !ert,
                         randomSplit = rs, nTree = Ntree, mTry = 6,
                         pooled = pooled1,
-                        tol1 = if (criterion_phase1[1] == 'mean.prob.combo') c(0.1,0,0.3,0.01)
-                        else c(0.1,0), #c(0.1,0),
+                        tol1 = if (criterion_phase1[1] == 'mean.prob.combo') tol1_param
+                        else tol1_param[1:2],#c(0.1,0), #c(0.1,0),
                         stratifiedSplit = FALSE)# actual fitting
       values[cv, "ns.CZMK"] = nodesize
       set.seed(cv)

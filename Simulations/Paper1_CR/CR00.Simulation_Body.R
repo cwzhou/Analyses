@@ -214,13 +214,13 @@ run_simulation <- function(sim){
                            method = NA,
                            surv_A = NA, surv_B = NA,
                            endpoint_A = NA, endpoint_B = NA) # each = 3 means repeating b/c theres 3 methods rn (obs, czmk, zom)
-  
+
   ######################################################################
   ######################################################################
   ######################################################################
   ######################################################################
   ######################################################################
-  
+
   # flow: obs (1) -> optimal (n.mc), obs.no.censor (n.mc)
   true2 = true3 = list()
   print(Sys.time())
@@ -479,12 +479,12 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
   cat("\n******************************\n")
   # estimation
   cat ("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
+  n.stages = 1
   if (!skip.csk) {
     cat ("  3. csk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # dtrSurv (Cho et al)
     models_dtr <- paste0("Surv(obs_time, D.0) ~ ",
                      paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>% as.formula
-    n.stages = 1
     arg.csk2 = list(data = data.df,
                     txName = paste("Trt"),
                     models = models_dtr,
@@ -493,7 +493,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
                     # splitRule = NULL,
                     splitRule = ifelse(dtr_criterion == "mean", "mean", "logrank"),
                     ERT = TRUE, uniformSplit = TRUE, replace = FALSE,
-                    randomSplit = 0.2, nTree = 300, 
+                    randomSplit = 0.2, nTree = 300,
                     mTry = rep(sqrt(ncov), n.stages),
                     pooled = FALSE,
                     stratifiedSplit = 0.1)
@@ -773,7 +773,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
     arg.zom$policy <- if (!zom.error) optimal.zom
     policy_zom <- arg.zom$policy
     # print(arg.zom$policy@phaseResults[["EndPointPhase2Results"]]@optimal@optimalTx)
-    if (!zom.error) result["zom_n_phase2"] <- mean(arg.zom$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) # result[sim, "zom_n_phase2"] 
+    if (!zom.error) result["zom_n_phase2"] <- mean(arg.zom$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) # result[sim, "zom_n_phase2"]
     rm(optimal.zom); gc()
 
     cat ("  6. zero-order model - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
@@ -956,16 +956,21 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
   gc()
   cat("--- End of Simulation", sim, "---\n")
 # } # for (sim in 1:n.sim) but removed for parallelizing
-  
+
   return(result)
 }
 
 # Number of cores to use for parallelization
-num_cores <- 20
+num_cores <- 5
 # Run the simulations in parallel
 results_list <- mclapply(1:n.sim, run_simulation, mc.cores = num_cores)
 # Combine the results into a single dataframe
-final_results <- do.call(rbind, results_list)
+final_results0 <- do.call(rbind, results_list) # days
+final_results <- final_results0 %>%
+  # convert to years
+  mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
+if (local == 1){
+  View(final_results)}
 
 message("\n END OF SIMS \n")
 # result
@@ -988,19 +993,21 @@ end_time = Sys.time()
 # df_long3$endpoint_type = factor(df_long3$endpoint_type, levels = c("os", "cause1"))
 # # View(df_long3 %>% arrange(sim, endpoint_type, data_type,method))
 
-result_sub = final_results %>% 
-  dplyr::select(obs_survival, czmk_survival, 
-                csk_survival, pmcr_survival, 
+result_sub = final_results %>%
+  dplyr::select(obs_survival, czmk_survival,
+                csk_survival, pmcr_survival,
                 aipwe_survival, zom_survival,
-                obs_endpoint, czmk_endpoint, 
-                csk_endpoint, pmcr_endpoint, 
+                obs_endpoint, czmk_endpoint,
+                csk_endpoint, pmcr_endpoint,
                 aipwe_endpoint, zom_endpoint)
 
 
 means = apply(result_sub, 2, mean, na.rm=TRUE)
 sds = apply(result_sub, 2, sd, na.rm=TRUE)
 mean_sd = cbind(means,sds)
-# print(round(mean_sd,3))
+if (local == 1){
+  print(round(mean_sd,3))
+}
 
 long_res = list(statistics = final_results,
                 settings = setting,
@@ -1013,12 +1020,12 @@ if (savingrds == TRUE){
   message('saving rds')
   saveRDS(long_res,
           filename)
-  
-  message('saving true2')
-  saveRDS(list(settings = setting,
-               true2_full_P2_eval = true2,
-               ind_stat = trt_result),
-          filename.true2)
+
+  # message('saving true2')
+  # saveRDS(list(settings = setting,
+  #              true2_full_P2_eval = true2,
+  #              ind_stat = trt_result),
+  #         filename.true2)
 }
 # write.csv(final_results, "/nas/longleaf/home/js9gt/survrf/Outputs/1STRATA_28Aug_10stage__500pt_lowcens_V2", row.names=FALSE)
 

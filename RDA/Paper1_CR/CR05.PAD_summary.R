@@ -6,7 +6,7 @@ library(ggplot2); library(cowplot)
 # add in other comparator methods
 
 # Specify date of the outputs and all_cause (T/F)
-date = "2024-08-25";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
+date = Sys.Date()#"2024-08-25";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
 
 mthd0 = c("CZMK", "CSK", "PMCR", "AIPWE", "ZOM", "CSKzom", "observed")
 labs0 = c("itrSurv", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
@@ -41,7 +41,7 @@ p1 = p2 = list()
 
 
 for (crit1 in 1:length(possible_crits1)) {
-  crit = possible_crits[crit1]
+  crit = possible_crits1[crit1]
   # Values_200CV_mean_rule1mean_surv_rule2gray_cr_tau365_2024-08-25.rds
   # for now, this is fixed rule2 (gray's test)
   # for now, this is fixed CR

@@ -24,7 +24,10 @@ if (local == 1){
   # data.df%>%group_by(action) %>% summarize(mean = mean(event.time))
   # data.df%>%group_by(status,action) %>% summarize(mean = mean(event.time))
   print(final_results)
-  View(final_results)
+  # View(final_results)
+
+  library(dplyr)
+  # Assuming your dataset is named 'df'
 }
 
 # message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
