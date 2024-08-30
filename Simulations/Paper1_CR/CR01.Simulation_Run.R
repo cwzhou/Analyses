@@ -27,4 +27,4 @@ if (local == 1){
   # View(final_results)
 }
 
-# message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
+message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
