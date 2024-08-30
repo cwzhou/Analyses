@@ -21,10 +21,13 @@ final_results0 <- do.call(rbind, results_list) # years
 print(is.data.frame(final_results0))
 final_results0 = as.data.frame(final_results0)
 print(is.data.frame(final_results0))
+print(head(final_results0))
 final_results <- final_results0 %>%
 #   # convert to days
   mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
+print("final_results")
 print(is.data.frame(final_results))
+print(head(final_results))
 
 result_sub = final_results %>%
   dplyr::select(obs_survival, czmk_survival,
