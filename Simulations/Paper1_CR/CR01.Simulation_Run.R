@@ -15,11 +15,14 @@ source("CR00.Simulation_Parameters.R")
 # call on functions then runs simulations
 source("CR00.Simulation_Body.R")
 
+print("now going into rbind")
 # Combine the results into a single dataframe
-final_results <- do.call(rbind, results_list) # days
-# final_results <- final_results0 %>%
-#   # convert to years
-#   mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
+final_results0 <- do.call(rbind, results_list) # years
+print(is.data.frame(final_results0))
+library(dplyr)
+final_results <- final_results0 %>%
+#   # convert to days
+  mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
 
 result_sub = final_results %>%
   dplyr::select(obs_survival, czmk_survival,
