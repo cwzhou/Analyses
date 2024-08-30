@@ -963,6 +963,7 @@ message("data.df")
 
 # Number of cores to use for parallelization
 num_cores <- 5
+results_list = list()
 # Run the simulations in parallel
 results_list <- mclapply(1:n.sim, run_simulation, mc.cores = num_cores)
 # Combine the results into a single dataframe
