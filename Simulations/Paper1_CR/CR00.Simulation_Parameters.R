@@ -93,18 +93,20 @@ if (arg1 == 1){
 }
 
 if (generate_failure_method == "simple_exp"){
+  tau.1 = 2
   # message("IN F01.DynamicsCR.R: we have f2_constant = 0.3 to make cause2 prevalance less and f1_constant.")
   # message("simple_exp with exp censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
-                  tau = 2,#365,#1 year - we use days here b/c censoring is for days #2.5,
+                  tau = tau.1,#365,#1 year - we use days here b/c censoring is for days #2.5,
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else if (generate_failure_method == "fine_gray"){
+  tau.1 = 3
   # message("fine_gray with uniform censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
-                  tau = 3,#365,
+                  tau = tau.1,#365,
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else{
@@ -161,14 +163,14 @@ if (generate_failure_method == "fine_gray"){
     # we want about 20% censoring
     ctype = 1, # uniform censoring
     censor_min = 0,
-    censor_max = tau+tau/2, # higher is less censoring for unif
+    censor_max = tau.1+tau.1/2, # higher is less censoring for unif
     censor_rate = 0  # not used for unif
     ),
   high.censoring = list(
     # we want about 50% censoring
     ctype = 1, # uniform censoring
     censor_min = 0,
-    censor_max = 0.7*tau, # lower is more censoring for unif
+    censor_max = 0.7*tau.1, # lower is more censoring for unif
     censor_rate = 0 # not used for unif
     ))
   } else if (generate_failure_method == "simple_exp"){
