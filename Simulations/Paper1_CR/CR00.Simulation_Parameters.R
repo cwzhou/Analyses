@@ -17,7 +17,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 date_folder = Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
-n.sim = 2
+n.sim = 10
 mean_tol1 = c(0.1,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
