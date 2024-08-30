@@ -170,6 +170,8 @@ Dynamics <-
           }
 
           else if (attr(policy, "class") %in% c("DTRSurv")) {
+            # single stage CR: n.stages = 1
+            n.stages = 1
             print("policy is from DTRSurv estimation (Cho)")
             x = output[as.logical(at.risk),] %>% output2observable(evaluate = TRUE)
             x[, c("obs_time", "D.0")] = 0  # dummy values in order for the package not to drop the NA rows.

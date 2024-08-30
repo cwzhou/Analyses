@@ -196,9 +196,9 @@ arg.czmk$evaluate <- arg.csk$evaluate <-
   arg.pmcr$evaluate <- arg.aipwe$evaluate <-
   arg.obs.no.censor$evaluate <- arg.zom$evaluate <- TRUE
 
-
 # Define the function that runs a single simulation
 run_simulation <- function(sim){
+  message("starting run_simulation")
   ### simulation
   r00 = data.frame(sim.no = sim) #data.frame(sim = n.sim)
   r00[column_names1] <- NA
@@ -234,13 +234,13 @@ run_simulation <- function(sim){
   }
   cat("\n#################################\n")
 
-  if (sim == 1){
-    sim_count = sim
-    prev_count = 0
-  } else{
-    sim_count = sim*2+prev_count
-    prev_count = prev_count + 1
-  }
+  # if (sim == 1){
+  #   sim_count = sim
+  #   prev_count = 0
+  # } else{
+  #   sim_count = sim*2+prev_count
+  #   prev_count = prev_count + 1
+  # }
 
   train_seed = sim*10000 + 123
   # if (setting_seed == 1){
@@ -303,6 +303,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
 
   # View(obs.data)
   # print(head(obs_1$event.time))
+message("data.df")
   data.df <<- obs.data %>%
     mutate(D.0 = ifelse(status> 0,1,0), # event from any cause indicator
            D.1 = ifelse(status==1,1,0), # event from cause 1 indicator
@@ -345,15 +346,15 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
   result["obs_survival"] <- overall_survival_val.fn(obs.data.rep)#val.fn_phase1(obs.data.rep$event.time)
   result["obs_endpoint"] <- endpoint_val.fn(obs.data.rep)
 
-  # A = -1; B = 1
-  # within method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-  A_mean = obs.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-  B_mean = obs.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-  A_mean_cr = obs.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-  B_mean_cr = obs.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-  # AB_diff = A_mean - B_mean
-  trt_result[sim_count, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("obs", A_mean, B_mean, A_mean_cr, B_mean_cr)
-  rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
+  # # A = -1; B = 1
+  # # within method, mean survival time from those who have action -1 and mean survival time for those who have action 1
+  # A_mean = obs.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
+  # B_mean = obs.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
+  # A_mean_cr = obs.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
+  # B_mean_cr = obs.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
+  # # AB_diff = A_mean - B_mean
+  # trt_result[sim_count, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("obs", A_mean, B_mean, A_mean_cr, B_mean_cr)
+  # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
 
   result["time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"] #result[sim, "time.obs"]
   # # print(flowchart(obs.data$output)) # if i fix this in 02_Simulation_Functions.R for CR then I can use, otherwise delete.
@@ -463,13 +464,13 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
       #   sapply(1:n.causes, function(s) mean(czmk.data.rep$status == s))
     }
 
-    # within czmk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    A_mean = czmk.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    B_mean = czmk.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    A_mean_cr = czmk.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    B_mean_cr = czmk.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    trt_result[sim_count+1, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("czmk", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
+    # # within czmk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
+    # A_mean = czmk.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
+    # B_mean = czmk.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
+    # A_mean_cr = czmk.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
+    # B_mean_cr = czmk.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
+    # trt_result[sim_count+1, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("czmk", A_mean, B_mean, A_mean_cr, B_mean_cr)
+    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
 
     result["time.czmk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.czmk"]
     arg.czmk$policy <- NULL; gc()
@@ -478,7 +479,7 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
 
   cat("\n******************************\n")
   # estimation
-  cat ("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
+  cat("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
   n.stages = 1
   if (!skip.csk) {
     cat ("  3. csk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
@@ -519,14 +520,14 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
       # result[sim, paste0("csk_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(csk.data.rep$status == s))
     }
-    # within csk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    A_mean = csk.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    B_mean = csk.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    A_mean_cr = csk.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    B_mean_cr = csk.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    # AB_diff = A_mean - B_mean
-    trt_result[sim_count+2, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("csk", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
+    # # within csk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
+    # A_mean = csk.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
+    # B_mean = csk.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
+    # A_mean_cr = csk.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
+    # B_mean_cr = csk.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
+    # # AB_diff = A_mean - B_mean
+    # trt_result[sim_count+2, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("csk", A_mean, B_mean, A_mean_cr, B_mean_cr)
+    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
 
     result["time.csk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.csk"]
     arg.csk$policy <- NULL; gc()
@@ -591,13 +592,13 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
       # result[sim, paste0("pmcr_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(pmcr.data.rep$status == s))
     }
-    # within pmcr method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    A_mean = pmcr.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    B_mean = pmcr.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    A_mean_cr = pmcr.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    B_mean_cr = pmcr.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("pmcr", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
+    # # within pmcr method, mean survival time from those who have action -1 and mean survival time for those who have action 1
+    # A_mean = pmcr.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
+    # B_mean = pmcr.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
+    # A_mean_cr = pmcr.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
+    # B_mean_cr = pmcr.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
+    # trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("pmcr", A_mean, B_mean, A_mean_cr, B_mean_cr)
+    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
 
     result["time.pmcr"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.pmcr"]
     arg.pmcr$policy <- NULL; gc()
@@ -660,13 +661,13 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
       result["aipwe_endpoint"] = endpoint_val.fn(aipwe.data.rep) #result[sim, "aipwe_endpoint"]
     }
 
-    # within aipwe method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    A_mean = aipwe.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    B_mean = aipwe.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    A_mean_cr = aipwe.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    B_mean_cr = aipwe.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("aipwe", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
+    # # within aipwe method, mean survival time from those who have action -1 and mean survival time for those who have action 1
+    # A_mean = aipwe.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
+    # B_mean = aipwe.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
+    # A_mean_cr = aipwe.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
+    # B_mean_cr = aipwe.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
+    # trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("aipwe", A_mean, B_mean, A_mean_cr, B_mean_cr)
+    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
 
     result["time.aipwe"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.aipwe"]
     arg.aipwe$policy <- NULL; gc()
@@ -788,13 +789,13 @@ obs_1_tmp = do.call(gdata_CR, arg.obs_tmp)
       # result[sim, paste0("zom_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(zom.data.rep$status == s))
 
-      # within zom method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-      A_mean = zom.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-      B_mean = zom.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-      A_mean_cr = zom.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-      B_mean_cr = zom.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-      trt_result[sim_count+4, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("zom", A_mean, B_mean, A_mean_cr, B_mean_cr)
-      rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
+      # # within zom method, mean survival time from those who have action -1 and mean survival time for those who have action 1
+      # A_mean = zom.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
+      # B_mean = zom.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
+      # A_mean_cr = zom.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
+      # B_mean_cr = zom.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
+      # trt_result[sim_count+4, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("zom", A_mean, B_mean, A_mean_cr, B_mean_cr)
+      # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     }
     # if (!zom.error) result[sim, "zom_phase1"] <- val.fn_phase1(zom.data.rep$event.time)
     # if (!zom.error) result[sim, "zom_phase2"] <- val.fn_phase2(zom.data.rep$event.time)
@@ -969,8 +970,10 @@ final_results0 <- do.call(rbind, results_list) # days
 final_results <- final_results0 %>%
   # convert to years
   mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
+
 if (local == 1){
-  View(final_results)}
+  View(final_results)
+  }
 
 message("\n END OF SIMS \n")
 # result
