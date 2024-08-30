@@ -17,17 +17,17 @@ source("F01.Simulation_Functions.R") # calls libraries
 date_folder = Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 # date_folder = Sys.Date()
 n.eval = 1000 #n.eval = 10000
-n.sim = 1
-mean_tol1 = c(0.15,0)
+n.sim = 100
+mean_tol1 = c(0.1,0)
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
 generate_failure_method = generate_failure_method[1]
 
 if (generate_failure_method == "simple_exp"){
-  crit_t0_eval = 1 # one year?
+  crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
 } else if (generate_failure_method == "fine_gray"){
-  crit_t0_eval = 0.5 # half year?
+  crit_t0_eval = 1 # 1 year (we dont use days bc its calculated using the rates which was for years)
 } else{
   stop("crit_t0_eval for generate_failure_method not defined in CR00.Simulation_Parameters.R.")
 }
@@ -35,7 +35,7 @@ if (generate_failure_method == "simple_exp"){
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
 # skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
-skip_method <- !c(TRUE, TRUE, !TRUE, !TRUE, TRUE, TRUE);
+skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 savingrds = TRUE
 
 #### Run this Script FOR CR. Change name later.
@@ -97,14 +97,14 @@ if (generate_failure_method == "simple_exp"){
   # message("simple_exp with exp censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
-                  tau = 2,#2.5,
+                  tau = 2,#365,#1 year - we use days here b/c censoring is for days #2.5,
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else if (generate_failure_method == "fine_gray"){
   # message("fine_gray with uniform censoring")
   default <- list(n.eval = n.eval,
                   n.sim = n.sim,
-                  tau = 4,
+                  tau = 2,#365,
                   generate_failure_method = generate_failure_method,
                   endpoint = endpoint)
 } else{
@@ -137,8 +137,8 @@ if (endpoint == "CR"){
 
 # arg9
 if (endpoint == "CR" & generate_failure_method == "fine_gray"){
-  cause1_prob <- list(small.cause1prob = list(cause1prob = 0.3),
-                      large.cause1prob = list(cause1prob = 0.7))
+  cause1_prob <- list(small.cause1prob = list(cause1prob = 0.1),
+                      large.cause1prob = list(cause1prob = 0.8))
 } else{
   cause1_prob <- list(cause1.prob = list(cause1prob = 1))
 }
@@ -158,27 +158,29 @@ size <- list(small.sample.size = list(n = 300),
 # arg2 size
 if (generate_failure_method == "fine_gray"){
   censor <- list(low.censoring = list(
-    ctype = 1, # uniform censoring
-    censor_min = 0,
     # we want about 20% censoring
-    censor_max = 4, # higher is less censoring for unif
-    censor_rate = 0.1),
+    ctype = 1, # uniform censoring
+    censor_min = tau/2,
+    censor_max = tau, # higher is less censoring for unif
+    censor_rate = 0  # not used for unif
+    ),
   high.censoring = list(
+    # we want about 50% censoring
     ctype = 1, # uniform censoring
     censor_min = 0,
-    # we want about 50% censoring
-    censor_max = 0.7, # lower is more censoring for unif
-    censor_rate = 0.1))
+    censor_max = 0.8*tau, # lower is more censoring for unif
+    censor_rate = 0 # not used for unif
+    ))
   } else if (generate_failure_method == "simple_exp"){
     censor <- list(low.censoring = list(ctype = 0, # exp censoring
-                                      censor_min = 0,
-                                      censor_max = 0.5,
-                                      censor_rate = 0.5 # lower is less censoring for exp
+                                      censor_min = 0, # not used for exp
+                                      censor_max = 0,# not used for exp
+                                      censor_rate = 0.5 # lower censoring: range 
                                   ),
                    high.censoring = list(ctype = 0, # exp censoring
-                                         censor_min = 0,
-                                         censor_max = 0.5,
-                                         censor_rate = 2.3 # higher is more censoring for exp
+                                         censor_min = 0, # not used for exp
+                                         censor_max = 0, # not used for exp
+                                         censor_rate = 3.3 # higher is more censoring for exp
                                    ))
   } else{
     stop("generate_failure_method is only coded up for simple exponential and fine-gray setting right now.")
@@ -205,17 +207,17 @@ if (endpoint == "CR"){
       # this works when tau = 2
       # N = 300 works better than N = 1000
       beta1 = list(
-        beta1.hazard0 = c(0, -1.6,-1.2,1.5), # (int), covariate (1~3)
-        beta1.hazard1 = c(0, 0.3,-0.4,-0.2),
-        beta2.hazard0 = c(0, 1.1,-1.3,0.3), #c(0,-0.1,-0.2),
-        beta2.hazard1 = c(0, -0.6,0.5,0.3)),
+        beta1.hazard0 = c(0, -1.5,-1.9,-0.3), # (int), covariate (1~3)
+        beta1.hazard1 = c(0, -0.6,-1.9,1.5),
+        beta2.hazard0 = c(0, 1,-0.1,0.4),#c(0, 1.1,-1.3,0.3), #c(0,-0.1,-0.2),
+        beta2.hazard1 = c(0, 1.2, 0.2,-1)),#c(0, -0.6,0.5,0.3)),
 
       # 6 covariates
       beta2 = list(
-        beta1.hazard0 = c(0, -0.5,-0.5,-0.5,-0.3,0.3), # (int), covariate (1~6)
-        beta1.hazard1 = c(0, -0.1,0.6,-0.9,0.5,-0.3),
-        beta2.hazard0 = c(0, 0.1,0.3,-0.6,0.3,0.8),
-        beta2.hazard1 = c(0, -0.3,-0.3,-0.2,-0.2,0.2))
+        beta1.hazard0 = c(0,-0.5,-1.2,1.5,0.1,0.6), #c(0, -0.5,-0.5,-0.5,-0.3,0.3), # (int), covariate (1~6)
+        beta1.hazard1 = c(0,0.3,-0.4,-0.2,0.9,1.6), #c(0, -0.1,0.6,-0.9,0.5,-0.3),
+        beta2.hazard0 = c(0,-0.6,1,1.4,1.5,2,1), #c(0, 0.1,0.3,-0.6,0.3,0.8),
+        beta2.hazard1 = c(0,1.5,-2.1,-0.8,0.1,1)) #c(0, -0.3,-0.3,-0.2,-0.2,0.2))
     )
 
   } else if (default$generate_failure_method == "fine_gray"){

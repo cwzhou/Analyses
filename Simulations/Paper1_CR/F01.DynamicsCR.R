@@ -60,11 +60,15 @@ Dynamics <-
     if (!is.null(covariate)) if (dim(covariate)[1] != N) stop("length of at.risk should match.")
 
     # initial state
+    if (is.null(tau)){
+      message("tau is MISSING so we set it to tau = 10")
+      tau = 10
+    }
     if (is.null(covariate))     covariate = mvrnorm(N, rep(0, ncov), Sig)
     if (is.null(colnames(covariate))) colnames(covariate) = paste0("Z", 1:ncov)
     if (is.null(censor_time)){
-      print("censor time was not generated earlier, randomly generating from unif(0,5) - change if needed")
-      censor_time = runif(N,min=0,max=5)
+      print("censor time was not generated earlier, randomly generating from unif(0,tau) - change if needed")
+      censor_time = runif(N,min=0,max=tau)
     }
     if (is.null(u1)){
       message("u1 was null so we are generating - make sure its the same for all methods")
@@ -74,12 +78,6 @@ Dynamics <-
       message("u2 was null so we are generating - make sure its the same for all methods")
       u2 <<- runif(N)  # Observed value
     }
-    if (is.null(tau)){
-      message("tau is MISSING so we set it to tau = 10")
-      tau = 10
-    }
-    # print('sdf')
-    # print(censor_time)
 
     # skeleton
     if (evaluate == TRUE){
@@ -129,7 +127,7 @@ Dynamics <-
             # below, we want D.1 b/c priority cause?
             for (phase in 1:2){
               # print(colnames(x))
-              # message("F01.multiPhaseDynamicsCR.R: line 103")
+              # message("F01.DynamicsCR.R: line 103")
               # print(sprintf("Phase: %s", phase))
               if (phase == 1){
                 x[, c("obs_time", paste0("D.", phase-1), "Trt", "A")] = 0  # dummy values in order for the package not to drop the NA rows.
@@ -215,7 +213,7 @@ Dynamics <-
               action = opt.AIPWE
 
             } else{
-              stop("no policy for that method exists. (F01.multiPhaseDynamicsCR.R LINE 209")
+              stop("no policy for that method exists. (F01.DynamicsCR.R LINE 209")
             }
           }
         } # policy does not have attr class
@@ -234,6 +232,9 @@ Dynamics <-
 
     # we HAVE OUR ACTION!
     action_tmp1 <<- action
+    covariate_tmp1 <<- covariate
+    u1_tmp1 <<- u1
+    u2_tmp1 <<- u2
 
     # hazards!!!!!!!
     #hazard linear predictor
@@ -252,9 +253,7 @@ Dynamics <-
     failure_os = failure_t1 = failure_t2 = failure_t3 = obs_time_failureCR = numeric(0)
 
     if (generate_failure_method == "fine_gray"){
-      # message("fine-gray")
-      # View(pred.hazard1i)
-      # message("mass_p:", mass_p)
+      message("fine-gray")
       # generating failure time from cause 1 based on Fine-Gray paper (1999):
       for (i in 1:N){
         u1i = u1[i]
@@ -262,16 +261,17 @@ Dynamics <-
         # Use backsolve_t function
         failure_t1[i] <- backsolve_t1(u1i, mass_p, pred.hazard1i)
       }
-      failure_t1 <<- failure_t1 # times 365 to make failure time larger
+      # failure_t1 <- failure_t1
       rate1 = exp(pred.hazard1)
+      # print(1)
       #failure t2
       constant_t2 = 1 #0.2 #to make failure time 2 smaller (more of it)
-      rate2 <<- constant_t2 * exp(pred.hazard2)
+      rate2 <- constant_t2 * exp(pred.hazard2)
       # failure_t2 <- rexp(N, rate = failure_t2_rate)*365 # old one before fixing u2
       failure_t2 <- -(1/rate2)*log(1-u2)
-      failure_t2 <<- failure_t2
+      # print(2)
     } else if (generate_failure_method == "simple_exp"){
-      # message("simple exponential method")
+      message("simple exponential method")
       # Generate 2 exponential RV which depend on covariates,
       # one for the competing event of interest $E_1$
       # and one for other causes, $E_2$.If $E_1<E_2$,
@@ -280,18 +280,23 @@ Dynamics <-
       # Hopefully get more direct control over the marginal cumulative incidence curves.
       # rate0 <<- exp(pred.hazard1) + exp(pred.hazard2)
       f1_constant = 1#1.2 # higher f1_constant to make failure time 1 lower (more of it)
-      rate1 <<- f1_constant * exp(pred.hazard1)
+      rate1 <- f1_constant * exp(pred.hazard1)
       f2_constant = 1#0.2 # lower f2_constant to make failure time 2 larger (less of it)
-      rate2 <<- f2_constant * exp(pred.hazard2)
+      rate2 <- f2_constant * exp(pred.hazard2)
       # set.seed(1);failure_os <- rexp(length(rate0), rate = rate0)
-      failure_t1 = -(1/rate1)*log(1-u1)
-      failure_t2 = -(1/rate2)*log(1-u2)
-      # View(cbind(failure_t1, failure_t2))
+      failure_t1 <- -(1/rate1)*log(1-u1)
+      failure_t2 <- -(1/rate2)*log(1-u2)
+      # print(head(failure_t1))
       } else{
         stop("no method for generating failure times is specified")
       }
+    failure_t1 = failure_t1
+    failure_t2 = failure_t2
+    # print("failure1 and failure2")
+    # print(head(cbind(failure_t1, failure_t2)))
+    ftdf <<- cbind(failure_t1, failure_t2)
     rates <<- cbind(rate1 = rate1, rate2 = rate2) #rate0 = rate0,
-
+    # print(1)
     ## evaluate ##
     if (evaluate == TRUE){
       # View(rates)
@@ -304,6 +309,8 @@ Dynamics <-
                             rate1 = rate1,
                             rate2 = rate2,
                             mass_p = mass_p)
+        # print("OS_eval")
+        # print(head(OS_eval))
         CIF_eval = eval_sims(generate_failure_method = generate_failure_method,
                              eval_ep = "CIF", priority_cause = priority_cause,
                              tau = tau,
@@ -311,6 +318,8 @@ Dynamics <-
                              rate1 = rate1,
                              rate2 = rate2,
                              mass_p = mass_p)
+        # print("CIF_eval")
+        # print(head(CIF_eval))
     }
 
     ## summary statistics
@@ -318,8 +327,7 @@ Dynamics <-
     ft1 <<- failure_t1; ft2 <<- failure_t2
     # View(cbind(ft0 = ft0, ft1 = ft1, ft2 = ft2))
     X.cause = pmin(failure_t1, failure_t2)#, failure_t3)
-    Xcause1 <<- failure_t1
-    Xcause2 <<- failure_t2
+    # Xcause1 <<- failure_t1; Xcause2 <<- failure_t2
     # Xcause3 <<- failure_t3
     censor.time <<- censor_time # this is already truncated by tau
     # print(3)
@@ -328,7 +336,7 @@ Dynamics <-
     D.2 = (failure_t2 <= censor.time & X.cause == failure_t2)
     status = 1*D.1+2*D.2
     # print(98)
-    # # tmp3 <<- phase.output
+    # tmp3 <<- phase.output
     # print(99)
     # ## bookkeeping and reassigning
     # print(100)
@@ -365,7 +373,7 @@ Dynamics <-
     # View(cbind(output,Xcause1,Xcause2,X.cause,censor.time))
 
     if (full_data == 1) {
-      # print(1)
+      # print("full_data == 1")
 
       f_times <<- cbind(failure.time1 = failure_t1,
                       failure.time2 = failure_t2,
@@ -393,7 +401,7 @@ Dynamics <-
 backsolve_t1 <- function(u1i, mass_p, pred.hazard1) {
   # Function to solve for t
   solve_t <- function(t, u1i, mass_p, pred.hazard1) {
-    (1 - (1 - mass_p * (1 - exp(-t))) ^ exp((pred.hazard1))) / (1 - (1 - mass_p) ^ exp(pred.hazard1)) - u1i
+    ((1 - ((1 - mass_p * (1 - exp(-t))) ^ exp(pred.hazard1))) / (1 - ((1 - mass_p) ^ exp(pred.hazard1)))) - u1i
   }
   # Specify the interval
   lower_boundary <- 1e-250
@@ -426,11 +434,12 @@ OS_func <- function(generate_failure_method, t, cause1_prob, lambda1, lambda2) {
   } else if (generate_failure_method == "fine_gray"){
     # print("fg os")
     term1 = (1-cause1_prob*(1-exp(-t)))^lambda1
-    term2 = -(1-exp(-t*lambda2))*((1-cause1_prob)^lambda1)
-    St = term1 + term2
+    term2 = (1-exp(-t*lambda2))*((1-cause1_prob)^lambda1)
+    St = term1 - term2
   } else{
     stop("generate_failure_method must be simple_exp or fine_gray.")
   }
+  # message("St = ", St)
   return(St)
 }
 # PC subdistribution for evaluation for sims
@@ -469,6 +478,7 @@ subdist_func <- function(generate_failure_method, priority_cause, t, cause1_prob
   } else{
     stop("generate_failure_method must be simple_exp or fine_gray.")
   }
+  # message("CIF = ", subdistr)
   return(subdistr)
 }
 
@@ -486,6 +496,7 @@ eval_sims = function(generate_failure_method,
   if (eval_ep == "OS"){
     # overall survival
     if (crit.eval == "prob"){
+      # message("crit.eval is prob")
       if (is.null(t0) | is.na(t0)){
         stop("t0.os needs to be specified for current crit.eval.os in F01 LINE 273")
       }
@@ -498,20 +509,27 @@ eval_sims = function(generate_failure_method,
                                generate_failure_method = generate_failure_method,
                                cause1_prob = mass_p,
                                lambda1 = rate1[i], lambda2 = rate2[i])
+        if (i == 1){
+          # print("OS testing i = 1")
+          # print(OS_result$value)
+        }
         OS_result1[i] = OS_result$value
-        # if (i == 30){
+        if (i == 1){
         #   message("rate1:",rate1[i])
         #   message("rate2:",rate2[i])
-        #   print(OS_func)
-        #   message("OS_result$value:",OS_result$value)
-        # }
+          # print(OS_func)
+          # message("OS_result$value:",OS_result$value)
+        }
       }
       OS_eval = OS_result1
+      testt <<- OS_func(generate_failure_method, t0, mass_p, rate1, rate2)
+      # View(testt)
     }
     eval_result = OS_eval
   } else if (eval_ep == "CIF"){
     # endpoint
     if (crit.eval == "prob"){
+      # message("crit.eval is prob")
       if (is.null(t0) | is.na(t0)){
         stop("t0.cif needs to be specified for current crit.eval.cif in F01 LINE 273")
       }
@@ -525,19 +543,27 @@ eval_sims = function(generate_failure_method,
                                 priority_cause = priority_cause,
                                 cause1_prob = mass_p,
                                 lambda1 = rate1[i], lambda2 = rate2[i])
+        if (i == 1){
+          # print("CIF testing i = 1")
+          # print(CIF_result$value)
+          # stop()
+        }
         CIF_result1[i] = CIF_result$value
+
       }
       CIF_eval = CIF_result1
+      testtcr <<- subdist_func(generate_failure_method, priority_cause, t0, mass_p, rate1, rate2)
+      # View(testtcr)
     }
     eval_result = CIF_eval
     } else{
     stop("eval_ep needs to be one of OS or CIF")
-  }
+    }
   return(eval_result)
 }
 
 
-# message("End of F01.multiPhaseDynamicsCR.R")
+# message("End of F01.DynamicsCR.R")
 
 
 # End of script -------------------------------------------------------------
