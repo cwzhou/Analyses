@@ -15,6 +15,46 @@ source("CR00.Simulation_Parameters.R")
 # call on functions then runs simulations
 source("CR00.Simulation_Body.R")
 
+# Combine the results into a single dataframe
+final_results0 <- do.call(rbind, results_list) # days
+final_results <- final_results0 %>%
+  # convert to years
+  mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
+
+result_sub = final_results %>%
+  dplyr::select(obs_survival, czmk_survival,
+                csk_survival, pmcr_survival,
+                aipwe_survival, zom_survival,
+                obs_endpoint, czmk_endpoint,
+                csk_endpoint, pmcr_endpoint,
+                aipwe_endpoint, zom_endpoint)
+
+
+means = apply(result_sub, 2, mean, na.rm=TRUE)
+sds = apply(result_sub, 2, sd, na.rm=TRUE)
+mean_sd = cbind(means,sds)
+
+long_res = list(statistics = final_results,
+                settings = setting,
+                # true_P2_eval = true3,
+                # p2.df = p2.df,
+                mean_sd = mean_sd)
+
+#not saving result_ext right now (statistics = result not statistics = result_ext)
+if (savingrds == TRUE){
+  message('saving rds')
+  saveRDS(long_res,
+          filename)
+  
+  # message('saving true2')
+  # saveRDS(list(settings = setting,
+  #              true2_full_P2_eval = true2,
+  #              ind_stat = trt_result),
+  #         filename.true2)
+}
+# write.csv(final_results, "/nas/longleaf/home/js9gt/survrf/Outputs/1STRATA_28Aug_10stage__500pt_lowcens_V2", row.names=FALSE)
+
+
 # source("plotting value functions.R")
 # plot_values(combined_data, OS_eval)
 # plot_values(combined_data, CIF_eval)
@@ -24,6 +64,7 @@ if (local == 1){
   # data.df%>%group_by(action) %>% summarize(mean = mean(event.time))
   # data.df%>%group_by(status,action) %>% summarize(mean = mean(event.time))
   print(final_results)
+  print(round(mean_sd,3))
   # View(final_results)
 }
 
