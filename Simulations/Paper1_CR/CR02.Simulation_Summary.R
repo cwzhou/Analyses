@@ -1,3 +1,9 @@
+local = 1
+if (local == 1){
+   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+ } else{
+   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+ }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
 saving_eps = TRUE#TRUE
@@ -216,6 +222,7 @@ for (crit.no in 1:crit.tot){
         }
       }) %>%
       do.call(rbind, .) %>%
+      # below is ONLY for days,not years
       mutate(value = ifelse(value<2, 365.25*value,value)) %>%
       mutate(
         method = factor(method,
