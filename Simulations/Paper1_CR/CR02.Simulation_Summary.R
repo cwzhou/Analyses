@@ -312,9 +312,9 @@ for (crit.no in 1:crit.tot){
         facet_grid(setting ~ censor + n + design, scales = "free_y")
     }
     p = p0 +
-      geom_point() +
+      # geom_point() +
       geom_boxplot() +
-      # geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
+      geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
       scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
       ylab(ylabs) +
       theme_bw() #+
@@ -349,7 +349,7 @@ for (crit.no in 1:crit.tot){
       if (saving_eps == TRUE){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
       }
-      ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
+      ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
              p.list[[Phase.no]],
              width = 12, height = 10)
 
