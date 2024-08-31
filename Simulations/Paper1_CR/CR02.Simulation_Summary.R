@@ -186,7 +186,7 @@ for (crit.no in 1:crit.tot){
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
           # print(head(a))
           beginning <- as.data.frame(a) %>%
-            dplyr::select(rep = sim,
+            dplyr::select(rep = sim.no,
                           all_of(var_method),
                           czmk_n_phase2, zom_n_phase2,
                           training_percent.censor, training_cause.1, training_cause.2)
