@@ -295,13 +295,13 @@ for (crit.no in 1:crit.tot){
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
-        facet_grid(cause1prob + setting ~ censor + n + design)
+        facet_grid(cause1prob + setting ~ censor + n + design, scales = "free_y")
     } else{
       p0 <-
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
-        facet_grid(setting ~ censor + n + design)
+        facet_grid(setting ~ censor + n + design, scales = "free_y")
     }
     p = p0 +
       geom_point() +
