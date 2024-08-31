@@ -1,7 +1,7 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-local = 0
+# local = 0 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
 # local = 1 # local = 0 for cluster
 #
 # # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
