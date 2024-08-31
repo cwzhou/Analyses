@@ -1,7 +1,7 @@
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
-# local = 0 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
+local = 0 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
 # local = 1 # local = 0 for cluster
 #
 # # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
@@ -23,7 +23,7 @@ mean_tol1 = c(0.1,0) # this is for differences in years so we don't want it to b
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
