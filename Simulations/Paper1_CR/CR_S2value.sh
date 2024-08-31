@@ -5,8 +5,9 @@ for l in {1..2} # cause 1 probabilty for CR # change to just 1 for simple_exp
         do for h in {1..2} #{1..4} beta = 1,2,3,4
           #ncauses = 2
             do for g in {1..2} # censor is either low (1) or high (2)
-   	      #endpoint = CR
-                do sbatch -t 07-05:00:00  --mail-type=fail --mail-user=cwzhou@email.unc.edu --mem=10G CR_S0run.sh CR01.Simulation_Run.R 1 $g 1 $h $i $j $k $k $l $1  #$1 = date
+   	          #endpoint = CR
+                do sbatch -t 07-05:00:00  --mail-type=fail --mail-user=cwzhou@email.unc.edu --mem=9000 CR_S0run.sh CR01.Simulation_Run.R 1 $g 1 $h $i $j $k $k $l $1  #$1 = date
+                #do sbatch -N 1 -n 1 -p gpu  -t 05-00:00:00 --mem=10G --qos gpu_access --gres=gpu:1 --mail-type=fail --mail-user=cwzhou@email.unc.edu CR_S0run.sh CR01.Simulation_Run.R 1 $g 1 $h $i $j $k $k $l $1  #$1 = date
       	      #done
             done
       	  #done
