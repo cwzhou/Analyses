@@ -216,6 +216,7 @@ for (crit.no in 1:crit.tot){
         }
       }) %>%
       do.call(rbind, .) %>%
+      mutate(value = ifelse(value<2, 365.25*value,value)) %>%
       mutate(
         method = factor(method,
                         levels = method.nm.simple1,
@@ -408,3 +409,4 @@ if (local == 1){
 }
 
 message("End of CR02.Simulation_Summary.R")
+
