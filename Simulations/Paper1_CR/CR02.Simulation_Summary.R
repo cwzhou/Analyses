@@ -1,4 +1,4 @@
-local = 1
+local = 0
 if (local == 1){
    setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
  } else{
