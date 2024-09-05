@@ -57,7 +57,7 @@ assign_skip_function(all_methods, skip_method)
 ### 0. Get the setting number.
 arg <- commandArgs(trailingOnly = TRUE)
 if (length(arg) < 9) {
-  arg = c(1, 1, 1, 2, 1, 1, 1, 1, 1) # by default
+  arg = c(1, 1, 1, 1, 1, 1, 1, 1, 1) # by default
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))
 }
