@@ -74,6 +74,18 @@ if (local == 1){
   print(final_results)
   print(round(mean_sd,3))
   # View(final_results)
+
+  print(rep_csk %>%
+          group_by(action) %>%
+          summarise(n=n(),
+                    os = mean(OS_eval),
+                    cif = mean(CIF_eval)))
+
+  print(rep_czmk %>%
+          group_by(action) %>%
+          summarise(n=n(),
+                    os = mean(OS_eval),
+                    cif = mean(CIF_eval)))
 }
 
 message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
