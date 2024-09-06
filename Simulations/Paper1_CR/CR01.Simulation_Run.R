@@ -3,6 +3,7 @@
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 local = 0
+parallel = 0
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
@@ -13,21 +14,26 @@ if (local == 1){
 source("CR00.Simulation_Parameters.R")
 
 # call on functions then runs simulations
-source("CR00.Simulation_Body.R")
+if (parallel == 1){
+  source("CR00.Simulation_Body.R")
+  print("now going into rbind")
+  # Combine the results into a single dataframe
+  final_results0 <- do.call(rbind, results_list) # years
+  print(is.data.frame(final_results0))
+  final_results0 = as.data.frame(final_results0)
+  print(is.data.frame(final_results0))
+  print(tail(final_results0))
+  final_results <- final_results0 %>%
+    #   # convert to days
+    mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
+  print("final_results")
+  print(is.data.frame(final_results))
+  print(tail(final_results,10))
+} else{
+  source("CR00.Simulation_Body_noparallel.R")
+  final_results = result
+}
 
-print("now going into rbind")
-# Combine the results into a single dataframe
-final_results0 <- do.call(rbind, results_list) # years
-print(is.data.frame(final_results0))
-final_results0 = as.data.frame(final_results0)
-print(is.data.frame(final_results0))
-print(tail(final_results0))
-final_results <- final_results0 %>%
-#   # convert to days
-  mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
-print("final_results")
-print(is.data.frame(final_results))
-print(tail(final_results,10))
 
 result_sub = final_results %>%
   dplyr::select(obs_survival, czmk_survival,
