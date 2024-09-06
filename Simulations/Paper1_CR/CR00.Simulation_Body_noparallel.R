@@ -1,6 +1,6 @@
 #### This script is run automatically from CR02.Simulation_Run.R. DO not run alone.
 
-library(parallel)
+# library(parallel)
 setting_seed = 0
 
 start_time = Sys.time()
