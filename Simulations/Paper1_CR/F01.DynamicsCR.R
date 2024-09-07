@@ -257,21 +257,26 @@ Dynamics <-
     if (generate_failure_method == "fine_gray"){
       message("fine-gray")
       # generating failure time from cause 1 based on Fine-Gray paper (1999):
+      # u11<<-u1
+      # pred.hazard11 <<- pred.hazard1
+      # massp <<- mass_p
       for (i in 1:N){
+        # print(i)
         u1i = u1[i]
         pred.hazard1i = pred.hazard1[i]
         # Use backsolve_t function
         failure_t1[i] <- backsolve_t1(u1i, mass_p, pred.hazard1i)
       }
+      # print(1)
       # failure_t1 <- failure_t1
       rate1 = exp(pred.hazard1)
-      # print(1)
+      # print(2)
       #failure t2
       constant_t2 = 1 #0.2 #to make failure time 2 smaller (more of it)
       rate2 <- constant_t2 * exp(pred.hazard2)
       # failure_t2 <- rexp(N, rate = failure_t2_rate)*365 # old one before fixing u2
       failure_t2 <- -(1/rate2)*log(1-u2)
-      # print(2)
+      # print(3)
     } else if (generate_failure_method == "simple_exp"){
       message("simple exponential method")
       # Generate 2 exponential RV which depend on covariates,
