@@ -2,8 +2,8 @@
 ## Edit parameters in CR00.Simulation_Parameters.R script
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-local = 0
-parallel = 1
+local = 1
+parallel = 0
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
