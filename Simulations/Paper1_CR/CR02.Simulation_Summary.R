@@ -1,4 +1,5 @@
-local = 0
+solo.plot = 1
+local = 1
 if (local == 1){
    setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
  } else{
@@ -20,7 +21,7 @@ testing_out = 1
 # endpoint = "CR"
 # generate_failure_method = c("simple_exp","fine_gray");
 # generate_failure_method = generate_failure_method[1]
-lab.date = "2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+lab.date = "2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
 dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 
@@ -123,7 +124,7 @@ if (endpoint == "CR"){
 }
 print(fn)
 
-p.list <- list()
+p.list <- p.list.solo <- list()
 for (crit.no in 1:crit.tot){
   message("%%%%%%%%%%%% crit.no", crit.no, " %%%%%%%%%%%%%%%%%")
   if (crit.no == 1){
@@ -136,6 +137,7 @@ for (crit.no in 1:crit.tot){
     # y_limits = y_limits_prob
   }
   file.name.saved = file_naming(lab.date, "SimulationResults", crit.no)
+  file.name.saved.solo = file_naming(lab.date, "solo.SimulationResults", crit.no)
   message(file.name.saved)
   for (Phase.no in 1:2){
     if (Phase.no == 1){
@@ -223,7 +225,7 @@ for (crit.no in 1:crit.tot){
       }) %>%
       do.call(rbind, .) %>%
       # below is ONLY for days,not years
-      mutate(value = ifelse(value<2, 365.25*value,value)) %>%
+      mutate(value = ifelse(value<2, value*365.25,value)) %>%
       mutate(
         method = factor(method,
                         levels = method.nm.simple1,
@@ -288,6 +290,7 @@ for (crit.no in 1:crit.tot){
     result.stat <- left_join(result.stat, result.stat.sd)
     rm(result.stat.sd)
     file.name.phase = file_naming(lab.date, Phase_lab, crit.no)
+    file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
     design.filter = c("Observational", "RCT")
     if (crit.no == 1){
       ylabs = sprintf("Mean Truncated %s", Phase_lab_1)
@@ -345,13 +348,78 @@ for (crit.no in 1:crit.tot){
                      geom = 'text',
                      col = "black",
                      vjust = -1.1,
-                     size = 2.5)
+                     size = 2.5) +
+      # Expand y-axis limits to prevent labels from being cut off
+      scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
+      
       if (saving_eps == TRUE){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
+        ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
+               p.list[[Phase.no]],
+               width = 12, height = 10)
       }
-      ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
-             p.list[[Phase.no]],
-             width = 12, height = 10)
+      
+      
+      if (solo.plot == 1){
+        solo.result.comb1 = result.comb1 %>% 
+          filter(design %in% design.filter[1]) %>%
+          filter(setting %in% "ncov=5",
+                 n %in% "N=700",
+                 censor %in% "Low Censoring (20%)") 
+        
+        if (generate_failure_method == "fine_gray"){
+          solo.result.comb1 = solo.result.comb1 %>%
+            filter(cause1prob %in% "mass_p = 0.8")
+          p0.solo <-
+            solo.result.comb1 %>%
+            ggplot(aes(x = method, y = value, group = method, color = method)) +
+            facet_grid(cause1prob + setting ~ censor + n + design)# , scales = "free_y")
+        } else{
+          p0.solo <-
+            solo.result.comb1 %>%
+            ggplot(aes(x = method, y = value, group = method, color = method)) +
+            facet_grid(setting ~ censor + n + design, scales = "free_y")
+        }
+        p.solo = p0.solo +
+          geom_boxplot() +
+          geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
+          scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
+          ylab(ylabs) +
+          theme_bw() #+
+        # theme(legend.position = "bottom")
+        rng = suppressWarnings(layer_scales(p.solo)$y$range$range)
+        rng[3] = rng[2] - rng[1]
+        rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
+        rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
+        p.list.solo[[Phase.no]] <-
+          p.solo +
+          stat_summary(aes(x = as.numeric(method),
+                           y = value),
+                       fun = mean,
+                       geom = 'point',
+                       col = "black",
+                       shape = "square",
+                       size = 1) +
+          stat_summary(aes(x = as.numeric(method),
+                           y = value,
+                           label = round(..y.., 2),
+          ),
+          fun = mean,
+          geom = 'text',
+          col = "black",
+          vjust = -1.1,
+          size = 2.5) +
+          scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
+                             # Expand y-axis limits to prevent labels from being cut off
+                             expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
+        
+        if (saving_eps == TRUE){
+          ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
+          ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
+                 p.list.solo[[Phase.no]],
+                 width = 12, height = 10)
+        }
+      }
 
     } # end of Phase.no for-loop
 
@@ -364,7 +432,7 @@ for (crit.no in 1:crit.tot){
     theme(legend.position = "none",
           axis.title.x=element_blank()) #+
     # ylim(y_limits)
-
+  
   p.grid <- plot_grid(p.1,
                       p.2,
                       align = "vh",
@@ -406,10 +474,47 @@ for (crit.no in 1:crit.tot){
   ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
          p.grid1,
          width = 20, height = 10)
+  
+  if (solo.plot == 1){
+    # y_limits = c(0.3,2.5)
+    y_limits = c(200,800)
+    p.1.solo = p.list.solo[[1]] +
+      theme(legend.position = "none",
+            axis.title.x=element_blank()) +
+    ylim(y_limits)
+    p.2.solo = p.list.solo[[2]] +
+      theme(legend.position = "none",
+            axis.title.x=element_blank()) +
+    ylim(y_limits)
+    p.grid.solo <- plot_grid(p.1.solo,
+                             p.2.solo,
+                             align = "vh",
+                             axis = "tblr",
+                             nrow = 1, ncol = 2)#,
+    # common.legend = FALSE)
+    p.grid1.solo <- plot_grid(p.grid.solo,
+                              get_legend(p.list.solo[[2]] +
+                                           theme(legend.direction = "horizontal",
+                                                 legend.key.size = unit(0.5, "cm"),    # Adjust the size of the legend keys
+                                                 legend.text = element_text(size = 8), # Adjust the size of the legend text
+                                                 legend.spacing.x = unit(0.1, "cm")) +
+                                           guides(color = guide_legend(nrow = 1, title = "Methods"))),
+                              align = "vh",
+                              axis = "tblr",
+                              ncol = 1,
+                              nrow = 2,
+                              rel_heights = c(1, 0.1))
+    save_plot(file.name.saved.solo, p.grid1.solo, base_height = 10, base_width = 20)
+    ggsave(file.name.saved.solo %>% gsub(".eps", ".png", .), #save as png too
+           p.grid1.solo,
+           width = 20, height = 10)
+  }
+
   } # end of crit.tot for-loop
 
 # EXPLORING PROPOPRTION OF PEOPLE DYING FROM CAUSE 1 (crit = 1: truncated mean)
 # source("CR03.Simulation_Summary_Supplementary.R")
+
 
 if (local == 1){
   # beep()
