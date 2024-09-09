@@ -107,17 +107,23 @@ for (crit1 in 1:length(possible_crits1)) {
           label = sprintf(paste0("%3.", if (crit == "mean") 0 else 3, "f"), ..y..)
         ),
         fun.y = mean,
-        geom = 'label',  # Use geom_label for a background
+        geom = 'text',
+        # geom = 'label',  # Use geom_label for a background; use 'text' for text
+        # fill = "white",  # White background
+        # label.size = 0,  # No border
+        # label.padding = unit(0.25, "lines")  # Padding around the label
         col = "black",
-        fill = "white",  # White background
-        label.size = 0,  # No border
         position = position_dodge(width = 0.9),  # Adjust the position to avoid overlap
-        vjust = -0.5,
+        vjust = -3.2,
+        hjust = -0.2,
         size = 3,
         fontface = "bold",  # Make the text bold
-        label.padding = unit(0.25, "lines")  # Padding around the label
+        ) +
+      theme_bw() + 
+      theme(axis.title.x = element_blank(),
+            panel.grid.major = element_blank()#, # Removes major gridlines
+            # panel.grid.minor = element_blank()  # Removes minor gridlines
       ) +
-      theme_bw() + theme(axis.title.x = element_blank()) +
       # ylim(c(if (crit == "mean") { if (all_cause) 2000 else 2200} else { if (all_cause) 0.45 else 0.6}, NA)) +
       ylab(if (crit == "mean" | crit == "area"){
         if (endpoint_type == "OS"){
@@ -132,7 +138,11 @@ for (crit1 in 1:length(possible_crits1)) {
             "Truncated death survival probability?"
           }
           }) +
-      guides(col = "none", group = "none")
+      guides(col = "none", group = "none") + 
+      scale_y_continuous(
+        breaks = c(0, 50, 100, 150, 200, 250),  # Define the breaks you want
+        limits = c(0, 270)                 # Set y-axis limits if needed
+      )
   }
 
   p1[[crit1]] = plot_RDA(data.long, "OS")

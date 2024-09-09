@@ -249,6 +249,7 @@ dat0 = data %>%
       args.CZMK <- list(data = train,
                         endPoint = "CR",
                         epName = "status",
+                        yName = "obs_time",
                         txName = Tx.nm,
                         models = models_itr,
                         tau = tau,
