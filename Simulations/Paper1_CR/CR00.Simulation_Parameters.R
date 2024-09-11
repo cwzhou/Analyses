@@ -16,15 +16,15 @@
 source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
-# date_folder = "2024-08-31" #Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
-date_folder = "2024-09-09" #Sys.Date()
-n.eval = 1000 #n.eval = 10000
+# date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
+date_folder = Sys.Date()
+n.eval = 10000 #n.eval = 10000
 n.sim = 200
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
@@ -57,7 +57,7 @@ assign_skip_function(all_methods, skip_method)
 ### 0. Get the setting number.
 arg <- commandArgs(trailingOnly = TRUE)
 if (length(arg) < 9) {
-  arg = c(1, 2, 1, 1, 2, 1, 1, 1, 2) # by default
+  arg = c(1, 1, 1, 1, 1, 1, 1, 1, 1) # by default
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))
 }

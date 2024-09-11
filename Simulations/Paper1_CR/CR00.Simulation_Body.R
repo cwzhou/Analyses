@@ -403,7 +403,7 @@ message("data.df")
                     uniformSplit = TRUE,
                     replace = FALSE,
                     randomSplit = 0.2,
-                    nTree = 1,#300,
+                    nTree = 300,
                     pooled = FALSE,
                     stratifiedSplit = 0.1)
     set.seed(train_seed + 1)
