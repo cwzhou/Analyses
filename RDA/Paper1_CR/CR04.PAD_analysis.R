@@ -59,6 +59,7 @@ pad_df = read.csv("/Volumes/McGinigle_Kate_IRB18-1153/Analysis/pad_df.csv",
 dataset_name = "pad"
 # code for reading in data
 data = pad_df %>%
+  dplyr::select(-stentBPG) %>%
   # make sure Treatment is "Trt" and time is "obs_time"
   mutate(Trt = ifelse(Trt == "Endovascular", 1, 0)) %>%
   # replace any covariate names with space or - with _

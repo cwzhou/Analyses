@@ -140,8 +140,8 @@ for (crit1 in 1:length(possible_crits1)) {
           }) +
       guides(col = "none", group = "none") + 
       scale_y_continuous(
-        breaks = c(0, 50, 100, 150, 200, 250),  # Define the breaks you want
-        limits = c(0, 270)                 # Set y-axis limits if needed
+        breaks = c(50, 100, 150, 200, 250, 300),  # Define the breaks you want
+        limits = c(50, 300)                 # Set y-axis limits if needed
       )
   }
 

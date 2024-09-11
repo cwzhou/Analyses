@@ -2,7 +2,7 @@
 ## Edit parameters in CR00.Simulation_Parameters.R script
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-local = 0
+local = 1
 parallel = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
@@ -81,21 +81,21 @@ if (local == 1){
   print(round(mean_sd,3))
   # View(final_results)
 
-  if (!skip.csk){
-    print(rep_csk %>%
-            group_by(action) %>%
-            summarise(n=n(),
-                      os = mean(OS_eval),
-                      cif = mean(CIF_eval)))
-  }
-
-  if (!skip.czmk){
-    print(rep_czmk %>%
-            group_by(action) %>%
-            summarise(n=n(),
-                      os = mean(OS_eval),
-                      cif = mean(CIF_eval)))
-  }
+  # if (!skip.csk){
+  #   print(rep_csk %>%
+  #           group_by(action) %>%
+  #           summarise(n=n(),
+  #                     os = mean(OS_eval),
+  #                     cif = mean(CIF_eval)))
+  # }
+  # 
+  # if (!skip.czmk){
+  #   print(rep_czmk %>%
+  #           group_by(action) %>%
+  #           summarise(n=n(),
+  #                     os = mean(OS_eval),
+  #                     cif = mean(CIF_eval)))
+  # }
 }
 
 message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
