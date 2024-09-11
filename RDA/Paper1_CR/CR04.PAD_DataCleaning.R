@@ -345,7 +345,8 @@ df_tmp1 = df_tmp0 %>%
                 Ethnicity, #indicator
                 Male, #indicator
                 InflowDisease, OutflowDisease, RunoffDisease,
-                stentBPG, CAD,
+                stentBPG, # previous revascularization
+                CAD,
                 CHRONIC_PULM_DISEASE, COAGULOPATHY,
                 `CONGESTIVE HEART FAILURE-COMPLICATED`, CHF,
                 `DEFICIENCY ANEMIA-NA`, `DEMENTIA-NA`, MI, OBESITY,
