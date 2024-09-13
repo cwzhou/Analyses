@@ -18,7 +18,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
 date_folder = "2024-09-15" #Sys.Date()
-n.eval = 10000 #n.eval = 10000
+n.eval = 1000 #n.eval = 10000
 n.sim = 200
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
