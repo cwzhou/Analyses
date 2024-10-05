@@ -291,7 +291,7 @@ for (crit.no in 1:crit.tot){
     rm(result.stat.sd)
     file.name.phase = file_naming(lab.date, Phase_lab, crit.no)
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
-    design.filter = c("Observational", "RCT")
+    design.filter = c("Trt: Covariate Dependent","Trt: Covariate Independent")
     if (crit.no == 1){
       ylabs = sprintf("Mean Truncated %s", Phase_lab_1)
     } else {
