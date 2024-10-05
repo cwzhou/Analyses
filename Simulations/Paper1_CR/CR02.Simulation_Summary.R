@@ -57,7 +57,7 @@ n.levels = c(1,2)
 n.labels = c(sprintf("N=%s",size$small.sample.size$n),
              sprintf("N=%s",size$large.sample.size$n))
 design.levels = c(1,2)
-design.labels = c("Observational","RCT")
+design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
 beta.levels = c(1,2)
 beta.labels = c(sprintf("ncov=%s",ncov.list$beta1),
              sprintf("ncov=%s",ncov.list$beta2))
@@ -351,22 +351,22 @@ for (crit.no in 1:crit.tot){
                      size = 2.5) +
       # Expand y-axis limits to prevent labels from being cut off
       scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
-      
+
       if (saving_eps == TRUE){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
         ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
                p.list[[Phase.no]],
                width = 12, height = 10)
       }
-      
-      
+
+
       if (solo.plot == 1){
-        solo.result.comb1 = result.comb1 %>% 
+        solo.result.comb1 = result.comb1 %>%
           filter(design %in% design.filter[1]) %>%
           filter(setting %in% "ncov=5",
                  n %in% "N=700",
-                 censor %in% "Low Censoring (20%)") 
-        
+                 censor %in% "Low Censoring (20%)")
+
         if (generate_failure_method == "fine_gray"){
           solo.result.comb1 = solo.result.comb1 %>%
             filter(cause1prob %in% "mass_p = 0.8")
@@ -412,7 +412,7 @@ for (crit.no in 1:crit.tot){
           scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
                              # Expand y-axis limits to prevent labels from being cut off
                              expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
-        
+
         if (saving_eps == TRUE){
           ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
           ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
@@ -432,7 +432,7 @@ for (crit.no in 1:crit.tot){
     theme(legend.position = "none",
           axis.title.x=element_blank()) #+
     # ylim(y_limits)
-  
+
   p.grid <- plot_grid(p.1,
                       p.2,
                       align = "vh",
@@ -474,7 +474,7 @@ for (crit.no in 1:crit.tot){
   ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
          p.grid1,
          width = 20, height = 10)
-  
+
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
     y_limits = c(200,800)
