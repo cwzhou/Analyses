@@ -1,4 +1,4 @@
-R code for simulation studies and real data analysis for implementing ITRsurv R package for competing risk endpoint
+R code for simulation studies and real data analysis for implementing itrSurv R package for competing risk endpoint
 
 1. Simulations.
 The simulations are designed to be run in R 3.4.1.
