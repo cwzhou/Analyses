@@ -35,8 +35,10 @@ endpoint = "RE" # endpoint
 Tx.nm = "A"
 
 ## other parameters
-nodesize = 5
-mindeath = round(sqrt(c(nodesize)), 0)
+nodeSizeSurv = 5
+nodeSizeEnd = 5
+minEventSurv = round(sqrt(c(nodeSizeSurv)), 0)
+minEventEnd = round(sqrt(c(nodeSizeEnd)), 0)
 Ntree = 1
 ert = FALSE
 rs = 0.2 # randomSplit = 0.2
@@ -220,7 +222,8 @@ values_colsnames <- c(
   unlist(lapply(traintest_methods, function(method) paste0(method, test_values))),
   # paste0(rda_methods, ".OS"),
   # paste0(rda_methods, ".RE"),
-  "ns.CZMK",
+  "ns1.CZMK",
+  "ns2.CZMK",
   "train_cens", "train_RE", "train_terminal"
 )
 values <- matrix(NA, K, length(values_colsnames),
@@ -306,14 +309,15 @@ for (cv in 1:K) {
                       pooled = FALSE,
                       tol1 = c(0.1,0.1),
                       stratifiedSplit = 0.1)
-    values[cv, "ns.CZMK"] = nodesize
+    values[cv, "ns1.CZMK"] = nodeSizeSurv
+    values[cv, "ns2.CZMK"] = nodeSizeEnd
     set.seed(cv)
     CZMK.i <-
       try(do.call(itrSurv::itrSurv,
-                  c(args.CZMK, list(nodeSizeSurv = nodesize,
-                                    nodeSizeEnd = nodesize,
-                                    minEventSurv = mindeath
-                                    minEventEnd = mindeath))))
+                  c(args.CZMK, list(nodeSizeSurv = nodeSizeSurv,
+                                    nodeSizeEnd = nodeSizeEnd,
+                                    minEventSurv = minEventSurv,
+                                    minEventEnd = minEventEnd))))
     values[cv, "CZMK.train.OS"] = CZMK.i@value[["V1"]][["Et_survival"]]
     values[cv, "CZMK.train.PropPhase2"] = CZMK.i@value[["V2"]][["PropPhase2"]]
     values[cv, "CZMK.train.RE"] = CZMK.i@value[["V3"]][["Et_mff"]]
@@ -368,7 +372,7 @@ for (cv in 1:K) {
     mutate(eligibility = !any(is.na(.data[[Tx.nm]]))) %>%
     ungroup() %>%
     pull(eligibility)
-  
+
   ### B1. the proposed method
   if (!err.CZMK) {
     for (phase in 1:2){
