@@ -103,7 +103,7 @@ gdata_RE <- function(N=10,
                  gapparam1, gapparam2, tau)
 
   # generating covariates
-  if (ztype == 0){z <- abs(rnorm(N))} #print("Covariates follow N(0,1)");
+  if (ztype == 0){z <- rnorm(N)} #print("Covariates follow N(0,1)");
   if (ztype == 1){z <- rbinom(N, 1, zparam)}
   if (ztype == 2){z <- runif(N)}
   # print(sprintf("covariates z: %s",z))
@@ -116,6 +116,10 @@ gdata_RE <- function(N=10,
   # generating censoring time
   if (ctype == 0){cc <- rexp(N,cparam)}
   if (ctype == 1){cc <- runif(N,min=0,max=tau)}
+  if (ctype == 99){
+    print("!!!!! no censoring. !!!!!")
+    cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau though so fix in future)
+  }
   # print(sprintf("censoring time cc: %s",cc))
 
   # generating gap time 1 using Gumbel bivariate exponential model

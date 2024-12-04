@@ -18,7 +18,6 @@ rule2 = "gray_re"
 ############################################################
 ################# methods for comparison ###################
 ############################################################
-# NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 rda_methods = c("CZMK", "ZOM", "observed")
 skip_method <- !c(TRUE,TRUE,TRUE);
 assign_skip_function(rda_methods, skip_method)
@@ -311,8 +310,10 @@ for (cv in 1:K) {
     set.seed(cv)
     CZMK.i <-
       try(do.call(itrSurv::itrSurv,
-                  c(args.CZMK, list(nodeSize = nodesize,
-                                    minEvent = mindeath))))
+                  c(args.CZMK, list(nodeSizeSurv = nodesize,
+                                    nodeSizeEnd = nodesize,
+                                    minEventSurv = mindeath
+                                    minEventEnd = mindeath))))
     values[cv, "CZMK.train.OS"] = CZMK.i@value[["V1"]][["Et_survival"]]
     values[cv, "CZMK.train.PropPhase2"] = CZMK.i@value[["V2"]][["PropPhase2"]]
     values[cv, "CZMK.train.RE"] = CZMK.i@value[["V3"]][["Et_mff"]]
@@ -326,8 +327,10 @@ for (cv in 1:K) {
     print(sprintf("Running ZOM for %s CV", cv))
     ZOM.i <-
       try(do.call(itrSurv::itrSurv, c(args.CZMK,
-                                      list(nodeSize = 1e+4,
-                                           minEvent = 1e+4))))
+                                      list(nodeSizeEnd = 1e+4,
+                                           nodeSizeSurv = 1e+4,
+                                           minEventEnd = 1e+4,
+                                           minEventSurv = 1e+4))))
     values[cv, "ZOM.train.OS"] = ZOM.i@value[["V1"]][["Et_survival"]]
     values[cv, "ZOM.train.PropPhase2"] = ZOM.i@value[["V2"]][["PropPhase2"]]
     values[cv, "ZOM.train.RE"] = ZOM.i@value[["V3"]][["Et_mff"]]

@@ -21,7 +21,7 @@ overall_survival_val.fn <- function(data){
   mean(data$OS_eval, na.rm = TRUE)
 }
 endpoint_val.fn <- function(data) {
-  # mean truncated years lost due to cause 1 (priorty cause) or
+  # mean integrated area under the curve to tau for cause 1 (priorty cause) or
   # mean CIF probability at t0 = crit.eval.cif
   mean(data$CIF_eval, na.rm = TRUE)
 }
@@ -409,8 +409,10 @@ message("data.df")
     set.seed(train_seed + 1)
     optimal.czmk <- do.call(itrSurv::itrSurv, c(arg.czmk2,
                                        list(mTry = sqrt(ncov),
-                                            nodeSize = nodesize,
-                                            minEvent = mindeath)))
+                                            nodeSizeSurv = nodesize,
+                                            nodeSizeEnd = nodesize,
+                                            minEventSurv = mindeath,
+                                            minEventEnd = mindeath)))
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk$policy <- if (!czmk.error) optimal.czmk
     # View(arg.czmk$policy)
@@ -750,7 +752,12 @@ message("data.df")
     set.seed(train_seed + 5)
     optimal.zom <- do.call(itrSurv::itrSurv, c(arg.czmk2,
                                       list(mTry = 1,
-                                           nodeSize = 1e+9,
+                                                minEventEnd = 1L,
+                                                minEventSurv = 1L,
+                                                nodeSizeEnd = 1e+9,
+                                                nodeSizeSurv = 1e+9)))
+                                           
+                                           
                                            minEvent = 1)))
     # optimal.zom <- try(itrSurv:::itrSurv(data = data.df,
     #                                      txName = "Trt",
