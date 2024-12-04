@@ -1,7 +1,8 @@
 # Define your list of IDs
 # id_list <- c(17, 4, 58, 73, 73, 24, 45, 36, 36, 36, 36, 12, 19, 52, 52)
 # Define your new list of IDs
-id_list <- c(25, 65, 41, 4, 58, 1, 73, 73, 24, 36, 36, 36, 36, 12, 19, 52, 52)
+# id_list <- c(25, 65, 41, 4, 58, 1, 73, 73, 24, 36, 36, 36, 36, 12, 19, 52, 52)
+id_list <- c(78, 57, 14, 61, 11, 11, 64, 64, 40, 40, 40, 40, 63, 55, 55, 55, 55)
 
 # Extract rows where ID matches any value in id_list
 filtered_a0 <- a0[a0$ID %in% id_list, ]
@@ -37,3 +38,4 @@ risk_death_summary <- data.frame(
 
 # Print the results
 print(risk_death_summary)
+message("death isnt quite working here --- but its correct in fortran using pr and prsurv so yay! need to update this one when got time")
