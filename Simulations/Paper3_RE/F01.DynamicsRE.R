@@ -1,104 +1,90 @@
 #' @param ncov number of covariates
-#' @return event.time observed time
-#' @return delta 1(min(death, treatment) <= censor)
-#' @at.risk Availability at the beginning of the phase
+#' @return event.time.start observed time
+#' @return event.time.end observed time
+#' @return indR: 1(re <= min(death,censor))
+#' @return indD: 1(death <= censor)
+#' We assume death and RE cannot occur at same time.
 #' @covariates(Z1-Zp) covariate values at the beginning of the phase
 #'
 Dynamics <-
-  function(N = 100,
-           u1 = u1,  # Observed value
-           u2 = u2,
-           u3 = u3,
-           n.phases = 2,
+  function(N = 100, #number of SUBJECTS
            tau = tau,          # structural parameters
            covariate = NULL,
            ncov = 5,
            Sig = diag(ncov) + 0.2 - diag(ncov) * 0.2,      # covariate structure
-           mass_p = 0.3,
+           gapparam1,
+           gapparam2,
+           G = G,
            censor_time=NULL,
-           at.risk = rep(1, N),
-           predHazardFn,      # list of predictor functions
+           predHazardFn_D,      # list of predictor functions
+           predHazardFn_R,
            predPropensityFn,  # optimal rule (if !is.null, propensity scores are ignored.) for value calculation
            policy = NULL, # policy is an object of rsf.obj list.
-           priority_cause = 1,
-           full_data = 0,
-           generate_failure_method = NULL,
-           crit.eval.os = "mean",
-           t0.os = NULL,
-           crit.eval.cif = "mean",
-           t0.cif = NULL,
+           crit.eval.surv = "mean",
+           t0.surv = NULL,
+           crit.eval.endpoint = "mean",
+           t0.endpoint = NULL,
            evaluate = FALSE
-           # seed1 = seed1
   ) {
-    # message("Starting F01.DynamicsCR.R")
-    # N = arg.obs$N
-    # at.risk = arg.obs$at.risk; ncov = arg.obs$ncov; corr = arg.obs$corr;
-    # at.risk = rep(1, N)
-    # N = arg.obs$N; n.phases = arg.obs$n.phases; tau = arg.obs$tau;
-    # tick = arg.obs$tick; hidden_data = arg.obs$hidden_data; printFlag = arg.obs$printFlag;
-    # predHazardFn = arg.obs$predHazardFn; predPropensityFn = arg.obs$predPropensityFn;
-    # predCensorFn = arg.obs$predCensorFn; surv.previous = rep(0, N)
-    # rho = NULL; omega = NULL; covariate = NULL;
-    # Sig = diag(ncov) + 0.2 - diag(ncov) * 0.2
-    # censor_time = trunc_cens_time
-
+    message("Starting F01.DynamicsRE.R")
     # message("N:",N)
-    # message("n.phases:",n.phases)
     # message("tau:", tau)
     # message("covariate:", covariate)
     # message("ncov:", ncov)
-    # message("mass_p:", mass_p)
     # message("full_data:", full_data)
     # message("censor_time:", censor_time)
     # message("policy:", policy)
-    # message("seed1: ", seed1)
-    # set.seed(seed1)
-    # print(N)
-    nphases = 2
-    if (length(at.risk) == 1) at.risk = rep(at.risk, N)
-    if (length(at.risk) != N)  stop("length of at.risk should match.")
-    if (!is.null(covariate)) if (dim(covariate)[1] != N) stop("length of at.risk should match.")
+    
+    if (!is.null(covariate)){
+        if (dim(covariate)[1] != N){
+          print(dim(covariate)[1])
+          print(N)
+          stop("length of cov should match.")
+        }
+    } 
 
     # initial state
     if (is.null(tau)){
-      message("tau is MISSING so we set it to tau = 10")
+      message("tau is NULL so we arbitraily set it to tau = 10")
       tau = 10
     }
-    if (is.null(covariate))     covariate = mvrnorm(N, rep(0, ncov), Sig)
-    if (is.null(colnames(covariate))) colnames(covariate) = paste0("Z", 1:ncov)
+    if (is.null(covariate)){
+      message("covariate is NULL so we arbitraily set it to covariate = mvrnorm(N, rep(0, ncov), Sig)")
+      covariate = mvrnorm(N, rep(0, ncov), Sig)
+    }
+    if (is.null(colnames(covariate)) & ncov > 1) colnames(covariate) = paste0("Z", 1:ncov)
     if (is.null(censor_time)){
-      print("censor time was not generated earlier, randomly generating from unif(0,tau) - change if needed")
+      print("censor_time is NULL, randomly generating from unif(0,tau) - change if needed")
       censor_time = runif(N,min=0,max=tau)
     }
-    if (is.null(u1)){
-      message("u1 was null so we are generating - make sure its the same for all methods")
-      u1 <<- runif(N)  # Observed value
-    }
-    if (is.null(u2)){
-      message("u2 was null so we are generating - make sure its the same for all methods")
-      u2 <<- runif(N)  # Observed value
-    }
+    # if (is.null(u1)){
+    #   message("u1 was null so we are generating - make sure its the same for all methods")
+    #   u1 <<- runif(N)  # Observed value
+    # }
+    # if (is.null(u2)){
+    #   message("u2 was null so we are generating - make sure its the same for all methods")
+    #   u2 <<- runif(N)  # Observed value
+    # }
 
     # skeleton
     if (evaluate == TRUE){
       output <-
-        array(NA, dim = c(N, 4 + 1 + ncov),
+        array(NA, dim = c(N, 4 + ncov),
               dimnames = list(1:N,
-                              c("subj.id", "OS_eval", "CIF_eval","action",
-                                "at.risk",
+                              c("subj.id", "Surv_eval", "Endpoint_eval","action",
                                 colnames(covariate))))
     } else{
       output <-
-        array(NA, dim = c(N, 3 + 2 + 2 + ncov), #+1 for failure_t3
-              dimnames = list(1:N, c("subj.id", "event.time", "status",
-                                     "failure_t1", "failure_t2",#"failure_t3",
-                                     "action", "at.risk", colnames(covariate))))
+        array(NA, dim = c(N, 8 + ncov),
+              dimnames = list(1:N, c("subj.id", 
+                                     "obs.event.time.start", "obs.event.time.end",
+                                     "statusD", "statusRE", 
+                                     "true.failure.start", "true.failure.end",
+                                     "action", colnames(covariate))))
     }
 
     output[, "subj.id"] <- 1:N
     action = rep(NA, N)           # initialize action vector
-
-    output[, "at.risk"]           <- at.risk
     output[, colnames(covariate)] <- covariate
 
     ## action                (t=0)
@@ -118,32 +104,32 @@ Dynamics <-
 
           if (attr(policy, "class") %in% c("ITRSurv")) {
             print("policy is from ITRSurv estimation")
-            x = output[as.logical(at.risk),] %>% output2observable(evaluate = TRUE)
+            x = output %>% output2observable(evaluate = TRUE)
             x$Trt = x$A
-            # print(1)
+            print(1)
             tmp_act = matrix(nrow = N, ncol = nphases+1+1)
             colnames(tmp_act) = c("StopatP1", "P1", "P2", "Final")
-            # print(colnames(x))
+            print(colnames(x))
             # below, we want D.1 b/c priority cause?
             for (phase in 1:2){
-              # print(colnames(x))
-              # message("F01.DynamicsCR.R: line 103")
-              # print(sprintf("Phase: %s", phase))
+              print(colnames(x))
+              message("F01.DynamicsRE.R: line 116")
+              print(sprintf("Phase: %s", phase))
               if (phase == 1){
                 x[, c("obs_time", paste0("D.", phase-1), "Trt", "A")] = 0  # dummy values in order for the package not to drop the NA rows.
               } else{
                 x[, c("obs_time", paste0("D.", priority_cause), "Trt", "A")] = 0  # dummy values in order for the package not to drop the NA rows.
               }
-              # print(colnames(x))
+              print(colnames(x))
               x = get_all_vars(policy@phaseResults[[phase]]@model, x)
               # View(x)
-              # print(colnames(x))
+              print(colnames(x))
 
               args <- list(policy, newdata = x, Phase = phase)
-              # print(2)
+              print(2)
               args_tmp <<- args
               docalling <- do.call(itrSurv::predict, args)
-              # print(3)
+              print(3)
               if (phase == 1){
                 # print(4)s
                 docalling1 <<- docalling
@@ -162,61 +148,13 @@ Dynamics <-
                                    tmp_act[, "P1"],
                                    tmp_act[, "P2"])
             tmp_act_itrsurv <<- tmp_act
-            action[at.risk != 0] = tmp_act[,4]
-            # print(6)
+            action = tmp_act[,4]
+            print(6)
             n.1 <- mean(stopatP1==1) # saving Ratio Stopping Ind at end of Phase 1
-            # View(as.data.frame(tmp_act))
-            # View(as.data.frame(tmp_act_itrsurv))
-          }
-
-          else if (attr(policy, "class") %in% c("DTRSurv")) {
-            # single stage CR: n.stages = 1
-            n.stages = 1
-            print("policy is from DTRSurv estimation (Cho)")
-            x = output[as.logical(at.risk),] %>% output2observable(evaluate = TRUE)
-            x[, c("obs_time", "D.0")] = 0  # dummy values in order for the package not to drop the NA rows.
-            if (n.stages == 1){stage = 1}
-            x = get_all_vars(policy@stageResults[[stage]]@model, x)
-            if (policy_csk@call$pooled == TRUE){
-              x = cbind(x, Trt = NA) # i added this myself to get pooled to work
-            }
-            # View(x)
-            args <- list(policy, newdata = x, stage = stage)
-            action[at.risk != 0] <- do.call(dtrSurv::predict, args)$optimal@optimalTx
-            tmp_act_csk <<- action
-          }
-          action[at.risk == 0] <- NA
+            View(as.data.frame(tmp_act))
+            
         } else{# policy has attr class
-          if (is.list(policy)){
-            if (policy[[1]] == "pmcr"){
-              # PMCR policy
-              print("policy is from PMCR estimation")
-              # linear decision rule: d(Z) = I(\beta^TZ>0)
-              cov2 <<- covariate %>%
-                as.data.frame() %>%
-                mutate(int = rep(1, nrow(covariate))) %>%
-                dplyr::select("int", everything()) %>%
-                as.matrix()
-              opt.PMCR =
-                ifelse((cov2 %*% as.matrix(policy[[2]])) > 0, 1, -1) %>%
-                as.vector()
-              action = opt.PMCR
-            } else if (policy[[1]] == "aipwe"){
-              # AIPWE policy
-              print("policy is from AIPWE estimation")
-              # decision rule: d(Z) = I(\eta_0 + \eta_1^TZ < 0)
-              cov2 <<- covariate %>%
-                as.matrix()
-              eta0 = policy[[2]][1] #
-              eta = policy[[2]][-1]
-              opt.AIPWE =
-                ifelse((eta0 + cov2 %*% as.matrix(eta)) < 0, 1, -1) %>%
-                as.vector()
-              action = opt.AIPWE
-
-            } else{
-              stop("no policy for that method exists. (F01.DynamicsCR.R LINE 209")
-            }
+            stop("no policy for that method exists. (F01.DynamicsRE.R LINE 158")
           }
         } # policy does not have attr class
       } # policy is not character
@@ -226,183 +164,294 @@ Dynamics <-
       # print(predPropensityFn)
       propensity = predPropensityFn(covariate = covariate)
       # print(propensity)
-      action = suppressWarnings(rbinom(N, 1, propensity) * 2 - 1) # 1 for aggressive and -1 for gentle
+      action = suppressWarnings(rbinom(N, 1, propensity)) # 1 for aggressive and 0 for gentle
       # for NAs in propensity, the action is NA. Thus, the warnings are suppressed.
-      action[at.risk == 0] <- NA
       # print(0)
+      prop_tmp1 <<- propensity
     }
-
+    
+    #######################################################################
+    #######################################################################
+    #######################################################################
+    #######################################################################
     # we HAVE OUR ACTION!
     action_tmp1 <<- action
     covariate_tmp1 <<- covariate
-    u1_tmp1 <<- u1
-    u2_tmp1 <<- u2
-
-    # hazards!!!!!!!
-    #hazard linear predictor
-    pred.hazard1 = predHazardFn(action = action, covariate = covariate, cause = 1)
-    # View(cbind(1,covariate))
-    # View(action)
-    pred.hazard2 = predHazardFn(action = action, covariate = covariate, cause = 2)
-    # pred.hazard3 = predHazardFn(action = action, covariate = covariate, cause = 3)
-    # View(pred.hazard1)
-    # View(pred.hazard2)
-
-    ph1 <<- pred.hazard1
-    ph2 <<- pred.hazard2
-    ph <<- cbind(ph1, ph2)
-    # print(1)
-    failure_os = failure_t1 = failure_t2 = failure_t3 = obs_time_failureCR = numeric(0)
-
-    if (generate_failure_method == "fine_gray"){
-      message("fine-gray")
-      # generating failure time from cause 1 based on Fine-Gray paper (1999):
-      # u11<<-u1
-      # pred.hazard11 <<- pred.hazard1
-      # massp <<- mass_p
-      for (i in 1:N){
-        # print(i)
-        u1i = u1[i]
-        pred.hazard1i = pred.hazard1[i]
-        # Use backsolve_t function
-        failure_t1[i] <- backsolve_t1(u1i, mass_p, pred.hazard1i)
+    # u1_tmp1 <<- u1
+    # u2_tmp1 <<- u2
+    
+    # generating gap time 1 using Gumbel bivariate exponential model
+    
+    # hazards! 
+    # lambda_D = lambda_0D*exp(t(beta_D)%*%z + omega_D * A + A * t(gamma_D) %*% z) #no intercept for z b/c survival
+    pred.hazard1 = predHazardFn_D(action = action, covariate = covariate)
+    # print(pred.hazard1)
+    # lambda_R = lambda_0R*exp(t(beta_R)%*%z + omega_R * A + A * t(gamma_R) %*% z)
+    pred.hazard2 = predHazardFn_R(action = action, covariate = covariate)
+    # print(pred.hazard2)
+    # message('action', action)
+    # message('covariate', covariate)
+  
+    
+    #if alpha=0 then independent and don't need to do this.
+    alpha1 = 4*gapparam1
+    alpha2 = 4*gapparam2
+    if (alpha1 == 0){
+      print("Independence")
+      # tt = rexp(N,lambda_0D*exp(t(beta_D)*z))
+      tt = rexp(N, predHazardFn_D(action = 0, covariate = covariate))
+    } else{
+      # print("============== Gumbel Bivariate Exponential ==============")
+      
+      # generate first gap time using marginal exp(lamR) distribution
+      # gaptime1 = rexp(N,lambda_R)
+      gaptime1 = rexp(N,pred.hazard2)
+      # print(sprintf("gaptime1: %s", gaptime1))
+      # print("Generating Failure Time")
+      
+      # generate conditional failure time (given gaptime1)
+      tt <- as.numeric(GumbelBiExp(N=N,lambda_D=pred.hazard1,lambda_R=pred.hazard2,
+                                   alpha=alpha1,y_type=1,y=gaptime1)$tt)
+      # print("Checking Plot")
+      # plot_check = Check_GumbelBiExp(N=N,tt=tt);
+      # print(plot_check)
+      
+      # Generate G conditional gaptime values for each subject
+      if (G>1){
+        # gaptimes <- generate_gaptime(N, lambda_D, lambda_R, alpha2, G)
+        gaptimes <- generate_gaptime(N, pred.hazard1, pred.hazard2, alpha2, G)
+        # print(gaptimes)
+        gaptimes[,1] = gaptime1
+        gap_names <- paste0("gaptime", 1:ncol(gaptimes))
+        colnames(gaptimes) <- gap_names
+      } else if (G==1){
+        gaptimes = gaptime1 %>% as.data.frame()
+        # print(gaptimes)
+        colnames(gaptimes) = "gaptime1"
       }
-      # print(1)
-      # failure_t1 <- failure_t1
-      rate1 = exp(pred.hazard1)
-      # print(2)
-      #failure t2
-      constant_t2 = 1 #0.2 #to make failure time 2 smaller (more of it)
-      rate2 <- constant_t2 * exp(pred.hazard2)
-      # failure_t2 <- rexp(N, rate = failure_t2_rate)*365 # old one before fixing u2
-      failure_t2 <- -(1/rate2)*log(1-u2)
-      # print(3)
-    } else if (generate_failure_method == "simple_exp"){
-      message("simple exponential method")
-      # Generate 2 exponential RV which depend on covariates,
-      # one for the competing event of interest $E_1$
-      # and one for other causes, $E_2$.If $E_1<E_2$,
-      # then the individual dies of the event of interest at time $E_1$;
-      # otherwise the person dies from the other event at time $E_2$.
-      # Hopefully get more direct control over the marginal cumulative incidence curves.
-      # rate0 <<- exp(pred.hazard1) + exp(pred.hazard2)
-      f1_constant = 1#1.2 # higher f1_constant to make failure time 1 lower (more of it)
-      rate1 <- f1_constant * exp(pred.hazard1)
-      f2_constant = 1#0.2 # lower f2_constant to make failure time 2 larger (less of it)
-      rate2 <- f2_constant * exp(pred.hazard2)
-      # set.seed(1);failure_os <- rexp(length(rate0), rate = rate0)
-      failure_t1 <- -(1/rate1)*log(1-u1)
-      failure_t2 <- -(1/rate2)*log(1-u2)
-      # print(head(failure_t1))
-    } else{
-      stop("no method for generating failure times is specified")
-    }
-    failure_t1 = failure_t1
-    failure_t2 = failure_t2
-    # print("failure1 and failure2")
-    # print(head(cbind(failure_t1, failure_t2)))
-    ftdf <<- cbind(failure_t1, failure_t2)
-    rates <<- cbind(rate1 = rate1, rate2 = rate2) #rate0 = rate0,
-    # print(1)
-    ## evaluate ##
+      
+      # Create a dataframe with the gaptime values
+      gap_df <- data.frame(ID = 1:N, gaptime0 = rep(0,N),gaptimes);#print(head(gap_df))
+      # Pivot the dataset to a longitudinal format
+      gap_df_longitudinal <- gap_df %>%
+        pivot_longer(cols = starts_with("gaptime"), names_to = "Gap", values_to = "Time_Gap") %>%
+        mutate(Gap = as.numeric(gsub("gaptime", "", Gap)));
+      # print(head(gap_df_longitudinal))
+      
+      # Calculate the recurrent times using cumulative sum per ID
+      recurrent_df_longitudinal <- gap_df_longitudinal %>%
+        group_by(ID) %>%
+        mutate(Time_Recurrent = cumsum(Time_Gap),
+               Recurrent = Gap) %>%
+        ungroup() %>%
+        filter(Gap != 0) %>%
+        as.data.frame() %>%
+        mutate(Label = paste0("Recurrent", Recurrent)) %>%
+        dplyr::select(-c(Gap, Time_Gap, Recurrent)) %>%
+        rename(Time = Time_Recurrent)
+      
+      # # generate conditional gaptime2 (given gaptime1)
+      # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1)$tt)
+      # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2)$tt)
+      # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3)$tt)
+      # gap_df = data.frame(ID = c(1:N), gaptime1 = gaptime1, gaptime2 = gaptime2, gaptime3 = gaptime3, gaptime4 = gaptime4)
+    } # end of Bivariate Gumbel
+    
     if (evaluate == TRUE){
-      # View(rates)
-      # View(rate1)
-      # View(rate2)
-      OS_eval = eval_sims(generate_failure_method = generate_failure_method,
-                          eval_ep = "OS", priority_cause = priority_cause,
+      Surv_eval = eval_sims(eval_ep = "Surv", 
                           tau = tau,
-                          crit.eval = crit.eval.os, t0 = t0.os,
+                          crit.eval = crit.eval.surv, 
+                          t0 = t0.surv,
                           rate1 = rate1,
-                          rate2 = rate2,
-                          mass_p = mass_p)
-      # print("OS_eval")
-      # print(head(OS_eval))
-      CIF_eval = eval_sims(generate_failure_method = generate_failure_method,
-                           eval_ep = "CIF", priority_cause = priority_cause,
+                          rate2 = rate2)
+      print("Surv_eval")
+      print(head(Surv_eval))
+      Endpoint_eval = eval_sims(eval_ep = "MFF", 
                            tau = tau,
-                           crit.eval = crit.eval.cif, t0 = t0.cif,
+                           crit.eval = crit.eval.endpoint, 
+                           t0 = t0.endpoint,
                            rate1 = rate1,
-                           rate2 = rate2,
-                           mass_p = mass_p)
-      # print("CIF_eval")
-      # print(head(CIF_eval))
+                           rate2 = rate2)
+      print("Endpoint_eval")
+      print(head(Endpoint_eval))
     }
+    
+    #steps to put together in one dataset
+    df_times = data.frame(ID = c(1:N), Time_Failure=tt, Time_Censor=censor_time, Time_Tau=tau0)
+    
+    # survival dataset (1row/person)
+    df_cov = data.frame(ID = c(1:N), covariate, Trt = action)
+    # View(df_cov)
+    df_surv1 = df_times %>% mutate(obs_time = pmin(Time_Failure, Time_Censor, Time_Tau),
+                                   indD = ifelse(Time_Failure <= pmin(Time_Censor, Time_Tau), 1, 0)
+    )
+    df_surv2 = inner_join(df_cov, df_surv1, by = "ID") %>%
+      dplyr::select(-c(Time_Failure, Time_Censor, Time_Tau))
+      # dplyr::select(ID, all_of(covariate), Trt, obs_time, indD)
+    # View(df_surv2)
+    
+    # recurrent dataset
+    df_times_long = df_times %>%
+      pivot_longer(cols = starts_with("Time_"), names_to = "Label", values_to = "Time") %>%
+      mutate(Label = gsub("Time_", "", Label)) %>%
+      as.data.frame();
+    df_long = rbind(recurrent_df_longitudinal, df_times_long) %>%
+      dplyr::select(ID, Label, Time) %>%
+      group_by(ID) %>%
+      arrange(ID, Time)
+    # find min(failure, censoring, tau0)
+    df_min = df_long %>%
+      group_by(ID) %>%
+      mutate(failure_status = ifelse(Label == "Failure", 1, ifelse(Label == "Censor" | Label == "Tau", 0, 99))) %>%
+      filter(Label %in% c("Censor", "Failure", "Tau")) %>%
+      summarise(min = min(Time),
+                failure_status_raw = failure_status[which.min(Time)],
+                Label = Label[which.min(Time)])
+    # combine min with long dataset
+    dataset0 = inner_join(df_long, df_min, by = "ID") %>%
+      # only keep observed data
+      filter(Time <= min) %>%
+      as.data.frame() %>%
+      dplyr::select(-Label.y) %>%
+      group_by(ID) %>%
+      # create dummy var for first row within ID, recurrence, failure, censoring
+      mutate(FirstRow = ifelse(row_number() == 1, 1, 0),
+             contains_recurrent = (grepl("recurrent", Label.x, ignore.case = TRUE)),
+             contains_failure = (grepl("failure", Label.x, ignore.case = TRUE)),
+             contains_censor = (grepl("censor", Label.x, ignore.case = TRUE))) %>%
+      # use lag to move future times to "L_open"
+      mutate(L_open = ifelse(FirstRow ==1, 0, lag(Time)), #open parentheses ("(")
+             R_closed = Time, #closed brack ("]")
+             IndR = ifelse(contains_recurrent == TRUE, 1, 0),
+             IndD = ifelse(contains_failure == TRUE, 1, 0)) %>%
+      rename(R_Label = Label.x) %>%
+      dplyr::select(ID, L_open, R_closed, IndR, IndD, R_Label) %>%
+      as.data.frame()
+    # View(dataset0)
+    #add in covariates
+    dataset = merge(dataset0, df_cov, by = "ID") #%>%
+      # dplyr::select(ID, L_open, R_closed, IndR, IndD, covariate, Trt, R_Label)
+    # View(dataset)
 
-    ## summary statistics
-    # ft0 <<- failure_os;
-    ft1 <<- failure_t1; ft2 <<- failure_t2
-    # View(cbind(ft0 = ft0, ft1 = ft1, ft2 = ft2))
-    X.cause = pmin(failure_t1, failure_t2)#, failure_t3)
-    # Xcause1 <<- failure_t1; Xcause2 <<- failure_t2
-    # Xcause3 <<- failure_t3
-    censor.time <<- censor_time # this is already truncated by tau
-    # print(3)
-    X = pmin(X.cause, censor.time)
-    D.1 = (failure_t1 <= censor.time & X.cause == failure_t1)
-    D.2 = (failure_t2 <= censor.time & X.cause == failure_t2)
-    status = 1*D.1+2*D.2
-    # print(98)
-    # tmp3 <<- phase.output
-    # print(99)
-    # ## bookkeeping and reassigning
-    # print(100)
+    #######################################################################
+    #######################################################################
+    #######################################################################
+    #######################################################################
+    #######################################################################
 
     if (evaluate == TRUE){
-      output[, c("OS_eval","CIF_eval","action")] <-
-        cbind(OS_eval, CIF_eval, action)
-    } else{
-      output[, c("event.time", "status",
-                 "failure_t1", "failure_t2",
-                 "action")] <- cbind(X, status,
-                                     failure_t1, failure_t2,
-                                     action)
-    }
-
-    # at.risk[is.na(at.risk)] = 0
-    # print(101)
-
-    # } # for (1 in 1:nphases)
-    attr(output, "tau") = tau
-    attr(output, "ncov") = ncov
-
-    # d = cbind(subj.id = 1:length(failure_t1), event.time = X, status = D.0, action = action,
-    #           Xcause1 = failure_t1, Xcause2 = failure_t2)
-    # d = as.data.frame(d)
-    # d1 = d %>%
-    #   dplyr::select(subj.id, event.time, status, action, Xcause1,Xcause2)
-    # d1 %>% group_by(status, action) %>%
-    #   summarize(mean_cause1 = mean(Xcause1),
-    #             mean_cause2 = mean(Xcause2)) %>%
-    #   print()
-
-    # print("hi")
-    # View(cbind(output,Xcause1,Xcause2,X.cause,censor.time))
-
-    if (full_data == 1) {
-      # print("full_data == 1")
-
-      f_times <<- cbind(failure.time1 = failure_t1,
-                        failure.time2 = failure_t2,
-                        censor.time = censor.time,
-                        tau = rep(tau, times = length(failure_t1)),
-                        status = rep(NA, times = length(failure_t1))) %>% as.data.frame()
-      f_times$observed_time = apply(as.matrix(f_times), 1, min)
-      f_times$status = status
-      output <<- output
-      f1 <<- list(statistics = output,
-                  times = f_times,
-                  status = status,
-                  D.1 = D.1,
-                  D.2 = D.2)
-      return(f1)
-    } else if (full_data == 2) {
-      return(c(output, failure.time1 = failure_t1, failure.time2 = failure_t2,
-               censor.time = censor.time))
-    } else {
+      output[, c("Surv_eval","Endpoint_eval","action")] <-
+        cbind(Surv_eval, Endpoint_eval, action)
+      attr(output, "tau") = tau
+      attr(output, "ncov") = ncov
       return(output)
+    } else{
+      today_date <- format(Sys.Date(), "%Y-%m-%d")
+      name = sprintf("Dataset_%s_N%s_G%s_rho1%s_rho2%s_tau%s",
+                     today_date,
+                     n, G, 
+                     gapparam1, gapparam2, tau0)
+      return(list(dataset_recurrent=dataset,dataset_survival=df_surv2,name=name))
+      # output[, c("obs.event.time.start", "obs.event.time.end",
+      #            "statusD", "statusRE", 
+      #            "true.failure.start", "true.failure.end",
+      #            "action")] <- cbind(X.start, X.end,
+      #                                statusD, statusRE,
+      #                                failure_t1, failure_t2,
+      #                                action)
     }
+    
+  } # end of Dynamics function
+
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+#######################################################################
+# below are functions used in Dynamics() function
+# evaluate
+eval_sims = function(eval_ep,
+                     tau,
+                     crit.eval,
+                     t0,
+                     rate1, 
+                     rate2){
+  # message('EVALUATING: F01.DynamicsRE.R, line 389')
+
+  if (eval_ep == "Surv"){
+    # survival
+    if (crit.eval == "prob"){
+      # message("crit.eval is prob")
+      if (is.null(t0) | is.na(t0)){
+        stop("t0.surv needs to be specified for current crit.eval.surv in F01 LINE 273")
+      }
+      Surv_eval = Surv_func(t0, rate1, rate2)
+    } else{
+      # Set the range for integration
+      Surv_result1 = numeric(0)
+      for (i in 1:length(rate1)){
+        Surv_result <- integrate(Surv_func, lower = 0, upper = tau,
+                               lambda1 = rate1[i], lambda2 = rate2[i])
+        Surv_result1[i] = Surv_result$value
+      }
+      Surv_eval = Surv_result1
+      testt <<- Surv_func(t0, rate1, rate2)
+    }
+    eval_result = Surv_eval
+  } else if (eval_ep == "MFF"){
+    # endpoint
+    if (crit.eval == "prob"){
+      # message("crit.eval is prob")
+      if (is.null(t0) | is.na(t0)){
+        stop("t0.endpoint needs to be specified for current crit.eval.endpoint in F01 LINE 273")
+      }
+      Endpoint_eval = mff_func(t0, rate1, rate2)
+    } else{
+      # Set the range for integration
+      Endpoint_result1 = numeric(0)
+      for (i in 1:length(rate1)){
+        # pretty sure we dont want integration here, so fix this. this is for CR which is not right for RE.
+        Endpoint_result <- integrate(mff_func, lower = 0, upper = tau,
+                                lambda1 = rate1[i], lambda2 = rate2[i])
+        Endpoint_result1[i] = Endpoint_result$value
+      }
+      Endpoint_eval = Endpoint_result1
+      testtre <<- mff_func(t0, rate1, rate2)
+    }
+    eval_result = Endpoint_eval
+  } else{
+    stop("eval_ep needs to be one of Surv or MFF")
   }
+  return(eval_result)
+}
+
+# define simulation value formulas for evaluating based on sim setting
+# need to fix below, bc rn its for CR
+# survival for evaluation for sims
+Surv_func <- function(t, lambda1, lambda2) {
+  # lambda1 = exp(Z %*% beta1.treatmentA)
+  # lambda2 = exp(Z %*% beta2.treatmentA)
+  # b/c assuming independence between T1 and T2
+  rate = lambda1 + lambda2
+  St = exp(-rate * t)
+  message("St = ", St)
+  return(St)
+}
+
+# need to fix below, because rn its subdistr.
+# mean freq func for evaluation for sims
+mff_func <- function(t, lambda1, lambda2){
+  lambda_pc = lambda2
+  lambda_npc = lambda1
+  # Pr(T\leqt, \epsilon=priority_cause): PC subdistribution
+  Lambda_sum = lambda_pc + lambda_npc
+  term1 = lambda_pc/Lambda_sum
+  term2 = -exp(-lambda_npc * t)
+  term3 = (lambda_npc/Lambda_sum) * exp(-t * Lambda_sum)
+  mff = term1 + term2 + term3
+  message("MFF = ", mff)
+  return(mff)
+}
 
 # backsolving for failure time from cause 1 based off of Fine-Gray 1999 paper
 backsolve_t1 <- function(u1i, mass_p, pred.hazard1) {
@@ -423,154 +472,13 @@ backsolve_t1 <- function(u1i, mass_p, pred.hazard1) {
   }
   # cat("Value at lower boundary:", value_at_lower, "\n")
   # cat("Value at upper boundary:", value_at_upper, "\n")
-
+  
   # Use uniroot to solve for t
   result1 <- uniroot(solve_t, lower = lower_boundary, upper = upper_boundary, tol = 1e-9, u1i = u1i, mass_p = mass_p, pred.hazard1 = pred.hazard1)
   return(result1$root)
 }
 
-# define simulation value formulas for evaluating based on sim setting
-# overall survival for evaluation for sims
-OS_func <- function(generate_failure_method, t, cause1_prob, lambda1, lambda2) {
-  if (generate_failure_method == "simple_exp"){
-    # lambda1 = exp(Z %*% beta1.treatmentA)
-    # lambda2 = exp(Z %*% beta2.treatmentA)
-    # b/c assuming independence between T1 and T2
-    rate = lambda1 + lambda2
-    St = exp(-rate * t)
-  } else if (generate_failure_method == "fine_gray"){
-    # print("fg os")
-    term1 = (1-cause1_prob*(1-exp(-t)))^lambda1
-    term2 = (1-exp(-t*lambda2))*((1-cause1_prob)^lambda1)
-    St = term1 - term2
-  } else{
-    stop("generate_failure_method must be simple_exp or fine_gray.")
-  }
-  # message("St = ", St)
-  return(St)
-}
-# PC subdistribution for evaluation for sims
-subdist_func <- function(generate_failure_method, priority_cause, t, cause1_prob, lambda1, lambda2){
-  if (generate_failure_method == "simple_exp"){
-    if (priority_cause == 1){
-      lambda_pc = lambda1
-      lambda_npc = lambda2
-    } else{
-      lambda_pc = lambda2
-      lambda_npc = lambda1
-    }
-    # Pr(T\leqt, \epsilon=priority_cause): PC subdistribution
-    Lambda_sum = lambda_pc + lambda_npc
-    term1 = lambda_pc/Lambda_sum
-    term2 = -exp(-lambda_npc * t)
-    term3 = (lambda_npc/Lambda_sum) * exp(-t * Lambda_sum)
-    # View(term1)
-    # View(term2)
-    # View(term3)
-    subdistr = term1 + term2 + term3
-  } else if (generate_failure_method == "fine_gray"){
-    # print("fg cif")
-    if (priority_cause == 1){
-      # Pr(T\leq t,\epsilon=1) = 1 - [1- p(1-exp(-t))]^(lambda1)
-      subdistr = 1 - (1- cause1_prob*(1-exp(-t)))^(lambda1)
-    } else if (priority_cause == 2){
-      # Pr(T\leq t,\epsilon=2|Z) = Pr(T\leq t|\epsilon=2,Z)Pr(\epsilon=2|Z)
-      # Pr(T\leq t|\epsilon=2,Z)
-      cdf_exp = 1-exp(-lambda2*t)
-      # Pr(\epsilon = 2 | Z)
-      Pr_eps2 = (1-cause1_prob)^lambda1
-      subdistr = cdf_exp * Pr_eps2
-      #lambda1 = exp(Z%*%beta1.treatmentA)
-    }
-  } else{
-    stop("generate_failure_method must be simple_exp or fine_gray.")
-  }
-  # message("CIF = ", subdistr)
-  return(subdistr)
-}
-
-# evaluate
-eval_sims = function(generate_failure_method,
-                     eval_ep,
-                     priority_cause,
-                     tau,
-                     crit.eval,
-                     t0,
-                     rate1, rate2,
-                     mass_p){
-  # message('EVALUATING: DynamicsCR.r line 263')
-
-  if (eval_ep == "OS"){
-    # overall survival
-    if (crit.eval == "prob"){
-      # message("crit.eval is prob")
-      if (is.null(t0) | is.na(t0)){
-        stop("t0.os needs to be specified for current crit.eval.os in F01 LINE 273")
-      }
-      OS_eval = OS_func(generate_failure_method, t0, mass_p, rate1, rate2)
-    } else{
-      # Set the range for integration (e.g., from 0 to infinity)
-      OS_result1 = numeric(0)
-      for (i in 1:length(rate1)){
-        OS_result <- integrate(OS_func, lower = 0, upper = tau,
-                               generate_failure_method = generate_failure_method,
-                               cause1_prob = mass_p,
-                               lambda1 = rate1[i], lambda2 = rate2[i])
-        if (i == 1){
-          # print("OS testing i = 1")
-          # print(OS_result$value)
-        }
-        OS_result1[i] = OS_result$value
-        if (i == 1){
-          #   message("rate1:",rate1[i])
-          #   message("rate2:",rate2[i])
-          # print(OS_func)
-          # message("OS_result$value:",OS_result$value)
-        }
-      }
-      OS_eval = OS_result1
-      testt <<- OS_func(generate_failure_method, t0, mass_p, rate1, rate2)
-      # View(testt)
-    }
-    eval_result = OS_eval
-  } else if (eval_ep == "CIF"){
-    # endpoint
-    if (crit.eval == "prob"){
-      # message("crit.eval is prob")
-      if (is.null(t0) | is.na(t0)){
-        stop("t0.cif needs to be specified for current crit.eval.cif in F01 LINE 273")
-      }
-      CIF_eval = subdist_func(generate_failure_method, priority_cause, t0, mass_p, rate1, rate2)
-    } else{
-      # Set the range for integration (e.g., from 0 to infinity)
-      CIF_result1 = numeric(0)
-      for (i in 1:length(rate1)){
-        CIF_result <- integrate(subdist_func, lower = 0, upper = tau,
-                                generate_failure_method = generate_failure_method,
-                                priority_cause = priority_cause,
-                                cause1_prob = mass_p,
-                                lambda1 = rate1[i], lambda2 = rate2[i])
-        if (i == 1){
-          # print("CIF testing i = 1")
-          # print(CIF_result$value)
-          # stop()
-        }
-        CIF_result1[i] = CIF_result$value
-
-      }
-      CIF_eval = CIF_result1
-      testtcr <<- subdist_func(generate_failure_method, priority_cause, t0, mass_p, rate1, rate2)
-      # View(testtcr)
-    }
-    eval_result = CIF_eval
-  } else{
-    stop("eval_ep needs to be one of OS or CIF")
-  }
-  return(eval_result)
-}
-
-
-# message("End of F01.DynamicsCR.R")
+message("End of F01.DynamicsRE.R")
 
 
 # End of script -------------------------------------------------------------

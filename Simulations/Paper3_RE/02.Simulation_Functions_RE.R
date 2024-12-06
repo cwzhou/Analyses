@@ -3,235 +3,184 @@
 # Author: Christina Zhou
 # Date: 11.12.2024
 
-source("02.Simulation_Libraries_RE.R")
 source("F01.DynamicsRE.R")
 # Functions -----------------------------------------------------------------
-gdata_CR <- function(N=10,
-                     u1 = NULL,
-                     u2 = NULL,
-                     u3 = NULL,
-                     ncov = 5,
-                     mass_p = 0.3,
-                     predHazardFn, predPropensityFn,
-                     ztype=0, zparam=0.5,
-                     ctype=0,cparam=2,censor_min=0,censor_max=NULL,
-                     num_A=2,tau=5,
-                     policy=NULL, priority_cause = 1,
-                     full_data=0,
-                     generate_failure_method = NULL,
-                     crit.eval.os = "mean",
-                     t0.os = NULL,
-                     crit.eval.cif = "mean",
-                     t0.cif = NULL,
-                     evaluate = FALSE){
-
-  if (is.null(u1)){
-    print("missing u1 --- make sure this is right...")
-    u1 <<- runif(N)  # Observed value
-  }
-  if (is.null(u2)){
-    print("missing u2 --- make sure this is right...")
-    u2 <<- runif(N)  # Observed value
-  }
-  if (is.null(u3)){
-    print("missing u3 --- make sure this is right...")
-    u3 <<- runif(N)  # Observed value
-  }
-
-  if (ztype == 0){
-    print("ztype=normal")
-    z <- matrix(rnorm(N * ncov), nrow = N, ncol = ncov) # positive for when testing but regular when we want zom to be not as good
-  }
-
-  if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
-  if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
-  if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
-
-  # generating censoring time
-  if (ctype == 0){
-    message("censoring: exp")
-    cc <- rexp(N,cparam)
-  }
-  if (ctype == 1){
-    message("censoring: unif")
-    if(is.null(censor_max)){censor_max = tau}
-    if(is.null(censor_min)){censor_min = 0}
-    message("censor_max is", censor_max)
-    cc <- runif(N,min=censor_min,max=censor_max)
-    # View(cc)
-  }
-  if (ctype == 99){
-    print("!!!!! no censoring. !!!!!")
-    cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau though so fix in future)
-  }
-  trunc_cens_time = pmin(cc, tau)
-
-  df_multi <<- Dynamics(N=N, u1 = u1, u2=u2, u3 = u3,
-                        tau=tau, covariate = z, ncov = ncov,
-                        mass_p = mass_p,
-                        censor_time = trunc_cens_time,
-                        predHazardFn = predHazardFn,
-                        predPropensityFn = predPropensityFn,
-                        policy=policy, priority_cause=priority_cause,
-                        full_data = full_data,
-                        generate_failure_method = generate_failure_method,
-                        crit.eval.os = crit.eval.os,
-                        t0.os = t0.os,
-                        crit.eval.cif = crit.eval.cif,
-                        t0.cif = t0.cif,
-                        evaluate = evaluate
-  ) %>% as.data.frame()
-
-  return(df_multi)
-}
-
 gdata_RE <- function(N=10,
                      G=2,
-                     lambda_0D=0.1,lambda_0R=4,beta_R=log(2),beta_D=log(3),
-                     omega_D=0.2,omega_R=0.1, gamma_D = 0.2, gamma_R = 0.1,
-                     ztype=0, zparam=0.5,ctype=1,cparam=2,
-                     gaptype=0,gapparam1=0.2,gapparam2=0.25,#rho;
-                     num_A=2,tau=10, seed1=2023){
+                     # lambda_0D=0.1,lambda_0R=4,beta_R=log(2),beta_D=log(3),
+                     # omega_D=0.2,omega_R=0.1, gamma_D = 0.2, gamma_R = 0.1,
+                     predHazardFn_D, predHazardFn_R, predPropensityFn,
+                     ztype=0, zparam=0.5,ctype=1,cparam=2,censor_min, censor_max,
+                     gaptype=0,gapparam1=0.2,gapparam2=0.25,
+                     num_A=2,
+                     ncov,
+                     tau0=10,
+                     policy=NULL,
+                     crit.eval.surv = "mean",
+                     t0.surv = NULL,
+                     crit.eval.endpoint = "mean",
+                     t0.endpoint = NULL,
+                     evaluate = FALSE
+                     ){
 
   # ztype indicates the distribution for covariate z: 0=normal(0,1),1=binary(zparam),2=uniform(0,1)
   # ctype indicates the distribution for censoring (0=exponential,1=uniform,
   #                                                 9=no censoring)
-  set.seed(seed1)
-  name = sprintf("Dataset_N%s_G%s_A%s_lambda0D%sBetaD%somegaD%sgammaR%s_lambda0R%sBetaR%somegaR%sgammaR%s_rho1%s_rho2%s_tau%s",
-                 N, G, num_A,
-                 round(lambda_0D,1), round(beta_D,1), round(omega_D,1), round(gamma_D,1), round(lambda_0R,1), round(beta_R,1), round(omega_R,1), round(gamma_R,1),
-                 gapparam1, gapparam2, tau)
 
   # generating covariates
-  if (ztype == 0){z <- rnorm(N)} #print("Covariates follow N(0,1)");
-  if (ztype == 1){z <- rbinom(N, 1, zparam)}
-  if (ztype == 2){z <- runif(N)}
+  if (ztype == 0){z <- matrix(rnorm(N*ncov, 1, zparam), nrow=N,ncol=ncov)}
+  if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
+  if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
+  if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
   # print(sprintf("covariates z: %s",z))
-
-  # generating treatment
-  A = rbinom(N, num_A-1, 0.5)
-  # print(sprintf("treatments A: %s",A))
-  df_cov = data.frame(ID = c(1:N), Cov = z, Trt = A)
-
+  
   # generating censoring time
   if (ctype == 0){cc <- rexp(N,cparam)}
-  if (ctype == 1){cc <- runif(N,min=0,max=tau)}
+  if (ctype == 1){cc <- runif(N,min=0,max=tau0)}
   if (ctype == 99){
     print("!!!!! no censoring. !!!!!")
-    cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau though so fix in future)
+    cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau0 though so fix in future)
   }
+  trunc_cens_time = pmin(cc, tau)
   # print(sprintf("censoring time cc: %s",cc))
-
-  # generating gap time 1 using Gumbel bivariate exponential model
-  #if alpha=0 then independent and don't need to do this.
-  alpha1 = 4*gapparam1
-  alpha2 = 4*gapparam2
-  lambda_D = lambda_0D*exp(t(beta_D)%*%z + omega_D * A + A * t(gamma_D) %*% z) #no intercept for z b/c survival
-  lambda_R = lambda_0R*exp(t(beta_R)%*%z + omega_R * A + A * t(gamma_R) %*% z)
-  # View(lambda_D)
-  # View(lambda_R)
-  if (alpha1 == 0){
-    print("Independence")
-    tt = rexp(N,lambda_0D*exp(t(beta_D)*z))
-  } else{
-    print("============== Gumbel Bivariate Exponential ==============")
-    # generate first gap time using marginal exp(lamR) distribution
-    gaptime1 = rexp(N,lambda_R)
-    # print(sprintf("gaptime1: %s", gaptime1))
-    # print("Generating Failure Time")
-    # generate conditional failure time (given gaptime1)
-    tt <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha1,y_type=1,y=gaptime1)$tt)
-    # print("Checking Plot")
-    plot_check = Check_GumbelBiExp(N=N,tt=tt);
-    # print(plot_check)
-    # Generate G conditional gaptime values for each subject
-    if (G>1){
-      gaptimes <- generate_gaptime(N, lambda_D, lambda_R, alpha2, G);#print(gaptimes)
-      gaptimes[,1] = gaptime1
-      gap_names <- paste0("gaptime", 1:ncol(gaptimes))
-      colnames(gaptimes) <- gap_names
-    } else if (G==1){
-      gaptimes = gaptime1 %>% as.data.frame()
-      # print(gaptimes)
-      colnames(gaptimes) = "gaptime1"
-    }
-    # Create a dataframe with the gaptime values
-    gap_df <- data.frame(ID = 1:N, gaptime0 = rep(0,N),gaptimes);#print(head(gap_df))
-    # Pivot the dataset to a longitudinal format
-    gap_df_longitudinal <- gap_df %>%
-      pivot_longer(cols = starts_with("gaptime"), names_to = "Gap", values_to = "Time_Gap") %>%
-      mutate(Gap = as.numeric(gsub("gaptime", "", Gap))); #print(head(gap_df_longitudinal))
-    # Calculate the recurrent times using cumulative sum per ID
-    recurrent_df_longitudinal <- gap_df_longitudinal %>%
-      group_by(ID) %>%
-      mutate(Time_Recurrent = cumsum(Time_Gap),
-             Recurrent = Gap) %>%
-      ungroup() %>%
-      filter(Gap != 0) %>%
-      as.data.frame() %>%
-      mutate(Label = paste0("Recurrent", Recurrent)) %>%
-      dplyr::select(-c(Gap, Time_Gap, Recurrent)) %>%
-      rename(Time = Time_Recurrent)
-
-    # # generate conditional gaptime2 (given gaptime1)
-    # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1)$tt)
-    # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2)$tt)
-    # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3)$tt)
-    # gap_df = data.frame(ID = c(1:N), gaptime1 = gaptime1, gaptime2 = gaptime2, gaptime3 = gaptime3, gaptime4 = gaptime4)
-  }
-
-  #steps to put together in one dataset
-  df_times = data.frame(ID = c(1:N), Time_Failure=tt, Time_Censor=cc, Time_Tau=tau)
-
-  # survival dataset (1row/person)
-  df_surv1 = df_times %>% mutate(obs_time = pmin(Time_Failure, Time_Censor, Time_Tau),
-                                 indD = ifelse(Time_Failure <= pmin(Time_Censor, Time_Tau), 1, 0)
+  
+  # # generating treatment
+  # A = rbinom(N, num_A-1, 0.5)
+  # # print(sprintf("treatments A: %s",A))
+  
+  df_multi <<- Dynamics(N=N, 
+                        tau=tau, 
+                        covariate = z,
+                        ncov = ncov,
+                        gapparam1 = gapparam1,
+                        gapparam2 = gapparam2,
+                        G = G,
+                        censor_time = trunc_cens_time,
+                        predHazardFn_D = predHazardFn_D,
+                        predHazardFn_R = predHazardFn_R,
+                        predPropensityFn = predPropensityFn,
+                        policy=policy, 
+                        crit.eval.surv = crit.eval.surv,
+                        t0.surv = t0.surv,
+                        crit.eval.endpoint = crit.eval.endpoint,
+                        t0.endpoint = t0.endpoint,
+                        evaluate = evaluate
   )
-  df_surv2 = inner_join(df_cov, df_surv1, by = "ID") %>%
-    dplyr::select(ID, Cov, Trt, obs_time, indD)
 
-  # recurrent dataset
-  df_times_long = df_times %>%
-    pivot_longer(cols = starts_with("Time_"), names_to = "Label", values_to = "Time") %>%
-    mutate(Label = gsub("Time_", "", Label)) %>%
-    as.data.frame();
-  df_long = rbind(recurrent_df_longitudinal, df_times_long) %>%
-    dplyr::select(ID, Label, Time) %>%
-    group_by(ID) %>%
-    arrange(ID, Time)
-  # find min(failure, censoring, tau)
-  df_min = df_long %>%
-    group_by(ID) %>%
-    mutate(failure_status = ifelse(Label == "Failure", 1, ifelse(Label == "Censor" | Label == "Tau", 0, 99))) %>%
-    filter(Label %in% c("Censor", "Failure", "Tau")) %>%
-    summarise(min = min(Time),
-              failure_status_raw = failure_status[which.min(Time)],
-              Label = Label[which.min(Time)])
-  # combine min with long dataset
-  dataset0 = inner_join(df_long, df_min, by = "ID") %>%
-    # only keep observed data
-    filter(Time <= min) %>%
-    as.data.frame() %>%
-    dplyr::select(-Label.y) %>%
-    group_by(ID) %>%
-    # create dummy var for first row within ID, recurrence, failure, censoring
-    mutate(FirstRow = ifelse(row_number() == 1, 1, 0),
-           contains_recurrent = (grepl("recurrent", Label.x, ignore.case = TRUE)),
-           contains_failure = (grepl("failure", Label.x, ignore.case = TRUE)),
-           contains_censor = (grepl("censor", Label.x, ignore.case = TRUE))) %>%
-    # use lag to move future times to "L_open"
-    mutate(L_open = ifelse(FirstRow ==1, 0, lag(Time)), #open paranthases ("(")
-           R_closed = Time, #closed brack ("]")
-           IndR = ifelse(contains_recurrent == TRUE, 1, 0),
-           IndD = ifelse(contains_failure == TRUE, 1, 0)) %>%
-    rename(R_Label = Label.x) %>%
-    dplyr::select(ID, L_open, R_closed, IndR, IndD, R_Label) %>%
-    as.data.frame()
-  #add in covariates
-  dataset = merge(dataset0,df_cov, by = "ID") %>%
-    dplyr::select(ID, L_open, R_closed, IndR, IndD, Cov, Trt, R_Label)
-  print(name)
-  list(dataset_recurrent=dataset,dataset_survival=df_surv2,name=name)
+  # # generating gap time 1 using Gumbel bivariate exponential model
+  # #if alpha=0 then independent and don't need to do this.
+  # alpha1 = 4*gapparam1
+  # alpha2 = 4*gapparam2
+  # lambda_D = lambda_0D*exp(t(beta_D)%*%z + omega_D * A + A * t(gamma_D) %*% z) #no intercept for z b/c survival
+  # lambda_R = lambda_0R*exp(t(beta_R)%*%z + omega_R * A + A * t(gamma_R) %*% z)
+  # # View(lambda_D)
+  # # View(lambda_R)
+  # if (alpha1 == 0){
+  #   print("Independence")
+  #   tt = rexp(N,lambda_0D*exp(t(beta_D)*z))
+  # } else{
+  #   print("============== Gumbel Bivariate Exponential ==============")
+  #   # generate first gap time using marginal exp(lamR) distribution
+  #   gaptime1 = rexp(N,lambda_R)
+  #   # print(sprintf("gaptime1: %s", gaptime1))
+  #   # print("Generating Failure Time")
+  #   # generate conditional failure time (given gaptime1)
+  #   tt <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha1,y_type=1,y=gaptime1)$tt)
+  #   # print("Checking Plot")
+  #   plot_check = Check_GumbelBiExp(N=N,tt=tt);
+  #   # print(plot_check)
+  #   # Generate G conditional gaptime values for each subject
+  #   if (G>1){
+  #     gaptimes <- generate_gaptime(N, lambda_D, lambda_R, alpha2, G);#print(gaptimes)
+  #     gaptimes[,1] = gaptime1
+  #     gap_names <- paste0("gaptime", 1:ncol(gaptimes))
+  #     colnames(gaptimes) <- gap_names
+  #   } else if (G==1){
+  #     gaptimes = gaptime1 %>% as.data.frame()
+  #     # print(gaptimes)
+  #     colnames(gaptimes) = "gaptime1"
+  #   }
+  #   # Create a dataframe with the gaptime values
+  #   gap_df <- data.frame(ID = 1:N, gaptime0 = rep(0,N),gaptimes);#print(head(gap_df))
+  #   # Pivot the dataset to a longitudinal format
+  #   gap_df_longitudinal <- gap_df %>%
+  #     pivot_longer(cols = starts_with("gaptime"), names_to = "Gap", values_to = "Time_Gap") %>%
+  #     mutate(Gap = as.numeric(gsub("gaptime", "", Gap))); #print(head(gap_df_longitudinal))
+  #   # Calculate the recurrent times using cumulative sum per ID
+  #   recurrent_df_longitudinal <- gap_df_longitudinal %>%
+  #     group_by(ID) %>%
+  #     mutate(Time_Recurrent = cumsum(Time_Gap),
+  #            Recurrent = Gap) %>%
+  #     ungroup() %>%
+  #     filter(Gap != 0) %>%
+  #     as.data.frame() %>%
+  #     mutate(Label = paste0("Recurrent", Recurrent)) %>%
+  #     dplyr::select(-c(Gap, Time_Gap, Recurrent)) %>%
+  #     rename(Time = Time_Recurrent)
+  # 
+  #   # # generate conditional gaptime2 (given gaptime1)
+  #   # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1)$tt)
+  #   # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2)$tt)
+  #   # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3)$tt)
+  #   # gap_df = data.frame(ID = c(1:N), gaptime1 = gaptime1, gaptime2 = gaptime2, gaptime3 = gaptime3, gaptime4 = gaptime4)
+  # }
+  # 
+  # #steps to put together in one dataset
+  # df_times = data.frame(ID = c(1:N), Time_Failure=tt, Time_Censor=cc, Time_Tau=tau0)
+  # # survival dataset (1row/person)
+  # df_cov = data.frame(ID = c(1:N), Cov = z, Trt = A)
+  # df_surv1 = df_times %>% mutate(obs_time = pmin(Time_Failure, Time_Censor, Time_Tau),
+  #                                indD = ifelse(Time_Failure <= pmin(Time_Censor, Time_Tau), 1, 0)
+  # )
+  # df_surv2 = inner_join(df_cov, df_surv1, by = "ID") %>%
+  #   dplyr::select(ID, Cov, Trt, obs_time, indD)
+  # 
+  # # recurrent dataset
+  # df_times_long = df_times %>%
+  #   pivot_longer(cols = starts_with("Time_"), names_to = "Label", values_to = "Time") %>%
+  #   mutate(Label = gsub("Time_", "", Label)) %>%
+  #   as.data.frame();
+  # df_long = rbind(recurrent_df_longitudinal, df_times_long) %>%
+  #   dplyr::select(ID, Label, Time) %>%
+  #   group_by(ID) %>%
+  #   arrange(ID, Time)
+  # # find min(failure, censoring, tau0)
+  # df_min = df_long %>%
+  #   group_by(ID) %>%
+  #   mutate(failure_status = ifelse(Label == "Failure", 1, ifelse(Label == "Censor" | Label == "Tau", 0, 99))) %>%
+  #   filter(Label %in% c("Censor", "Failure", "Tau")) %>%
+  #   summarise(min = min(Time),
+  #             failure_status_raw = failure_status[which.min(Time)],
+  #             Label = Label[which.min(Time)])
+  # # combine min with long dataset
+  # dataset0 = inner_join(df_long, df_min, by = "ID") %>%
+  #   # only keep observed data
+  #   filter(Time <= min) %>%
+  #   as.data.frame() %>%
+  #   dplyr::select(-Label.y) %>%
+  #   group_by(ID) %>%
+  #   # create dummy var for first row within ID, recurrence, failure, censoring
+  #   mutate(FirstRow = ifelse(row_number() == 1, 1, 0),
+  #          contains_recurrent = (grepl("recurrent", Label.x, ignore.case = TRUE)),
+  #          contains_failure = (grepl("failure", Label.x, ignore.case = TRUE)),
+  #          contains_censor = (grepl("censor", Label.x, ignore.case = TRUE))) %>%
+  #   # use lag to move future times to "L_open"
+  #   mutate(L_open = ifelse(FirstRow ==1, 0, lag(Time)), #open paranthases ("(")
+  #          R_closed = Time, #closed brack ("]")
+  #          IndR = ifelse(contains_recurrent == TRUE, 1, 0),
+  #          IndD = ifelse(contains_failure == TRUE, 1, 0)) %>%
+  #   rename(R_Label = Label.x) %>%
+  #   dplyr::select(ID, L_open, R_closed, IndR, IndD, R_Label) %>%
+  #   as.data.frame()
+  # #add in covariates
+  # dataset = merge(dataset0,df_cov, by = "ID") %>%
+  #   dplyr::select(ID, L_open, R_closed, IndR, IndD, Cov, Trt, R_Label)
+  # name = sprintf("Dataset_N%s_G%s_A%s_lambda0D%sBetaD%somegaD%sgammaR%s_lambda0R%sBetaR%somegaR%sgammaR%s_rho1%s_rho2%s_tau%s",
+  #                N, G, num_A,
+  #                round(lambda_0D,1), round(beta_D,1), round(omega_D,1), round(gamma_D,1), round(lambda_0R,1), round(beta_R,1), round(omega_R,1), round(gamma_R,1),
+  #                gapparam1, gapparam2, tau0)
+  # print(name)
+  # list(dataset_recurrent=dataset,dataset_survival=df_surv2,name=name)
 }
 
 # function for generating failure time from Gumbel bivariate exponential distribution (1960)
@@ -536,3 +485,84 @@ message("End of 02.Simulation_Functions_RE.R")
 
 # End of script -------------------------------------------------------------
 
+
+
+
+# gdata_CR <- function(N=10,
+#                      u1 = NULL,
+#                      u2 = NULL,
+#                      u3 = NULL,
+#                      ncov = 5,
+#                      mass_p = 0.3,
+#                      predHazardFn, predPropensityFn,
+#                      ztype=0, zparam=0.5,
+#                      ctype=0,cparam=2,censor_min=0,censor_max=NULL,
+#                      num_A=2,tau=5,
+#                      policy=NULL, priority_cause = 1,
+#                      full_data=0,
+#                      generate_failure_method = NULL,
+#                      crit.eval.os = "mean",
+#                      t0.os = NULL,
+#                      crit.eval.cif = "mean",
+#                      t0.cif = NULL,
+#                      evaluate = FALSE){
+#   
+#   if (is.null(u1)){
+#     print("missing u1 --- make sure this is right...")
+#     u1 <<- runif(N)  # Observed value
+#   }
+#   if (is.null(u2)){
+#     print("missing u2 --- make sure this is right...")
+#     u2 <<- runif(N)  # Observed value
+#   }
+#   if (is.null(u3)){
+#     print("missing u3 --- make sure this is right...")
+#     u3 <<- runif(N)  # Observed value
+#   }
+#   
+#   if (ztype == 0){
+#     print("ztype=normal")
+#     z <- matrix(rnorm(N * ncov), nrow = N, ncol = ncov) # positive for when testing but regular when we want zom to be not as good
+#   }
+#   
+#   if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
+#   if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
+#   if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
+#   
+#   # generating censoring time
+#   if (ctype == 0){
+#     message("censoring: exp")
+#     cc <- rexp(N,cparam)
+#   }
+#   if (ctype == 1){
+#     message("censoring: unif")
+#     if(is.null(censor_max)){censor_max = tau}
+#     if(is.null(censor_min)){censor_min = 0}
+#     message("censor_max is", censor_max)
+#     cc <- runif(N,min=censor_min,max=censor_max)
+#     # View(cc)
+#   }
+#   if (ctype == 99){
+#     print("!!!!! no censoring. !!!!!")
+#     cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau though so fix in future)
+#   }
+#   trunc_cens_time = pmin(cc, tau)
+#   
+#   df_multi <<- Dynamics(N=N, u1 = u1, u2=u2, u3 = u3,
+#                         tau=tau, covariate = z, ncov = ncov,
+#                         mass_p = mass_p,
+#                         censor_time = trunc_cens_time,
+#                         predHazardFn = predHazardFn,
+#                         predPropensityFn = predPropensityFn,
+#                         policy=policy, priority_cause=priority_cause,
+#                         full_data = full_data,
+#                         generate_failure_method = generate_failure_method,
+#                         crit.eval.os = crit.eval.os,
+#                         t0.os = t0.os,
+#                         crit.eval.cif = crit.eval.cif,
+#                         t0.cif = t0.cif,
+#                         evaluate = evaluate
+#   ) %>% as.data.frame()
+#   
+#   return(df_multi)
+# }
