@@ -138,14 +138,17 @@ Dynamics <-
               x = get_all_vars(policy@phaseResults[[phase]]@model, x)
               # View(x)
               # print(colnames(x))
-
-              args <- list(policy, newdata = x, Phase = phase)
+              pol <<- policy
+              xx <<- x
+              pp <<- phase
+              args <- list(policy, newdata = x, Phase = phase, endPoint = "CR")
               # print(2)
               args_tmp <<- args
+              # print("start docalling")
               docalling <- do.call(itrSurv::predict, args)
               # print(3)
               if (phase == 1){
-                # print(4)s
+                # print(4)
                 docalling1 <<- docalling
                 tp_surv <<- policy@params@survivalparam@timePoints
                 stopatP1 <<- docalling$optimal@Ratio_Stopping_Ind #stop=1 for P1 and stop=0 for P2
@@ -163,7 +166,7 @@ Dynamics <-
                                    tmp_act[, "P2"])
             tmp_act_itrsurv <<- tmp_act
             action[at.risk != 0] = tmp_act[,4]
-            # print(6)
+            print(6)
             n.1 <- mean(stopatP1==1) # saving Ratio Stopping Ind at end of Phase 1
             # View(as.data.frame(tmp_act))
             # View(as.data.frame(tmp_act_itrsurv))

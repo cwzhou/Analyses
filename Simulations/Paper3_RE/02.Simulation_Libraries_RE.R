@@ -16,9 +16,7 @@ library(MASS)
 library(reshape2)
 library(ggplot2)
 library(cowplot)
-# for pmcr:
-library(rgenoud)
-library(rpart)
+library(parallel)
 
 # if (local == 1){
 #   message("Local Machine")

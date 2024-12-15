@@ -33,33 +33,33 @@ gdata_RE <- function(N=10,
   if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
   if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
   # print(sprintf("covariates z: %s",z))
-  
+
   # generating censoring time
   if (ctype == 0){cc <- rexp(N,cparam)}
   if (ctype == 1){cc <- runif(N,min=0,max=tau0)}
   if (ctype == 99){
     print("!!!!! no censoring. !!!!!")
     cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau0 though so fix in future)
+    # View(cc)
   }
-  trunc_cens_time = pmin(cc, tau)
   # print(sprintf("censoring time cc: %s",cc))
-  
+
   # # generating treatment
   # A = rbinom(N, num_A-1, 0.5)
   # # print(sprintf("treatments A: %s",A))
-  
-  df_multi <<- Dynamics(N=N, 
-                        tau=tau, 
+
+  df_multi <<- Dynamics(N=N,
+                        tau=tau0,
                         covariate = z,
                         ncov = ncov,
                         gapparam1 = gapparam1,
                         gapparam2 = gapparam2,
                         G = G,
-                        censor_time = trunc_cens_time,
+                        censor_time = cc,
                         predHazardFn_D = predHazardFn_D,
                         predHazardFn_R = predHazardFn_R,
                         predPropensityFn = predPropensityFn,
-                        policy=policy, 
+                        policy=policy,
                         crit.eval.surv = crit.eval.surv,
                         t0.surv = t0.surv,
                         crit.eval.endpoint = crit.eval.endpoint,
@@ -117,14 +117,14 @@ gdata_RE <- function(N=10,
   #     mutate(Label = paste0("Recurrent", Recurrent)) %>%
   #     dplyr::select(-c(Gap, Time_Gap, Recurrent)) %>%
   #     rename(Time = Time_Recurrent)
-  # 
+  #
   #   # # generate conditional gaptime2 (given gaptime1)
   #   # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1)$tt)
   #   # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2)$tt)
   #   # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3)$tt)
   #   # gap_df = data.frame(ID = c(1:N), gaptime1 = gaptime1, gaptime2 = gaptime2, gaptime3 = gaptime3, gaptime4 = gaptime4)
   # }
-  # 
+  #
   # #steps to put together in one dataset
   # df_times = data.frame(ID = c(1:N), Time_Failure=tt, Time_Censor=cc, Time_Tau=tau0)
   # # survival dataset (1row/person)
@@ -134,7 +134,7 @@ gdata_RE <- function(N=10,
   # )
   # df_surv2 = inner_join(df_cov, df_surv1, by = "ID") %>%
   #   dplyr::select(ID, Cov, Trt, obs_time, indD)
-  # 
+  #
   # # recurrent dataset
   # df_times_long = df_times %>%
   #   pivot_longer(cols = starts_with("Time_"), names_to = "Label", values_to = "Time") %>%
@@ -189,13 +189,16 @@ GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y) {
   # if y_type=2 then we want to input gaptime as the y aka gaptime2|gaptime1.
   if (y_type==1){
     title = "Generated Failure Time (conditional on first gap time)"
+    lambda = lambda_D
   } else if (y_type==2){
     title = "Generated Gap Time (conditional on previous gap time)"
+    lambda = lambda_R
   } else{
     stop("Invalid y_type")
   }
-  u = runif(N); #print(sprintf("u: %s", u))
-  c = 1-2*exp(-lambda_R*y); #print(sprintf("1-2exp(-y): %s", round(c,3)))
+  u = runif(N)
+  # print(sprintf("From Gumbel Bivariate Exp: generated u = %s", u))
+  c = 1-2*exp(-lambda*y); #print(sprintf("1-2exp(-y): %s", round(c,3)))
   rootsqd = (u-1)/(c*alpha) + ((1+c*alpha)/(2*c*alpha))^2; #print(sprintf("root^2: %s",rootsqd))
   root = sqrt(rootsqd)
   expnegx_plus = (1+c*alpha)/(2*c*alpha) + root;
@@ -506,7 +509,7 @@ message("End of 02.Simulation_Functions_RE.R")
 #                      crit.eval.cif = "mean",
 #                      t0.cif = NULL,
 #                      evaluate = FALSE){
-#   
+#
 #   if (is.null(u1)){
 #     print("missing u1 --- make sure this is right...")
 #     u1 <<- runif(N)  # Observed value
@@ -519,16 +522,16 @@ message("End of 02.Simulation_Functions_RE.R")
 #     print("missing u3 --- make sure this is right...")
 #     u3 <<- runif(N)  # Observed value
 #   }
-#   
+#
 #   if (ztype == 0){
 #     print("ztype=normal")
 #     z <- matrix(rnorm(N * ncov), nrow = N, ncol = ncov) # positive for when testing but regular when we want zom to be not as good
 #   }
-#   
+#
 #   if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
 #   if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
 #   if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
-#   
+#
 #   # generating censoring time
 #   if (ctype == 0){
 #     message("censoring: exp")
@@ -547,7 +550,7 @@ message("End of 02.Simulation_Functions_RE.R")
 #     cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau though so fix in future)
 #   }
 #   trunc_cens_time = pmin(cc, tau)
-#   
+#
 #   df_multi <<- Dynamics(N=N, u1 = u1, u2=u2, u3 = u3,
 #                         tau=tau, covariate = z, ncov = ncov,
 #                         mass_p = mass_p,
@@ -563,6 +566,6 @@ message("End of 02.Simulation_Functions_RE.R")
 #                         t0.cif = t0.cif,
 #                         evaluate = evaluate
 #   ) %>% as.data.frame()
-#   
+#
 #   return(df_multi)
 # }

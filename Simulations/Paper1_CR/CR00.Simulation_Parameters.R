@@ -116,7 +116,7 @@ if (generate_failure_method == "simple_exp"){
 
 
 # arg7 and 8 crit
-crit_surv <- list(crit1 = list(criterion_phase1 = "mean",  #"area"
+crit_surv <- list(crit1 = list(criterion_phase1 = "mean",
                                crit.value_phase1 = crit_t0_eval,#NULL,
                                value_phase1 = "truncated overall survival mean E[T]",
                                tol1 = mean_tol1),
@@ -126,7 +126,7 @@ crit_surv <- list(crit1 = list(criterion_phase1 = "mean",  #"area"
                                tol1 = combo_tol1)
                   )
 if (endpoint == "CR"){
-  crit3 = list(criterion_phase2 = "mean", #"area"
+  crit3 = list(criterion_phase2 = "mean",
                crit.value_phase2 = crit_t0_eval, #NULL,
                value_phase2 = "truncated PC-CIF mean PC-CIF[T] \n or Years Lost due to PC"
   )

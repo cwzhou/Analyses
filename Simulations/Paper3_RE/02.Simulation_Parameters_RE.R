@@ -13,10 +13,10 @@ source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
 
-savingrds = FALSE
-date_folder = "2024-12-05"
-n.eval = 10
-n.sim = 1
+savingrds = TRUE
+date_folder = "2024-12-15"
+n.eval = 300
+n.sim = 2
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 1
@@ -28,7 +28,7 @@ gapparam2 = 0.7 #rho for gap times
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "zom", "obs");
-skip_method <- c(TRUE, !TRUE, !TRUE);
+skip_method <- c(!TRUE, TRUE, TRUE);
 n.methods <- length(all_methods)
 # Loop to create logical SKIP objects for each method and assign skip_method
 assign_skip_function(all_methods, skip_method)
@@ -46,7 +46,7 @@ names(arg)[1:num.args] = c("endpoint", "censor",
                            "gamma_D","gamma_R",
                            "omega_D","omega_R",
                            "lambda_0D","lambda_0R",
-                           "propensity", "size", 
+                           "propensity", "size",
                            "crit_surv", "crit_endpoint")
 print("arg:")
 print(arg)
@@ -102,7 +102,7 @@ censor <- list(low.censoring = list(
 
 # arg3-10 betas, gammas, omegas, lambda0s
 if (endpoint == "RE"){
-  # no intercept b/c survival 
+  # no intercept b/c survival
   # parameters for disease for covariates
   betasD <- list(
     beta1 = list(
@@ -149,9 +149,9 @@ if (endpoint == "RE"){
       lambda0R.hazard0 = c(1),
       lambda0R.hazard1 = c(1))
   )
-  
-  ncovD.list <- lapply(betasD, function(x) length(x$beta.hazard1) ) 
-  ncovR.list <- lapply(betasR, function(x) length(x$beta.hazard1) ) 
+
+  ncovD.list <- lapply(betasD, function(x) length(x$beta.hazard1) )
+  ncovR.list <- lapply(betasR, function(x) length(x$beta.hazard1) )
   if (ncovD.list$beta1 == ncovR.list$beta1){
     ncov.list <- ncovD.list
   } else{
@@ -165,7 +165,7 @@ propensity <-   # (int), covariate (1~5)
        rct  = list(beta.propensity = function(p) c(rep(0, p))))  # RCT
 
 # arg6 size
-size <- list(small.sample.size = list(n = 100),
+size <- list(small.sample.size = list(n = 300),
              large.sample.size = list(n = 700))
 
 # arg7 and 8 crit
@@ -190,7 +190,7 @@ if (endpoint == "RE"){
 
 setting = c(all_methods = all_methods,
             n.methods = n.methods,
-            arg = list(arg), 
+            arg = list(arg),
             default,
             censor[[arg2]],
             # beta
@@ -213,7 +213,7 @@ setting = c(all_methods = all_methods,
             )
 
 ### 2. put a selected setting into the global environment
-cat("setting (endpoint, censor, beta_D, beta_R, 
+cat("setting (endpoint, censor, beta_D, beta_R,
     gamma_D, gamma_R, omega_D, omega_R, lambda_0D, lambda_0R,
     propensity, size, crit_phase1, crit_phase2) ", arg, "\n")
 list2env(setting, envir = globalenv())
@@ -244,6 +244,82 @@ if (endpoint == "RE"){
     )
   }
 }
+
+if (!dir.exists("output")) dir.create("output")
+if (!dir.exists("figure")) dir.create("figure")
+dir_rds = sprintf("./output/%s", date_folder)
+dir_fig = dir_rds %>% gsub("output/", "figure/", .)
+print(dir_rds)
+print(dir_fig)
+if (local == 0){
+  if (endpoint == "CR"){
+    dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_1/output/%s/%s",
+                          generate_failure_method,
+                          date_folder)
+  } else if (endpoint == "RE"){
+    dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_3/output/%s",
+                          date_folder)
+  } else{
+    message("endpoint DNE")
+  }
+  if (savingrds == TRUE){
+    if (!dir.exists(dir_rds_tmp)) dir.create(dir_rds_tmp)
+  }
+}
+if (savingrds == TRUE){
+  if (!dir.exists(dir_rds)) dir.create(dir_rds)
+  if (!dir.exists(dir_fig)) dir.create(dir_fig)
+}
+if (endpoint == "CR"){
+  if (generate_failure_method == "fine_gray"){
+    filename = paste0(dir_rds,"/simResult_", generate_failure_method,
+                      "_censor", arg2,
+                      "_nCauses", arg3, "_cause1prob", arg9,
+                      "_beta", arg4, "_prop", arg5,
+                      "_n", arg6, "_critS", arg7, "_critE", arg8, ".rds")
+  } else if (generate_failure_method == "simple_exp"){
+    filename = paste0(dir_rds,"/simResult_", generate_failure_method,
+                      "_censor", arg2,
+                      "_nCauses", arg3,
+                      "_beta", arg4, "_prop", arg5,
+                      "_n", arg6, "_critS", arg7, "_critE", arg8, ".rds")
+  } else{
+    stop("we dont have this generate_failure_method coded yet.")
+  }
+
+} else if (endpoint == "RE"){
+  filename = paste0(dir_rds, "/simResult_RE",
+                    "_censor", arg2, "_prop", arg11,
+                    "_n", arg12,
+                    "_betaD.", arg3,
+                    "_gammaD.", arg5,
+                    "_omegaD.", arg7,
+                    "_lambda0D.", arg9,
+                    ".rds")
+
+  # arg1 <- as.numeric(arg[1]) # 1..3 # 1=CR,2=RE,3=MC
+  # arg2 <- as.numeric(arg[2]) # 1,2 #censoring = 20%, censoring = 50%
+  # arg3 <- as.numeric(arg[3]) # 1..4 4 possible beta_D combinations
+  # arg4 <- as.numeric(arg[4]) # 1..4 4 possible beta_R combinations
+  # arg5 <- as.numeric(arg[5]) # 1..4 4 possible gamma_D combinations
+  # arg6 <- as.numeric(arg[6]) # 1..4 4 possible gamma_R combinations
+  # arg7 <- as.numeric(arg[7]) # 1..4 4 possible omega_D combinations
+  # arg8 <- as.numeric(arg[8]) # 1..4 4 possible omega_R combinations
+  # arg9 <- as.numeric(arg[9]) # 1..4 4 possible lambda_0D combinations
+  # arg10 <- as.numeric(arg[10]) # 1..4 4 possible lambda_0R combinations
+  # arg11 <- as.numeric(arg[11]) # 1..2 2 possible propensity combinations
+  # arg12 <- as.numeric(arg[12]) # 1..2 2 possible size combinations
+  # arg13 <- as.numeric(arg[13]) # 1..3 3 possible crit for surv (mean, mean.prob.combo, prob)
+  # arg14 <- as.numeric(arg[14]) # 1..3 3 possible crit for ep (mean, mean.prob.combo, prob)
+  # arg.date <- if (is.na(arg[num.args+1]) | arg[num.args+1] == "") date_folder else as.character(arg[num.args+1])
+
+
+} else{
+  message("endpoint DNE")
+}
+
+print(filename)
+
 
 ### 3. Run the simulation
 cv.nodesize = FALSE
@@ -279,9 +355,9 @@ message("End of 02.Simulation_Parameters_RE.R")
 #   omega_R = log(3) #parameters for treatment+covariate interaction
 #   ztype = 0 # covariate distribution
 #   zparam = 0.3 # covariate distribution parameter
-#   
+#
 #   ## TREATMENT COVARIATE INTERACTION ##
-#   
+#
 #   ##### Censoring Hyperparameters #####
 #   ctype = 1 # censoring distribution
 #   cparam = 2 # censoring distribution parameter
@@ -289,7 +365,7 @@ message("End of 02.Simulation_Parameters_RE.R")
 #   gaptype = 0 # failure vs gap time indicator
 #   gapparam1 = 0.1 #rho for failure
 #   gapparam2 = 0.7 #rho for gap times
-#   
+#
 #   print(sprintf("Parameters: N=%s, tau0=%s, G=%s, num_A=%s, lambda_0D=%s, lambda_0R=%s, beta_D=%s, beta_R=%s, omega_D=%s, omega_R=%s, ztype=%s, zparam=%s, ctype=%s, cparam=%s, gaptype=%s, gapparam1=%s, gapparam2=%s.",
 #                 N, tau0, G, num_A,
 #                 lambda_0D, lambda_0R, beta_D, beta_R,
