@@ -26,9 +26,9 @@ Dynamics <-
            t0.endpoint = NULL,
            evaluate = FALSE
   ) {
-    message("Starting F01.DynamicsRE.R")
+    # message("Starting F01.DynamicsRE.R")
     # message("N:",N)
-    message("tau:", tau)
+    # message("tau:", tau)
     # message("covariate:", covariate)
     # message("ncov:", ncov)
     # message("full_data:", full_data)

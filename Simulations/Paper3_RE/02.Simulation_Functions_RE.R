@@ -33,6 +33,7 @@ gdata_RE <- function(N=10,
   if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
   if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
   # print(sprintf("covariates z: %s",z))
+  zzcov <<- z
 
   # generating censoring time
   if (ctype == 0){cc <- rexp(N,cparam)}

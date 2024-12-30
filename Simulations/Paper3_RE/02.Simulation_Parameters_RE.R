@@ -14,9 +14,9 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2024-12-15"
-n.eval = 300
-n.sim = 2
+date_folder = "2024-12-30"
+n.eval = 200
+n.sim = 5
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 1
@@ -28,7 +28,7 @@ gapparam2 = 0.7 #rho for gap times
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "zom", "obs");
-skip_method <- c(!TRUE, TRUE, TRUE);
+skip_method <- !c(TRUE, TRUE, TRUE);
 n.methods <- length(all_methods)
 # Loop to create logical SKIP objects for each method and assign skip_method
 assign_skip_function(all_methods, skip_method)
@@ -103,51 +103,71 @@ censor <- list(low.censoring = list(
 # arg3-10 betas, gammas, omegas, lambda0s
 if (endpoint == "RE"){
   # no intercept b/c survival
-  # parameters for disease for covariates
+  # Covariate effects for survival
   betasD <- list(
     beta1 = list(
-      beta.hazard0 = c(log(2)),
-      beta.hazard1 = c(log(2)))
-  )
-  # parameters for recurrence for covariates
-  betasR <- list(
-      beta1 = list(
-        beta.hazard0 = c(log(2)),
-        beta.hazard1 = c(log(2)))
+      beta.hazard0 = c(log(1.4), log(2), log(1.3)),  # Covariate effects for Treatment 0
+      beta.hazard1 = c(log(1.1), log(1.3), log(1.1))   # Covariate effects for Treatment 1
     )
+  )
+  
+  # Covariate effects for recurrence
+  betasR <- list(
+    beta1 = list(
+      beta.hazard0 = c(log(0.8), log(0.9), log(1.2)),  # Fewer recurrences for Treatment 0
+      beta.hazard1 = c(log(1.5), log(1.6), log(0.7))    # More recurrences for Treatment 1
+    )
+  )
+  
+  # Interaction between treatment and covariates for survival
   gammaD <- list(
     gammaD1 = list(
-      gammaD.hazard0 = c(log(2)),
-      gammaD.hazard1 = c(log(2)))
+      gammaD.hazard0 = c(log(1.1), log(1.05), log(1.2)),  # Interaction effects for Treatment 0
+      gammaD.hazard1 = c(log(1.1), log(1.05), log(1.2))   # Interaction effects for Treatment 1
+    )
   )
+  
+  # Interaction between treatment and covariates for recurrence
   gammaR <- list(
     gammaR1 = list(
-      gammaR.hazard0 = c(log(2)),
-      gammaR.hazard1 = c(log(2)))
+      gammaR.hazard0 = c(log(1.2), log(1.15), log(1.25)),  # Interaction for Treatment 0 recurrence
+      gammaR.hazard1 = c(log(1.4), log(1.35), log(1.45))   # Stronger interaction for Treatment 1 recurrence
+    )
   )
-  #parameters for disease for treatment
+  
+  # Parameters for disease for treatment
+  # Parameters for survival hazard (disease-related)
   omegaD <- list(
     omegaD1 = list(
-      omegaD.hazard0 = c(log(3)),
-      omegaD.hazard1 = c(log(3)))
+      omegaD.hazard0 = log(2.5),  # Treatment 0 survival effect
+      omegaD.hazard1 = log(2.2)   # Treatment 1 survival effect
+    )
   )
+  
+  
   #parameters for treatment+covariate interaction
+  # Parameters for recurrence hazard (treatment effects)
   omegaR <- list(
     omegaR1 = list(
-      omegaR.hazard0 = c(log(3)),
-      omegaR.hazard1 = c(log(3)))
+      omegaR.hazard0 = log(0.5),  # Treatment 0 recurrence effect
+      omegaR.hazard1 = log(1.8)   # Treatment 1 recurrence effect
+    )
   )
-  # baseline hazard for disease
+  
+  # Baseline hazards for survival (disease-related)
   lambda0D <- list(
     lambda0D1 = list(
-      lambda0D.hazard0 = c(1),
-      lambda0D.hazard1 = c(1))
+      lambda0D.hazard0 = c(1),  # Consistent baseline hazard
+      lambda0D.hazard1 = c(1)
     )
-  # baseline hazard for recurrence
+  )
+  
+  # Baseline hazards for recurrence
   lambda0R <- list(
     lambda0R1 = list(
-      lambda0R.hazard0 = c(1),
-      lambda0R.hazard1 = c(1))
+      lambda0R.hazard0 = c(1),  # Consistent baseline hazard
+      lambda0R.hazard1 = c(1)
+    )
   )
 
   ncovD.list <- lapply(betasD, function(x) length(x$beta.hazard1) )
