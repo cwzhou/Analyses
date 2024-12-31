@@ -205,7 +205,7 @@ Dynamics <-
 
     if (evaluate == TRUE){
       message("original G was: ", G)
-      G = 10
+      G = G #999
       message("But now setting G to be really high: G = ", G)
     } else{
       G = G

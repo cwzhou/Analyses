@@ -70,7 +70,7 @@ endpoint_val.fn <- function(data, idName, epName, txName) {
 
 
 # need to source CHECKPackagesScripts.R where we want to check_RE = 1
-init_seed = 2025
+init_seed = 1995
 idName0 = "ID"
 epName0 = "IndR"
 txName0 = "Trt"
@@ -86,6 +86,7 @@ arg_list = list(N=n,
                 # omega_D=omega_D,omega_R=omega_R,gamma_D=gamma_D,gamma_R=gamma_R,
                 ztype = 0, # covariate distribution
                 zparam = 0.3, # covariate distribution parameter
+                zseed = 2025,
                 ctype=ctype,
                 cparam=censor_rate,
                 censor_min=censor_min,
@@ -97,14 +98,13 @@ arg_list = list(N=n,
                 predHazardFn_R = predHazardFn_R,
                 predPropensityFn = predPropensityFn # list of predictor functions
 )
-set.seed(2025)
+set.seed(init_seed)
 u1_train = runif(n)
 u1_test = runif(n.eval)
 u2_train = runif(n)
 u2_test = runif(n.eval)
 u3_train = runif(n)
 u3_test = runif(n.eval)
-
 
 arg.obs.train <- c(arg_list,
                    list(u1 = u1_train,
@@ -140,7 +140,6 @@ arg.czmk.test = c(arg_list,
 # update args that alr exist in arg.czmk.test
 arg.czmk.test$N = n.eval
 arg.czmk.test$ctype = 99
-arg.obs.no.censor <- arg.zom.test <- arg.czmk.test
 # sim = 1
 
 # Initialize an empty list to collect datasets for all simulations
@@ -168,14 +167,17 @@ all_sims_data.mff <- list()
   ### simulation
   for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
   message("starting run_simulation for sim#", sim)
-
+    
   cat("\n\n#################################\n")
   cat("######### Simulation ",sim, "#########\n")
   cat("      Endpoint: ", endpoint, "      \n")
   cat("#################################\n")
 
-  train_seed = sim*10000 + init_seed
-  test_seed = train_seed + 10
+  train_seed = sim*10000 + init_seed*3
+  test_seed = train_seed + 30306
+  arg.obs.train$zseed = arg.obs.train$zseed*sim
+  arg.czmk.test$zseed = test_seed*sim
+  arg.obs.no.censor <- arg.zom.test <- arg.czmk.test
 
   cat ("%%% Training Data for", sim_data_type, "Simulation:",sim,"%%%\n")
   tt(1)
@@ -185,8 +187,12 @@ all_sims_data.mff <- list()
   # if (sim_data_type == "RE"){
     message("Recurrent Events Survival Data Simulation")
     sim.train = do.call(gdata_RE, arg.obs.train)
+    obs.times_train <<- times_act
+    ph1_obs_train <<-pred.hazard1
+    gap1_obs_train <<- gaptime1
+    tt_obs_train <<- tt
     df_recurr = sim.train$dataset_recurrent; #View(df_recurr)
-    df_surv = sim.train$dataset_survival; #View(df_surv)
+    df_surv = sim.train$dataset_survival; head(df_surv)
     name = sprintf("%s_%s",sim.train$name, sim_data_type); print(name)
     # update this to include name_surv
     assign(name, df_recurr)
@@ -237,10 +243,10 @@ all_sims_data.mff <- list()
   message("using test_seed to generate obs testing data")
   set.seed(test_seed)
   obs.data.rep <- do.call(gdata_RE, arg.obs.no.censor) # no censoring for eval sets
-  obs.times <<- times_act
-  ph1_obs <<-pred.hazard1
-  gap1_obs <<- gaptime1
-  tt_obs <<- tt
+  obs.times_test <<- times_act
+  ph1_obs_test <<-pred.hazard1
+  gap1_obs_test <<- gaptime1
+  tt_obs_test <<- tt
   rep_obs <<- obs.data.rep
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
@@ -294,6 +300,10 @@ all_sims_data.mff <- list()
                                    minEventSurv = 3L,
                                    nodeSizeEnd = 6L,
                                    nodeSizeSurv = 6L)))
+    # czmk.times_train <<- times_act
+    # ph1_czmk_train <<-pred.hazard1
+    # gap1_czmk_train <<- gaptime1
+    # tt_czmk_train <<- tt
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk.test$policy <- if (!czmk.error) optimal.czmk
     policy_czmk <<- arg.czmk.test$policy
@@ -309,10 +319,10 @@ all_sims_data.mff <- list()
       set.seed(test_seed)
       # TO DO: MAKE SURE THE COVARIATES ARE THE SAME FOR CZMK AND ZOM TEST SET
       czmk.data.rep <- do.call(gdata_RE, arg.czmk.test); head(czmk.data.rep$dataset_survival$Z1)
-      czmk.times <<- times_act
-      ph1_czmk <<- pred.hazard1
-      gap1_czmk <<- gaptime1
-      tt_czmk <<- tt
+      czmk.times_test <<- times_act
+      ph1_czmk_test <<- pred.hazard1
+      gap1_czmk_test <<- gaptime1
+      tt_czmk_test <<- tt
       czmk.test.df_recurr <<- czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
       czmk.test.df_surv <<- czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
       predd_surv_czmk_eval <<- predd_surv
@@ -352,8 +362,10 @@ all_sims_data.mff <- list()
                                                     minEventSurv = 1L,
                                                     nodeSizeEnd = 1e+9,
                                                     nodeSizeSurv = 1e+9)))
-
-
+    # zom.times_train <<- times_act
+    # ph1_zom_train <<-pred.hazard1
+    # gap1_zom_train <<- gaptime1
+    # tt_zom_train <<- tt
     zom.error <- class(optimal.zom)[1] == "try-error"
     arg.zom.test$policy <- if (!zom.error) optimal.zom
     policy_zom <- arg.zom.test$policy
@@ -364,11 +376,11 @@ all_sims_data.mff <- list()
       cat ("  6. zero-order model - Evaluation for RE Simulation",sim,"\n")
       set.seed(test_seed)
       zom.data.rep <- do.call(gdata_RE, arg.zom.test); head(zom.data.rep$dataset_survival$Z1)
-      zom.times <<- times_act
-      ph1_zom <<-pred.hazard1
-      ph2_zom <<-pred.hazard2
-      gap1_zom <<- gaptime1
-      tt_zom <<- tt
+      zom.times_test <<- times_act
+      ph1_zom_test <<-pred.hazard1
+      ph2_zom_test <<-pred.hazard2
+      gap1_zom_test <<- gaptime1
+      tt_zom_test <<- tt
       rep_zom <<- zom.data.rep
       zom.test.df_recurr = zom.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
       zom.test.df_surv = zom.data.rep$dataset_survival; #View(czmk.test.df_surv)

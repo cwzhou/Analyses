@@ -13,7 +13,8 @@ gdata_RE <- function(N=10,
                      # lambda_0D=0.1,lambda_0R=4,beta_R=log(2),beta_D=log(3),
                      # omega_D=0.2,omega_R=0.1, gamma_D = 0.2, gamma_R = 0.1,
                      predHazardFn_D, predHazardFn_R, predPropensityFn,
-                     ztype=0, zparam=0.5,ctype=1,cparam=2,censor_min, censor_max,
+                     ztype=0, zparam=0.5,zseed = 2025,
+                     ctype=1,cparam=2,censor_min, censor_max,
                      gaptype=0,gapparam1=0.2,gapparam2=0.25,
                      num_A=2,
                      ncov,
@@ -39,14 +40,47 @@ gdata_RE <- function(N=10,
   # ctype indicates the distribution for censoring (0=exponential,1=uniform,
   #                                                 9=no censoring)
 
-  # generating covariates
-  if (ztype == 0){z <- matrix(rnorm(N*ncov, 1, zparam), nrow=N,ncol=ncov)}
-  if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
-  if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
-  if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
-  # print(sprintf("covariates z: %s",z))
+  # # generating covariates
+  # if (ztype == 0){z <- matrix(rnorm(N*ncov, 1, zparam), nrow=N,ncol=ncov)}
+  # if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
+  # if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
+  # if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
+  # # print(sprintf("covariates z: %s",z))
+  # zzcov <<- z
+  
+  if (ztype == 0) {
+    # Generate random binary and continuous covariates for each variable
+    # Randomly assign each covariate to binary or continuous with 50% chance
+    set.seed(zseed)
+    cov_type <- sample(c(0, 1), ncov, replace = TRUE)  # 0 = continuous, 1 = binary
+    z <- matrix(0, nrow = N, ncol = ncov)   # Initialize covariate matrix 
+    for (i in 1:ncov) {
+      if (cov_type[i] == 1) {
+        # Binary covariate (using binomial distribution)
+        z[, i] <- rbinom(N, 1, 0.5)  # 50% probability for binary values
+      } else {
+        # Continuous covariate (normally distributed)
+        z[, i] <- rnorm(N, mean = 0, sd = zparam)
+      }
+    }
+  }
+  if (ztype == 1) {
+    # Generate binary covariates using binomial distribution
+    z <- matrix(rbinom(N * ncov, 1, 0.5), nrow = N, ncol = ncov)  # 50% probability for binary values
+  }
+  if (ztype == 2) {
+    # Generate continuous covariates using normal distribution
+    z <- matrix(rnorm(N * ncov, mean = 0, sd = zparam), nrow = N, ncol = ncov)
+  }
+  if (ztype == 3) {
+    # Generate continuous covariates using uniform distribution
+    z <- matrix(runif(N * ncov), nrow = N, ncol = ncov)
+  }
+  if (is.null(colnames(z))) {
+    colnames(z) <- paste0("Z", 1:ncov)
+  }
   zzcov <<- z
-
+  
   # generating censoring time
   if (ctype == 0){cc <- rexp(N,cparam)}
   if (ctype == 1){cc <- runif(N,min=0,max=tau0)}
