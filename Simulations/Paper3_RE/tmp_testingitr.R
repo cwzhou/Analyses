@@ -6,6 +6,7 @@
 setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
 source("02.Simulation_Parameters_RE.R")
 start_time = Sys.time()
+savingrds = FALSE
 
 # Generate column names based on methods for result
 column_names = NULL
@@ -97,7 +98,19 @@ arg_list = list(N=n,
                 predHazardFn_R = predHazardFn_R,
                 predPropensityFn = predPropensityFn # list of predictor functions
 )
-arg.obs.train <- arg_list
+set.seed(2025)
+u1_train = runif(n)
+u1_test = runif(n.eval)
+u2_train = runif(n)
+u2_test = runif(n.eval)
+u3_train = runif(n)
+u3_test = runif(n.eval)
+
+
+arg.obs.train <- c(arg_list,
+                   list(u1 = u1_train,
+                        u2 = u2_train,
+                        u3 = u3_train))
 arg.czmk.train = list(endPoint = endpoint,
                       idName = idName0,
                       epName = epName0,
@@ -114,11 +127,17 @@ arg.czmk.train = list(endPoint = endpoint,
                       nTree = 300,
                       pooled = FALSE,
                       tol1 = tol1,
-                      stratifiedSplit = 0.1)
+                      stratifiedSplit = 0.1,
+                      u1 = u1_train,
+                      u2 = u2_train)
 arg.czmk.test = c(arg_list,
                   evaluate = TRUE,
                   crit.eval.surv = criterion_phase1,
-                  crit.eval.endpoint = criterion_phase2)
+                  crit.eval.endpoint = criterion_phase2,
+                  list(
+                    u1 = u1_test,
+                    u2 = u2_test,
+                    u3 = u3_test))
 # update args that alr exist in arg.czmk.test
 arg.czmk.test$N = n.eval
 arg.czmk.test$ctype = 99
@@ -142,16 +161,15 @@ attr(result, "criterion_phase2") <- list(criterion = criterion_phase2) #, crit.v
 # flow: obs (1) -> optimal (n.mc), obs.no.censor (n.mc)
 print(Sys.time())
 
+sim = 1
 ######################################################################
 ######################################################################
 ######################################################################
 ######################################################################
 ######################################################################
 ### simulation
-sim = 2
-sim = 10 # testing malloc
-
-message("starting run_simulation for sim#", sim)
+# for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
+  message("starting run_simulation for sim#", sim)
   
   cat("\n\n#################################\n")
   cat("######### Simulation ",sim, "#########\n")
@@ -221,13 +239,19 @@ message("starting run_simulation for sim#", sim)
   message("using test_seed to generate obs testing data")
   set.seed(test_seed)
   obs.data.rep <- do.call(gdata_RE, arg.obs.no.censor) # no censoring for eval sets
+  obs.times <<- times_act
+  ph1_obs <<-pred.hazard1
+  gap1_obs <<- gaptime1
+  tt_obs <<- tt
   rep_obs <<- obs.data.rep
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
   # result["obs_survival"] = survival_val.fn(obs.test.df_surv)
   result[sim, "obs_survival"] = survival_val.fn(obs.test.df_surv)
   obs.mff.result <- endpoint_val.fn(data = obs.test.df_recurr, idName0, epName0, txName0)
-  obs.mff.df <- cbind(simulation = sim, obs.mff.result$mff_tau_df, method = "observed")
+  obs.mff.df <- cbind(simulation = sim, obs.mff.result$mff_tau_df, 
+                      survival = obs.test.df_surv$obs_time,
+                      method = "observed")
   # result["obs_endpoint"] = obs.mff.result$mean_value
   result[sim, "obs_endpoint"] = obs.mff.result$mean_value
   # View(obs.mff.df); View(result)
@@ -256,6 +280,7 @@ message("starting run_simulation for sim#", sim)
   cat("\n******************************\n")
   # estimation
   cat ("1. czmk for simulation", sim, "\n")
+  if (!skip.czmk) {
     cat ("  1. czmk - Policy estimation for RE Simulation",sim,"\n")
     # new package itrSurv
     set.seed(train_seed + 1)
@@ -271,3 +296,154 @@ message("starting run_simulation for sim#", sim)
                                    minEventSurv = 3L,
                                    nodeSizeEnd = 6L,
                                    nodeSizeSurv = 6L)))
+    czmk.error <- class(optimal.czmk)[1] == "try-error"
+    optimal.czmk
+    arg.czmk.test$policy <- if (!czmk.error) optimal.czmk
+    policy_czmk <<- arg.czmk.test$policy
+    #training
+    predd_surv_train_czmk <<- predd_surv
+    predd_ep_train_czmk <<- predd_ep
+    # if (!czmk.error) result["czmk_n_phase2"] <- mean(arg.czmk.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) #result[sim, "czmk_n_phase2"]
+    if (!czmk.error) result[sim,"czmk_n_phase2"] <- mean(arg.czmk.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0)
+    rm(optimal.czmk); gc()
+    
+    cat ("  \n 1. czmk - Evaluation for RE Simulation",sim,"\n")
+    if (!czmk.error) {
+      set.seed(test_seed)
+      # TO DO: MAKE SURE THE COVARIATES ARE THE SAME FOR CZMK AND ZOM TEST SET
+      czmk.data.rep <- do.call(gdata_RE, arg.czmk.test); head(czmk.data.rep$dataset_survival$Z1)
+      czmk.times <<- times_act
+      ph1_czmk <<- pred.hazard1
+      gap1_czmk <<- gaptime1
+      tt_czmk <<- tt
+      czmk.test.df_recurr <<- czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
+      czmk.test.df_surv <<- czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
+      predd_surv_czmk_eval <<- predd_surv
+      predd_ep_czmk_eval <<- predd_ep
+      rep_czmk <<- czmk.data.rep
+      # result["czmk_survival"] = survival_val.fn(czmk.test.df_surv)
+      result[sim,"czmk_survival"] = survival_val.fn(czmk.test.df_surv)
+      # czmk.test.df_recurr %>% group_by(ID) %>% summarize(Number_RE = sum(IndR), Trt = mean(Trt))
+      czmk.mff.result <<- endpoint_val.fn(data = czmk.test.df_recurr, idName0, epName0, txName0)
+      czmk.mff.df <<- cbind(simulation = sim, czmk.mff.result$mff_tau_df, 
+                            survival = czmk.test.df_surv$obs_time,
+                            method = "czmk")
+      # View(czmk.mff.df); View(result)
+      # result["czmk_endpoint"] = czmk.mff.result$mean_value #result[sim, "czmk_endpoint"]
+      result[sim, "czmk_endpoint"] = czmk.mff.result$mean_value
+    } # end of if czmk.error
+    # result["time.czmk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.czmk"]
+    result[sim, "time.czmk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
+    arg.czmk.test$policy <- NULL; gc()
+    rm(czmk.data.rep); gc()
+  } # if skip.czmk
+  
+  cat("\n******************************\n")
+  # estimation
+  cat ("2. Estimation - zero-order model for RE Simulation",sim,"\n")
+  if (!skip.zom) {
+    cat ("  2. zom - Policy estimation for RE Simulation",sim,"\n")
+    set.seed(train_seed + 2)
+    optimal.zom <- do.call(itrSurv::itrSurv, c(arg.czmk.train,
+                                               list(data = data_to_use,
+                                                    models = models_RE,
+                                                    timePointsSurvival = timePointsSurvival,
+                                                    timePointsEndpoint = timePointsEndpoint,
+                                                    tau = tau0,
+                                                    mTry = 1,
+                                                    minEventEnd = 1L,
+                                                    minEventSurv = 1L,
+                                                    nodeSizeEnd = 1e+9,
+                                                    nodeSizeSurv = 1e+9)))
+    
+    
+    zom.error <- class(optimal.zom)[1] == "try-error"
+    arg.zom.test$policy <- if (!zom.error) optimal.zom
+    policy_zom <- arg.zom.test$policy
+    # if (!zom.error) result["zom_n_phase2"] <- mean(arg.zom.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) # result[sim, "zom_n_phase2"]
+    if (!zom.error) result[sim, "zom_n_phase2"] <- mean(arg.zom.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0)
+    rm(optimal.zom); gc()
+    if (!zom.error){
+      cat ("  6. zero-order model - Evaluation for RE Simulation",sim,"\n")
+      set.seed(test_seed)
+      zom.data.rep <- do.call(gdata_RE, arg.zom.test); head(zom.data.rep$dataset_survival$Z1)
+      zom.times <<- times_act
+      ph1_zom <<-pred.hazard1
+      ph2_zom <<-pred.hazard2
+      gap1_zom <<- gaptime1
+      tt_zom <<- tt
+      rep_zom <<- zom.data.rep
+      zom.test.df_recurr = zom.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
+      zom.test.df_surv = zom.data.rep$dataset_survival; #View(czmk.test.df_surv)
+      # result["zom_survival"] = survival_val.fn(zom.test.df_surv) #result[sim, "zom_survival"]
+      result[sim, "zom_survival"] = survival_val.fn(zom.test.df_surv)
+      zom.mff.result <- endpoint_val.fn(data = zom.test.df_recurr, idName0, epName0, txName0)
+      zom.mff.df <- cbind(simulation = sim, zom.mff.result$mff_tau_df, 
+                          survival = zom.test.df_surv$obs_time,
+                          method = "zom")
+      # result["zom_endpoint"] = zom.mff.result$mean_value #result[sim, "zom_endpoint"]
+      result[sim, "zom_endpoint"] = zom.mff.result$mean_value
+    }
+    # result["time.zom"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.zom"]
+    result[sim, "time.zom"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
+    arg.zom.test$policy <- NULL; gc()
+    rm(zom.data.rep); gc()
+  } # if !skip.zom
+  
+  # Initialize an empty list to collect datasets
+  mff.dataset_list <- list()
+  # Check if each dataset exists and add it to the list
+  if (exists("czmk.mff.df")) mff.dataset_list[["czmk"]] <- czmk.mff.df
+  if (exists("zom.mff.df")) mff.dataset_list[["zom"]] <- zom.mff.df
+  if (exists("obs.mff.df")) mff.dataset_list[["obs"]] <- obs.mff.df
+  # Stack the datasets
+  mff.stacked_data <- do.call(rbind, mff.dataset_list)
+  row.names(mff.stacked_data) <- NULL
+  # Optionally add a column to indicate the simulation number
+  mff.stacked_data$simulation <- sim
+  # Append to the list of all simulations' data
+  all_sims_data.mff[[sim]] <- mff.stacked_data
+  
+  ### saving and cleaning
+  if (savingrds == TRUE){
+    message('saving rds tmp')
+    saveRDS(result, filename.tmp) # saving the temporary results
+    if (!dir.exists(paste0(dir_rds,"/mff"))) {
+      dir.create(paste0(dir_rds,"/mff"), recursive = TRUE)
+    }
+    filename_stacked.tmp = paste0(dir_rds,"/mff/stacked.mff_sim", sim, ".rds")
+    # saveRDS(mff.stacked_data, filename_stacked.tmp)
+    saveRDS(all_sims_data.mff, filename_stacked.tmp)
+    message('saved rds stacked')
+  }
+  gc()
+  cat("--- End of Simulation", sim, "---\n")
+# } # for (sim in 1:n.sim) but removed for parallelizing
+# return(result) # this is for parallel
+# } # this is for run_simulation for parallel
+
+# Combine all simulations into one big dataset for MFF
+mff_allsims <- do.call(rbind, all_sims_data.mff)
+row.names(mff_allsims) <- NULL
+View(mff_allsims)
+if (savingrds == TRUE){
+  write.csv(mff_allsims, paste0(dir_rds,"/mff/mff_allsims.csv"), row.names = FALSE)
+}
+
+# # Number of cores to use for parallelization
+# num_cores <- 5
+# results_list = list()
+# # Run the simulations in parallel
+# results_list <- mclapply(2, run_simulation, mc.cores = num_cores)
+
+
+message("\n END OF SIMS \n")
+# result
+end_time = Sys.time()
+
+message("End of Script: 01.Simulation_Run_RE.R")
+sprintf("Overall Time Took: %s", round(end_time - start_time,2))
+
+
+print("end of script")
+

@@ -13,13 +13,13 @@ source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
 
-savingrds = TRUE
-date_folder = "2024-12-30"
-n.eval = 200
-n.sim = 5
+savingrds = FALSE
+date_folder = "2024-12-29"
+n.eval = 500
+n.sim = 3
 sim_data_type = "RE"
 endpoint = sim_data_type
-tau0 = 1
+tau0 = 1.5
 ##### Gap Time Hyperparameters #####
 G = 3 # total gap times
 gaptype = 0 # failure vs gap time indicator
@@ -106,16 +106,16 @@ if (endpoint == "RE"){
   # Covariate effects for survival
   betasD <- list(
     beta1 = list(
-      beta.hazard0 = c(log(1.4), log(2), log(1.3)),  # Covariate effects for Treatment 0
-      beta.hazard1 = c(log(1.1), log(1.3), log(1.1))   # Covariate effects for Treatment 1
+      beta.hazard0 = c(log(0.8), log(0.25), log(1.3)),  # Covariate effects for Treatment 0
+      beta.hazard1 = c(log(2), log(0.8), log(1.1))   # Covariate effects for Treatment 1
     )
   )
   
   # Covariate effects for recurrence
   betasR <- list(
     beta1 = list(
-      beta.hazard0 = c(log(0.8), log(0.9), log(1.2)),  # Fewer recurrences for Treatment 0
-      beta.hazard1 = c(log(1.5), log(1.6), log(0.7))    # More recurrences for Treatment 1
+      beta.hazard0 = c(log(1.8), log(1.9), log(1.2)),  # Lower means Fewer recurrences for Treatment 0
+      beta.hazard1 = c(log(1.1), log(0.6), log(1.7))    # More recurrences for Treatment 1
     )
   )
   
@@ -130,8 +130,8 @@ if (endpoint == "RE"){
   # Interaction between treatment and covariates for recurrence
   gammaR <- list(
     gammaR1 = list(
-      gammaR.hazard0 = c(log(1.2), log(1.15), log(1.25)),  # Interaction for Treatment 0 recurrence
-      gammaR.hazard1 = c(log(1.4), log(1.35), log(1.45))   # Stronger interaction for Treatment 1 recurrence
+      gammaR.hazard0 = c(log(1.2), log(1.1), log(1.5)),  # Interaction for Treatment 0 recurrence
+      gammaR.hazard1 = c(log(1.1), log(1.35), log(1.15))   # Higher means Stronger interaction for Treatment 1 recurrence
     )
   )
   
@@ -139,8 +139,8 @@ if (endpoint == "RE"){
   # Parameters for survival hazard (disease-related)
   omegaD <- list(
     omegaD1 = list(
-      omegaD.hazard0 = log(2.5),  # Treatment 0 survival effect
-      omegaD.hazard1 = log(2.2)   # Treatment 1 survival effect
+      omegaD.hazard0 = log(3),  # Treatment 0 survival effect
+      omegaD.hazard1 = log(3)   # Treatment 1 survival effect
     )
   )
   
@@ -149,8 +149,8 @@ if (endpoint == "RE"){
   # Parameters for recurrence hazard (treatment effects)
   omegaR <- list(
     omegaR1 = list(
-      omegaR.hazard0 = log(0.5),  # Treatment 0 recurrence effect
-      omegaR.hazard1 = log(1.8)   # Treatment 1 recurrence effect
+      omegaR.hazard0 = log(3),  # Treatment 0 recurrence effect
+      omegaR.hazard1 = log(3)   # Treatment 1 recurrence effect
     )
   )
   
@@ -192,7 +192,7 @@ size <- list(small.sample.size = list(n = 300),
 criterion_phase1 = "mean"
 criterion_phase2 = "mean"
 crit_t0_eval = 1
-mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
+mean_tol1 = c(0.02,0) # this is for differences in years so we don't want it to be too big
 crit_surv <- list(crit1 = list(criterion_phase1 = criterion_phase1,
                                crit.value_phase1 = crit_t0_eval,
                                value_phase1 = "truncated survival mean E[T]",
@@ -253,14 +253,18 @@ if (endpoint == "RE"){
   # lambda_R = lambda_0R*exp(t(beta_R)%*%z + omega_R * A + A * t(gamma_R) %*% z)
   predHazardFn_D <- function(action, covariate) {
     ifelse(action == 1,
-           lambda0D.hazard1 * cbind(covariate) %*% exp(beta.hazard1) + omegaD.hazard1 * action + action * cbind(covariate) %*% gammaD.hazard1,
-           lambda0D.hazard0 * cbind(covariate) %*% exp(beta.hazard0)  + omegaD.hazard0 * action + action * cbind(covariate) %*% gammaD.hazard0
+           lambda0D.hazard1 * exp(cbind(covariate) %*% beta.hazard1 + omegaD.hazard1 * action + action * cbind(covariate) %*% gammaD.hazard1),
+           lambda0D.hazard0 * exp(cbind(covariate) %*% beta.hazard0 + omegaD.hazard0 * action + action * cbind(covariate) %*% gammaD.hazard0)
+           # lambda0D.hazard1 * cbind(covariate) %*% exp(beta.hazard1) + omegaD.hazard1 * action + action * cbind(covariate) %*% gammaD.hazard1,
+           # lambda0D.hazard0 * cbind(covariate) %*% exp(beta.hazard0)  + omegaD.hazard0 * action + action * cbind(covariate) %*% gammaD.hazard0
     )
   }
   predHazardFn_R <- function(action, covariate) {
     ifelse(action == 1,
-           lambda0R.hazard1 * cbind(covariate) %*% exp(beta.hazard1) + omegaR.hazard1 * action + action * cbind(covariate) %*% gammaR.hazard1,
-           lambda0R.hazard0 * cbind(covariate) %*% exp(beta.hazard0) + omegaR.hazard0 * action + action * cbind(covariate) %*% gammaR.hazard0
+           lambda0R.hazard1 * exp(cbind(covariate) %*% beta.hazard1 + omegaR.hazard1 * action + action * cbind(covariate) %*% gammaR.hazard1),
+           lambda0R.hazard0 * exp(cbind(covariate) %*% beta.hazard0 + omegaR.hazard0 * action + action * cbind(covariate) %*% gammaR.hazard0)
+           # lambda0R.hazard1 * cbind(covariate) %*% exp(beta.hazard1) + omegaR.hazard1 * action + action * cbind(covariate) %*% gammaR.hazard1,
+           # lambda0R.hazard0 * cbind(covariate) %*% exp(beta.hazard0) + omegaR.hazard0 * action + action * cbind(covariate) %*% gammaR.hazard0
     )
   }
 }

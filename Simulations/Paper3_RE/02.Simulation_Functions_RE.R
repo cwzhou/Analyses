@@ -6,6 +6,9 @@
 source("F01.DynamicsRE.R")
 # Functions -----------------------------------------------------------------
 gdata_RE <- function(N=10,
+                     u1 = NULL,
+                     u2 = NULL,
+                     u3 = NULL,
                      G=2,
                      # lambda_0D=0.1,lambda_0R=4,beta_R=log(2),beta_D=log(3),
                      # omega_D=0.2,omega_R=0.1, gamma_D = 0.2, gamma_R = 0.1,
@@ -22,6 +25,15 @@ gdata_RE <- function(N=10,
                      t0.endpoint = NULL,
                      evaluate = FALSE
                      ){
+  
+  if (is.null(u1)){
+    print("missing u1 --- make sure this is right...")
+    u1 <<- runif(N)  # Observed value
+  }
+  if (is.null(u2)){
+    print("missing u2 --- make sure this is right...")
+    u2 <<- runif(N)  # Observed value
+  }
 
   # ztype indicates the distribution for covariate z: 0=normal(0,1),1=binary(zparam),2=uniform(0,1)
   # ctype indicates the distribution for censoring (0=exponential,1=uniform,
@@ -50,6 +62,9 @@ gdata_RE <- function(N=10,
   # # print(sprintf("treatments A: %s",A))
 
   df_multi <<- Dynamics(N=N,
+                        u1 = u1, 
+                        u2=u2, 
+                        u3 = u3,
                         tau=tau0,
                         covariate = z,
                         ncov = ncov,
@@ -185,7 +200,7 @@ gdata_RE <- function(N=10,
 }
 
 # function for generating failure time from Gumbel bivariate exponential distribution (1960)
-GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y) {
+GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y, u.unif = NULL) {
   # y_type indicates what type of conditional y we want: 1 = survival time; 2 = gap time
   # if y_type=2 then we want to input gaptime as the y aka gaptime2|gaptime1.
   if (y_type==1){
@@ -197,7 +212,11 @@ GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y) {
   } else{
     stop("Invalid y_type")
   }
-  u = runif(N)
+  if (is.null(u.unif)){
+    u = runif(N)
+  } else{
+    u = u.unif
+  }
   # print(sprintf("From Gumbel Bivariate Exp: generated u = %s", u))
   c = 1-2*exp(-lambda*y); #print(sprintf("1-2exp(-y): %s", round(c,3)))
   rootsqd = (u-1)/(c*alpha) + ((1+c*alpha)/(2*c*alpha))^2; #print(sprintf("root^2: %s",rootsqd))
@@ -213,12 +232,12 @@ GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y) {
   list(tt=tt)
 }
 
-generate_gaptime <- function(N, lambda_D, lambda_R, alpha, G) {
+generate_gaptime <- function(N, lambda_D, lambda_R, alpha, G, u = NULL) {
   gaptime <- matrix(0, nrow = N, ncol = G)
   for (i in 2:G) { # starting with gaptime2
     # print(sprintf("Generating Gap Time %s", i))
     gaptime[,i] <- as.numeric(GumbelBiExp(N = N, lambda_D = lambda_D, lambda_R = lambda_R,
-                                          alpha = alpha, y_type = 2, y = gaptime[i - 1])$tt)
+                                          alpha = alpha, y_type = 2, y = gaptime[i - 1], u = u)$tt)
     # print(sprintf("End of Gap Time %s", i ))
   }
   return(gaptime)

@@ -97,7 +97,19 @@ arg_list = list(N=n,
                 predHazardFn_R = predHazardFn_R,
                 predPropensityFn = predPropensityFn # list of predictor functions
 )
-arg.obs.train <- arg_list
+set.seed(2025)
+u1_train = runif(n)
+u1_test = runif(n.eval)
+u2_train = runif(n)
+u2_test = runif(n.eval)
+u3_train = runif(n)
+u3_test = runif(n.eval)
+
+
+arg.obs.train <- c(arg_list,
+                   list(u1 = u1_train,
+                        u2 = u2_train,
+                        u3 = u3_train))
 arg.czmk.train = list(endPoint = endpoint,
                       idName = idName0,
                       epName = epName0,
@@ -114,11 +126,17 @@ arg.czmk.train = list(endPoint = endpoint,
                       nTree = 300,
                       pooled = FALSE,
                       tol1 = tol1,
-                      stratifiedSplit = 0.1)
+                      stratifiedSplit = 0.1,
+                      u1 = u1_train,
+                      u2 = u2_train)
 arg.czmk.test = c(arg_list,
                   evaluate = TRUE,
                   crit.eval.surv = criterion_phase1,
-                  crit.eval.endpoint = criterion_phase2)
+                  crit.eval.endpoint = criterion_phase2,
+                  list(
+                  u1 = u1_test,
+                  u2 = u2_test,
+                  u3 = u3_test))
 # update args that alr exist in arg.czmk.test
 arg.czmk.test$N = n.eval
 arg.czmk.test$ctype = 99
@@ -219,13 +237,19 @@ all_sims_data.mff <- list()
   message("using test_seed to generate obs testing data")
   set.seed(test_seed)
   obs.data.rep <- do.call(gdata_RE, arg.obs.no.censor) # no censoring for eval sets
+  obs.times <<- times_act
+  ph1_obs <<-pred.hazard1
+  gap1_obs <<- gaptime1
+  tt_obs <<- tt
   rep_obs <<- obs.data.rep
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
   # result["obs_survival"] = survival_val.fn(obs.test.df_surv)
   result[sim, "obs_survival"] = survival_val.fn(obs.test.df_surv)
   obs.mff.result <- endpoint_val.fn(data = obs.test.df_recurr, idName0, epName0, txName0)
-  obs.mff.df <- cbind(simulation = sim, obs.mff.result$mff_tau_df, method = "observed")
+  obs.mff.df <- cbind(simulation = sim, obs.mff.result$mff_tau_df, 
+                      survival = obs.test.df_surv$obs_time,
+                      method = "observed")
   # result["obs_endpoint"] = obs.mff.result$mean_value
   result[sim, "obs_endpoint"] = obs.mff.result$mean_value
   # View(obs.mff.df); View(result)
@@ -285,16 +309,22 @@ all_sims_data.mff <- list()
       set.seed(test_seed)
       # TO DO: MAKE SURE THE COVARIATES ARE THE SAME FOR CZMK AND ZOM TEST SET
       czmk.data.rep <- do.call(gdata_RE, arg.czmk.test); head(czmk.data.rep$dataset_survival$Z1)
-      czmk.test.df_recurr = czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
-      czmk.test.df_surv = czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
+      czmk.times <<- times_act
+      ph1_czmk <<- pred.hazard1
+      gap1_czmk <<- gaptime1
+      tt_czmk <<- tt
+      czmk.test.df_recurr <<- czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
+      czmk.test.df_surv <<- czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
       predd_surv_czmk_eval <<- predd_surv
       predd_ep_czmk_eval <<- predd_ep
       rep_czmk <<- czmk.data.rep
       # result["czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       result[sim,"czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       # czmk.test.df_recurr %>% group_by(ID) %>% summarize(Number_RE = sum(IndR), Trt = mean(Trt))
-      czmk.mff.result <- endpoint_val.fn(data = czmk.test.df_recurr, idName0, epName0, txName0)
-      czmk.mff.df <- cbind(simulation = sim, czmk.mff.result$mff_tau_df, method = "czmk")
+      czmk.mff.result <<- endpoint_val.fn(data = czmk.test.df_recurr, idName0, epName0, txName0)
+      czmk.mff.df <<- cbind(simulation = sim, czmk.mff.result$mff_tau_df, 
+                            survival = czmk.test.df_surv$obs_time,
+                            method = "czmk")
       # View(czmk.mff.df); View(result)
       # result["czmk_endpoint"] = czmk.mff.result$mean_value #result[sim, "czmk_endpoint"]
       result[sim, "czmk_endpoint"] = czmk.mff.result$mean_value
@@ -334,13 +364,20 @@ all_sims_data.mff <- list()
       cat ("  6. zero-order model - Evaluation for RE Simulation",sim,"\n")
       set.seed(test_seed)
       zom.data.rep <- do.call(gdata_RE, arg.zom.test); head(zom.data.rep$dataset_survival$Z1)
+      zom.times <<- times_act
+      ph1_zom <<-pred.hazard1
+      ph2_zom <<-pred.hazard2
+      gap1_zom <<- gaptime1
+      tt_zom <<- tt
       rep_zom <<- zom.data.rep
       zom.test.df_recurr = zom.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
       zom.test.df_surv = zom.data.rep$dataset_survival; #View(czmk.test.df_surv)
       # result["zom_survival"] = survival_val.fn(zom.test.df_surv) #result[sim, "zom_survival"]
       result[sim, "zom_survival"] = survival_val.fn(zom.test.df_surv)
       zom.mff.result <- endpoint_val.fn(data = zom.test.df_recurr, idName0, epName0, txName0)
-      zom.mff.df <- cbind(simulation = sim, zom.mff.result$mff_tau_df, method = "zom")
+      zom.mff.df <- cbind(simulation = sim, zom.mff.result$mff_tau_df, 
+                          survival = zom.test.df_surv$obs_time,
+                          method = "zom")
       # result["zom_endpoint"] = zom.mff.result$mean_value #result[sim, "zom_endpoint"]
       result[sim, "zom_endpoint"] = zom.mff.result$mean_value
     }

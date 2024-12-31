@@ -8,6 +8,9 @@
 #'
 Dynamics <-
   function(N = 100, #number of SUBJECTS
+           u1 = u1,
+           u2 = u2,
+           u3 = u3,
            tau = tau0,          # structural parameters
            covariate = NULL,
            ncov = 5,
@@ -57,14 +60,14 @@ Dynamics <-
       print("censor_time is NULL, randomly generating from unif(0,tau) - change if needed")
       censor_time = runif(N,min=0,max=tau)
     }
-    # if (is.null(u1)){
-    #   message("u1 was null so we are generating - make sure its the same for all methods")
-    #   u1 <<- runif(N)  # Observed value
-    # }
-    # if (is.null(u2)){
-    #   message("u2 was null so we are generating - make sure its the same for all methods")
-    #   u2 <<- runif(N)  # Observed value
-    # }
+    if (is.null(u1)){
+      message("u1 was null so we are generating - make sure its the same for all methods")
+      u1 <<- runif(N)  # Observed value
+    }
+    if (is.null(u2)){
+      message("u2 was null so we are generating - make sure its the same for all methods")
+      u2 <<- runif(N)  # Observed value
+    }
 
     epName1 = "IndR"
     # skeleton
@@ -192,17 +195,17 @@ Dynamics <-
 
     # hazards!
     # lambda_D = lambda_0D*exp(t(beta_D)%*%z + omega_D * A + A * t(gamma_D) %*% z) #no intercept for z b/c survival
-    pred.hazard1 = predHazardFn_D(action = action, covariate = covariate)
+    pred.hazard1 <<- predHazardFn_D(action = action, covariate = covariate)
     # print(pred.hazard1)
     # lambda_R = lambda_0R*exp(t(beta_R)%*%z + omega_R * A + A * t(gamma_R) %*% z)
-    pred.hazard2 = predHazardFn_R(action = action, covariate = covariate)
+    pred.hazard2 <<- predHazardFn_R(action = action, covariate = covariate)
     # print(pred.hazard2)
     # message('action', action)
     # message('covariate', covariate)
 
     if (evaluate == TRUE){
       message("original G was: ", G)
-      G = 999
+      G = 10
       message("But now setting G to be really high: G = ", G)
     } else{
       G = G
@@ -213,29 +216,31 @@ Dynamics <-
     alpha2 = 4*gapparam2
     if (alpha1 == 0){
       print("Independence")
-      # tt = rexp(N,lambda_0D*exp(t(beta_D)*z))
-      tt = rexp(N, predHazardFn_D(action = 0, covariate = covariate))
+      # tt_fail = rexp(N,lambda_0D*exp(t(beta_D)*z))
+      # tt_fail <<- rexp(N, predHazardFn_D(action = 0, covariate = covariate))
+      rateD = predHazardFn_D(action = 0, covariate = covariate)
+      tt_fail <<- -(1/rateD)*log(1-u1)
     } else{
       # print("============== Gumbel Bivariate Exponential ==============")
 
       # generate first gap time using marginal exp(lamR) distribution
       # gaptime1 = rexp(N,lambda_R)
-      gaptime1 = rexp(N,pred.hazard2)
+      # gaptime1 <<- rexp(N,pred.hazard2)
+      gaptime1 <<- -(1/pred.hazard2)*log(1-u1)
       # print(sprintf("gaptime1: %s", gaptime1))
+      
       # print("Generating Failure Time")
-
       # generate conditional failure time (given gaptime1)
-      tt <- as.numeric(GumbelBiExp(N=N,lambda_D=pred.hazard1,lambda_R=pred.hazard2,
-                                   alpha=alpha1,y_type=1,y=gaptime1)$tt)
+      tt_fail <<- as.numeric(GumbelBiExp(N=N,lambda_D=pred.hazard1,lambda_R=pred.hazard2,
+                                   alpha=alpha1,y_type=1,y=gaptime1,u=u2)$tt)
       # print("Checking Plot")
-      # plot_check = Check_GumbelBiExp(N=N,tt=tt);
+      # plot_check = Check_GumbelBiExp(N=N,tt=tt_fail);
       # print(plot_check)
 
       # Generate G conditional gaptime values for each subject
       if (G>1){
         # gaptimes <- generate_gaptime(N, lambda_D, lambda_R, alpha2, G)
-        gaptimes <- generate_gaptime(N, pred.hazard1, pred.hazard2, alpha2, G)
-        # print(gaptimes)
+        gaptimes <- generate_gaptime(N, pred.hazard1, pred.hazard2, alpha2, G, u = u3)
         gaptimes[,1] = gaptime1
         gap_names <- paste0("gaptime", 1:ncol(gaptimes))
         colnames(gaptimes) <- gap_names
@@ -266,9 +271,9 @@ Dynamics <-
         rename(Time = Time_Recurrent)
 
       # # generate conditional gaptime2 (given gaptime1)
-      # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1)$tt)
-      # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2)$tt)
-      # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3)$tt)
+      # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1,u=u3)$tt)
+      # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2,u=u4)$tt)
+      # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3,u=u5)$tt)
       # gap_df = data.frame(ID = c(1:N), gaptime1 = gaptime1, gaptime2 = gaptime2, gaptime3 = gaptime3, gaptime4 = gaptime4)
     } # end of Bivariate Gumbel
 
@@ -293,7 +298,7 @@ Dynamics <-
 
     #steps to put together in one dataset
     trunc_cens_time = pmin(censor_time, tau0)
-    df_times <<- data.frame(ID = c(1:N), Time_Failure=tt, Time_Censor=censor_time, Time_Tau=tau0, Truncated_Censor_Time = trunc_cens_time)
+    df_times <<- data.frame(ID = c(1:N), Time_Failure=tt_fail, Time_Censor=censor_time, Time_Tau=tau0, Truncated_Censor_Time = trunc_cens_time)
     # View(df_times)
 
     # survival dataset (1row/person)
@@ -302,6 +307,9 @@ Dynamics <-
     df_surv1 = df_times %>% mutate(obs_time = pmin(Time_Failure, Time_Censor, Time_Tau),
                                    indD = ifelse(Time_Failure <= pmin(Time_Censor, Time_Tau), 1, 0)
     )
+    
+    times_act <<- inner_join(df_cov, df_surv1, by = "ID")
+    
     # View(df_surv1)
     df_surv2 = inner_join(df_cov, df_surv1, by = "ID") %>%
       dplyr::select(-c(Time_Failure, Time_Censor, Time_Tau))
@@ -517,4 +525,3 @@ message("End of F01.DynamicsRE.R")
 
 
 # End of script -------------------------------------------------------------
-
