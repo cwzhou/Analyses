@@ -13,7 +13,8 @@ gdata_RE <- function(N=10,
                      # lambda_0D=0.1,lambda_0R=4,beta_R=log(2),beta_D=log(3),
                      # omega_D=0.2,omega_R=0.1, gamma_D = 0.2, gamma_R = 0.1,
                      predHazardFn_D, predHazardFn_R, predPropensityFn,
-                     ztype=0, zparam=0.5,zseed = 2025,
+                     ztype=0, zparam=0.5,
+                     zseed = 2025,
                      ctype=1,cparam=2,censor_min, censor_max,
                      gaptype=0,gapparam1=0.2,gapparam2=0.25,
                      num_A=2,
@@ -51,7 +52,7 @@ gdata_RE <- function(N=10,
   if (ztype == 0) {
     # Generate random binary and continuous covariates for each variable
     # Randomly assign each covariate to binary or continuous with 50% chance
-    set.seed(zseed)
+    # set.seed(zseed)
     cov_type <- sample(c(0, 1), ncov, replace = TRUE)  # 0 = continuous, 1 = binary
     z <- matrix(0, nrow = N, ncol = ncov)   # Initialize covariate matrix 
     for (i in 1:ncov) {
@@ -262,7 +263,7 @@ GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y, u.unif = NULL) {
   expnegx = expnegx_minus*(expnegx_plus>1)+expnegx_plus*(expnegx_plus<=1)
   # print(sprintf("exp(-x): %s", round(expnegx,3)))
   tt = -log(expnegx)
-  # print(sprintf("%s (N = %s) is: %s", title, N, round(tt,2)))
+  # print(sprintf("%s (N = %s) is: %s", title, N, head(round(tt,2))))
   list(tt=tt)
 }
 

@@ -59,6 +59,7 @@ endpoint_val.fn <- function(data, idName, epName, txName) {
         Number_RE = sum(!!sym(epName)),
         Trt = mean(!!sym(txName))
       ) %>% as.data.frame()
+    print(head(mff_tau_df))
 
     # Calculate the mean across people
     mean_value <- mean(mff_tau_df$Number_RE, na.rm = TRUE)
@@ -67,7 +68,6 @@ endpoint_val.fn <- function(data, idName, epName, txName) {
     return(list(mff_tau_df = mff_tau_df, mean_value = mean_value))
   }
 }
-
 
 # need to source CHECKPackagesScripts.R where we want to check_RE = 1
 init_seed = 1995
@@ -86,7 +86,7 @@ arg_list = list(N=n,
                 # omega_D=omega_D,omega_R=omega_R,gamma_D=gamma_D,gamma_R=gamma_R,
                 ztype = 0, # covariate distribution
                 zparam = 0.3, # covariate distribution parameter
-                zseed = 2025,
+                # zseed = 2025, # don't need - delete: jan 1, 2025
                 ctype=ctype,
                 cparam=censor_rate,
                 censor_min=censor_min,
@@ -98,18 +98,8 @@ arg_list = list(N=n,
                 predHazardFn_R = predHazardFn_R,
                 predPropensityFn = predPropensityFn # list of predictor functions
 )
-set.seed(init_seed)
-u1_train = runif(n)
-u1_test = runif(n.eval)
-u2_train = runif(n)
-u2_test = runif(n.eval)
-u3_train = runif(n)
-u3_test = runif(n.eval)
 
-arg.obs.train <- c(arg_list,
-                   list(u1 = u1_train,
-                        u2 = u2_train,
-                        u3 = u3_train))
+arg.obs.train <- c(arg_list)
 arg.czmk.train = list(endPoint = endpoint,
                       idName = idName0,
                       epName = epName0,
@@ -126,20 +116,15 @@ arg.czmk.train = list(endPoint = endpoint,
                       nTree = 300,
                       pooled = FALSE,
                       tol1 = tol1,
-                      stratifiedSplit = 0.1,
-                      u1 = u1_train,
-                      u2 = u2_train)
+                      stratifiedSplit = 0.1)
 arg.czmk.test = c(arg_list,
                   evaluate = TRUE,
                   crit.eval.surv = criterion_phase1,
-                  crit.eval.endpoint = criterion_phase2,
-                  list(
-                  u1 = u1_test,
-                  u2 = u2_test,
-                  u3 = u3_test))
+                  crit.eval.endpoint = criterion_phase2)
 # update args that alr exist in arg.czmk.test
 arg.czmk.test$N = n.eval
 arg.czmk.test$ctype = 99
+arg.obs.no.censor <- arg.zom.test <- arg.czmk.test
 # sim = 1
 
 # Initialize an empty list to collect datasets for all simulations
@@ -172,20 +157,35 @@ all_sims_data.mff <- list()
   cat("######### Simulation ",sim, "#########\n")
   cat("      Endpoint: ", endpoint, "      \n")
   cat("#################################\n")
-
   train_seed = sim*10000 + init_seed*3
   test_seed = train_seed + 30306
-  arg.obs.train$zseed = arg.obs.train$zseed*sim
-  arg.czmk.test$zseed = test_seed*sim
-  arg.obs.no.censor <- arg.zom.test <- arg.czmk.test
+  
+  set.seed(init_seed*sim+505)
+  u1_train = runif(n)
+  u1_test = runif(n.eval)
+  u2_train = runif(n)
+  u2_test = runif(n.eval)
+  u3_train = runif(n)
+  u3_test = runif(n.eval)
+  arg.czmk.test$u1 <- arg.zom.test$u1 <- arg.obs.no.censor$u1 <- u1_test
+  arg.czmk.test$u2 <- arg.zom.test$u2 <- arg.obs.no.censor$u2 <- u2_test
+  arg.czmk.test$u3 <- arg.zom.test$u3 <- arg.obs.no.censor$u3 <- u3_test
+  arg.obs.train$u1 = u1_train
+  arg.obs.train$u2 = u2_train
+  arg.obs.train$u3 = u3_train
+  
+  # arg.obs.train$zseed = round(arg.obs.train$zseed*sim)
+  # arg.czmk.test$zseed = round(test_seed*sim+1)
+  # arg.zom.test$zseed = round(test_seed*sim+2)
+  # arg.obs.no.censor$zseed = round(test_seed*sim+3)
 
   cat ("%%% Training Data for", sim_data_type, "Simulation:",sim,"%%%\n")
   tt(1)
 
-  message("using train_seed (", train_seed, ") to generate training data")
-  set.seed(train_seed)
   # if (sim_data_type == "RE"){
     message("Recurrent Events Survival Data Simulation")
+    message("using train_seed (", train_seed, ") to generate training data")
+    set.seed(train_seed)
     sim.train = do.call(gdata_RE, arg.obs.train)
     obs.times_train <<- times_act
     ph1_obs_train <<-pred.hazard1
@@ -196,6 +196,7 @@ all_sims_data.mff <- list()
     name = sprintf("%s_%s",sim.train$name, sim_data_type); print(name)
     # update this to include name_surv
     assign(name, df_recurr)
+    assign(sprintf("df_sim%s", sim), df_surv)
     # head_recurr = head(df_recurr); head_recurr
     # kable(head_recurr, format = "latex", caption = "Recurrent Events Dataset Example")
 
@@ -238,16 +239,37 @@ all_sims_data.mff <- list()
   a0_ids = a0 %>% pull(ID) %>% unique(); #length(a0_ids)
   a1 = data_to_use %>% filter(Trt == 1); #dim(a1)
   a1_ids = a1 %>% pull(ID) %>% unique(); #length(a1_ids)
+  
+  mff_to_remove <- c("zom.mff.df", "obs.mff.df", "czmk.mff.df")
+  for (obj in mff_to_remove) {
+    if (exists(obj, envir = .GlobalEnv)) {
+      rm(list = obj, envir = .GlobalEnv)
+    }
+  }
 
   # # # obs policy value (testing)
   message("using test_seed to generate obs testing data")
   set.seed(test_seed)
   obs.data.rep <- do.call(gdata_RE, arg.obs.no.censor) # no censoring for eval sets
-  obs.times_test <<- times_act
-  ph1_obs_test <<-pred.hazard1
-  gap1_obs_test <<- gaptime1
-  tt_obs_test <<- tt
-  rep_obs <<- obs.data.rep
+  # obs.times_test <<- times_act
+  # ph1_obs_test <<-pred.hazard1
+  # gap1_obs_test <<- gaptime1
+  # tt_obs_test <<- tt
+  # rep_obs <<- obs.data.rep
+  # Define your variables in a list for cleaner handling
+  variables_to_assign <- list(
+    times_test = times_act,
+    ph1_test = pred.hazard1,
+    ph2_test = pred.hazard2,
+    gap1_test = gaptime1,
+    tt_test = tt
+  )
+  # Assign each variable using sprintf
+  for (name in names(variables_to_assign)) {
+    assign(sprintf("obs_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
+  }
+  assign(sprintf("rep_obs_sim%s", sim), obs.data.rep, envir = .GlobalEnv)
+  
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
   # result["obs_survival"] = survival_val.fn(obs.test.df_surv)
@@ -318,16 +340,33 @@ all_sims_data.mff <- list()
     if (!czmk.error) {
       set.seed(test_seed)
       # TO DO: MAKE SURE THE COVARIATES ARE THE SAME FOR CZMK AND ZOM TEST SET
-      czmk.data.rep <- do.call(gdata_RE, arg.czmk.test); head(czmk.data.rep$dataset_survival$Z1)
-      czmk.times_test <<- times_act
-      ph1_czmk_test <<- pred.hazard1
-      gap1_czmk_test <<- gaptime1
-      tt_czmk_test <<- tt
-      czmk.test.df_recurr <<- czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
-      czmk.test.df_surv <<- czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
-      predd_surv_czmk_eval <<- predd_surv
-      predd_ep_czmk_eval <<- predd_ep
-      rep_czmk <<- czmk.data.rep
+      czmk.data.rep <- do.call(gdata_RE, arg.czmk.test); #head(czmk.data.rep$dataset_survival$Z1)
+      czmk.test.df_recurr = czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
+      czmk.test.df_surv = czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
+      # czmk.times_test <<- times_act
+      # ph1_czmk_test <<- pred.hazard1
+      # gap1_czmk_test <<- gaptime1
+      # tt_czmk_test <<- tt
+      # rep_czmk <<- czmk.data.rep
+
+      # Define your variables in a list for cleaner handling
+      variables_to_assign <- list(
+        times_test = times_act,
+        ph1_test = pred.hazard1,
+        ph2_test = pred.hazard2,
+        gap1_test = gaptime1,
+        tt_test = tt,
+        predd_surv_eval = predd_surv,
+        predd_ep_eval = predd_ep,
+        test.df_recurr = czmk.test.df_recurr,
+        test.df_surv = czmk.test.df_surv
+      )
+      # Assign each variable using sprintf
+      for (name in names(variables_to_assign)) {
+        assign(sprintf("czmk_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
+      }
+      assign(sprintf("rep_czmk_sim%s", sim), czmk.data.rep, envir = .GlobalEnv)
+      
       # result["czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       result[sim,"czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       # czmk.test.df_recurr %>% group_by(ID) %>% summarize(Number_RE = sum(IndR), Trt = mean(Trt))
@@ -376,12 +415,24 @@ all_sims_data.mff <- list()
       cat ("  6. zero-order model - Evaluation for RE Simulation",sim,"\n")
       set.seed(test_seed)
       zom.data.rep <- do.call(gdata_RE, arg.zom.test); head(zom.data.rep$dataset_survival$Z1)
-      zom.times_test <<- times_act
-      ph1_zom_test <<-pred.hazard1
-      ph2_zom_test <<-pred.hazard2
-      gap1_zom_test <<- gaptime1
-      tt_zom_test <<- tt
-      rep_zom <<- zom.data.rep
+      # zom.times_test <<- times_act
+      # ph1_zom_test <<-pred.hazard1
+      # ph2_zom_test <<-pred.hazard2
+      # gap1_zom_test <<- gaptime1
+      # tt_zom_test <<- tt
+      # Define your variables in a list for cleaner handling
+      variables_to_assign <- list(
+        times_test = times_act,
+        ph1_test = pred.hazard1,
+        ph2_test = pred.hazard2,
+        gap1_test = gaptime1,
+        tt_test = tt
+      )
+      # Assign each variable using sprintf
+      for (name in names(variables_to_assign)) {
+        assign(sprintf("zom_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
+      }
+      assign(sprintf("rep_zom_sim%s", sim), zom.data.rep, envir = .GlobalEnv)
       zom.test.df_recurr = zom.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
       zom.test.df_surv = zom.data.rep$dataset_survival; #View(czmk.test.df_surv)
       # result["zom_survival"] = survival_val.fn(zom.test.df_surv) #result[sim, "zom_survival"]
@@ -434,10 +485,23 @@ all_sims_data.mff <- list()
 # Combine all simulations into one big dataset for MFF
 mff_allsims <- do.call(rbind, all_sims_data.mff)
 row.names(mff_allsims) <- NULL
-View(mff_allsims)
+# View(mff_allsims)
 if (savingrds == TRUE){
   write.csv(mff_allsims, paste0(dir_rds,"/mff/mff_allsims.csv"), row.names = FALSE)
 }
+
+# mff_allsims %>% 
+#   group_by(simulation, Number_RE, method) %>% 
+#   summarize(count = n()) %>% 
+#   View()
+num_re_0.15 = mff_allsims %>%
+  group_by(simulation, Number_RE, method) %>%
+  summarize(count = n(), .groups = "drop") %>%  # Step 1: Calculate `count`
+  group_by(Number_RE, method) %>%
+  summarize(mean_count = mean(count, na.rm = TRUE), .groups = "drop")  # Step 2: Calculate mean
+View(num_re_0.15)
+
+
 
 # # Number of cores to use for parallelization
 # num_cores <- 5

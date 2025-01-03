@@ -13,10 +13,10 @@ source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
 
-savingrds = TRUE
-date_folder = "2024-12-31"
-n.eval = 600
-n.sim = 10
+savingrds = FALSE
+date_folder = "2025-01-02"
+n.eval = 1000
+n.sim = 5
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 1.5
@@ -106,7 +106,7 @@ if (endpoint == "RE"){
   # Covariate effects for survival
   betasD <- list(
     beta1 = list(
-      beta.hazard0 = c(log(2), log(0.9), log(1.3), log(1.2), log(0.8)),  # Covariate effects for Treatment 0 (5 parameters)
+      beta.hazard0 = c(log(1.3), log(0.9), log(1.3), log(1.2), log(1.8)),  # Covariate effects for Treatment 0 (5 parameters)
       beta.hazard1 = c(log(1.1), log(0.2), log(1.1), log(0.95), log(1.15))  # Covariate effects for Treatment 1 (5 parameters)
     ),
     beta2 = list(
@@ -157,8 +157,8 @@ if (endpoint == "RE"){
   # omegaD: Represents the direct treatment effect on the survival hazard, independent of covariates.
   omegaD <- list(
     omegaD1 = list(
-      omegaD.hazard0 = log(3),  # Treatment 0 survival effect
-      omegaD.hazard1 = log(3)   # Treatment 1 survival effect
+      omegaD.hazard0 = log(1.3),  # Treatment 0 survival effect
+      omegaD.hazard1 = log(3.5)   # Treatment 1 survival effect
     ),
     omegaD2 = list(  # Second list (identical to omegaD1 for now)
       omegaD.hazard0 = log(3),  # Treatment 0 survival effect
@@ -171,8 +171,8 @@ if (endpoint == "RE"){
   # omegaR: Represents the direct treatment effect on the recurrence hazard, independent of covariates.
   omegaR <- list(
     omegaR1 = list(
-      omegaR.hazard0 = log(3),  # Treatment 0 recurrence effect
-      omegaR.hazard1 = log(3)   # Treatment 1 recurrence effect
+      omegaR.hazard0 = log(3.3),  # Treatment 0 recurrence effect
+      omegaR.hazard1 = log(1.3)   # Treatment 1 recurrence effect
     ),
     omegaR2 = list(  # Second list (identical to omegaR1 for now)
       omegaR.hazard0 = log(3),  # Treatment 0 recurrence effect

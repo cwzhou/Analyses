@@ -204,9 +204,9 @@ Dynamics <-
     # message('covariate', covariate)
 
     if (evaluate == TRUE){
-      message("original G was: ", G)
+      # message("original G was: ", G)
       G = G #999
-      message("But now setting G to be really high: G = ", G)
+      # message("But now setting G to be really high: G = ", G)
     } else{
       G = G
     }
@@ -227,12 +227,14 @@ Dynamics <-
       # gaptime1 = rexp(N,lambda_R)
       # gaptime1 <<- rexp(N,pred.hazard2)
       gaptime1 <<- -(1/pred.hazard2)*log(1-u1)
-      # print(sprintf("gaptime1: %s", gaptime1))
+      # print(sprintf("gaptime1: %s", head(gaptime1)))
       
       # print("Generating Failure Time")
       # generate conditional failure time (given gaptime1)
       tt_fail <<- as.numeric(GumbelBiExp(N=N,lambda_D=pred.hazard1,lambda_R=pred.hazard2,
                                    alpha=alpha1,y_type=1,y=gaptime1,u=u2)$tt)
+      # print(sprintf("failure time: %s", head(tt_fail)))
+      
       # print("Checking Plot")
       # plot_check = Check_GumbelBiExp(N=N,tt=tt_fail);
       # print(plot_check)
