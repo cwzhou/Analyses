@@ -26,13 +26,14 @@ column_names <- lapply(all_methods, function(method) {
   }
 })
 # Flatten the list of column names
-column_names <- unlist(column_names)
+column_names <- c(unlist(column_names),"train_cens")
 # Define a custom sorting function
 custom_sort <- function(names) {
   order(
     !grepl("_survival$", names),
     !grepl("_endpoint$", names),
     !grepl("_n_phase2$", names),
+    !grepl("train_cens", names),
     !grepl("^time_", names),
     !grepl("^czmk_", names),
     !grepl("^zom_", names),
@@ -40,8 +41,8 @@ custom_sort <- function(names) {
     names
   )
 }
-sorted_column_names <- column_names[custom_sort(column_names)]
-
+sorted_column_names <- column_names[custom_sort(c(column_names))]
+print(sorted_column_names)
 print(filename)
 filename.tmp <- gsub("\\.rds", "_tmp.rds", filename)
 
@@ -91,7 +92,8 @@ arg_list = list(N=n,
                 cparam=censor_rate,
                 censor_min=censor_min,
                 censor_max=censor_max,
-                gaptype=gaptype,gapparam1=gapparam1,gapparam2=gapparam2, #gapparams are the rhos
+                # gaptype=gaptype, # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025
+                # gapparam1=gapparam1,gapparam2=gapparam2, #gapparams are the rhos
                 ncov = ncov,
                 tau0=tau0,
                 predHazardFn_D = predHazardFn_D,
@@ -151,12 +153,14 @@ all_sims_data.mff <- list()
   ######################################################################
   ### simulation
   for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
-  message("starting run_simulation for sim#", sim)
+  # message("starting run_simulation for sim#", sim)
     
-  cat("\n\n#################################\n")
-  cat("######### Simulation ",sim, "#########\n")
-  cat("      Endpoint: ", endpoint, "      \n")
-  cat("#################################\n")
+  cat("\n\n##################################################################\n")
+  cat("##################################################################\n")
+  cat("################## Simulation ",sim, "##################\n")
+  cat("#########      Endpoint: ", endpoint, "      #########\n")
+  cat("##################################################################\n")
+  cat("##################################################################\n")
   train_seed = sim*10000 + init_seed*3
   test_seed = train_seed + 30306
   
@@ -190,16 +194,25 @@ all_sims_data.mff <- list()
     obs.times_train <<- times_act
     ph1_obs_train <<-pred.hazard1
     gap1_obs_train <<- gaptime1
-    tt_obs_train <<- tt
+    tt_obs_train <<- tt_fail
     df_recurr = sim.train$dataset_recurrent; #View(df_recurr)
     df_surv = sim.train$dataset_survival; head(df_surv)
-    name = sprintf("%s_%s",sim.train$name, sim_data_type); print(name)
+    name = sprintf("%s_%s",sim.train$name, sim_data_type); #print(name)
     # update this to include name_surv
     assign(name, df_recurr)
     assign(sprintf("df_sim%s", sim), df_surv)
     # head_recurr = head(df_recurr); head_recurr
     # kable(head_recurr, format = "latex", caption = "Recurrent Events Dataset Example")
 
+    # Calculate the number of censored observations
+    n_censored <- sum(df_surv$indD == 0)  # Count of censored observations
+    # Calculate the total number of observations
+    n_total <- nrow(df_surv)  # Total number of rows in the dataset
+    # Calculate the percentage of censored data
+    training_censored <- n_censored / n_total
+    cat("Percentage of censored data:", training_censored*100, "%\n")
+    result[sim, "train_cens"] = round(training_censored,3)
+    
     # Output --------------------------------------------------------------------
     if (savingrds == TRUE){
       folder_path <- sprintf("./2_pipeline/%s", date_folder)
@@ -254,7 +267,7 @@ all_sims_data.mff <- list()
   # obs.times_test <<- times_act
   # ph1_obs_test <<-pred.hazard1
   # gap1_obs_test <<- gaptime1
-  # tt_obs_test <<- tt
+  # tt_obs_test <<- tt_fail
   # rep_obs <<- obs.data.rep
   # Define your variables in a list for cleaner handling
   variables_to_assign <- list(
@@ -262,7 +275,7 @@ all_sims_data.mff <- list()
     ph1_test = pred.hazard1,
     ph2_test = pred.hazard2,
     gap1_test = gaptime1,
-    tt_test = tt
+    tt_test = tt_fail
   )
   # Assign each variable using sprintf
   for (name in names(variables_to_assign)) {
@@ -325,7 +338,7 @@ all_sims_data.mff <- list()
     # czmk.times_train <<- times_act
     # ph1_czmk_train <<-pred.hazard1
     # gap1_czmk_train <<- gaptime1
-    # tt_czmk_train <<- tt
+    # tt_czmk_train <<- tt_fail
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk.test$policy <- if (!czmk.error) optimal.czmk
     policy_czmk <<- arg.czmk.test$policy
@@ -355,7 +368,7 @@ all_sims_data.mff <- list()
         ph1_test = pred.hazard1,
         ph2_test = pred.hazard2,
         gap1_test = gaptime1,
-        tt_test = tt,
+        tt_test = tt_fail,
         predd_surv_eval = predd_surv,
         predd_ep_eval = predd_ep,
         test.df_recurr = czmk.test.df_recurr,
@@ -426,7 +439,7 @@ all_sims_data.mff <- list()
         ph1_test = pred.hazard1,
         ph2_test = pred.hazard2,
         gap1_test = gaptime1,
-        tt_test = tt
+        tt_test = tt_fail
       )
       # Assign each variable using sprintf
       for (name in names(variables_to_assign)) {
@@ -477,7 +490,11 @@ all_sims_data.mff <- list()
     message('saved rds stacked')
   }
   gc()
-  cat("--- End of Simulation", sim, "---\n")
+  cat("---------------------------------------------------\n")
+  cat("------------ End of Simulation", sim, "------------\n")
+  print(result[sim,])
+  View(result)
+  cat("---------------------------------------------------\n")
   } # for (sim in 1:n.sim) but removed for parallelizing
   # return(result) # this is for parallel
   # } # this is for run_simulation for parallel
@@ -499,7 +516,29 @@ num_re_0.15 = mff_allsims %>%
   summarize(count = n(), .groups = "drop") %>%  # Step 1: Calculate `count`
   group_by(Number_RE, method) %>%
   summarize(mean_count = mean(count, na.rm = TRUE), .groups = "drop")  # Step 2: Calculate mean
-View(num_re_0.15)
+# View(num_re_0.15)
+num_re_sim = mff_allsims %>%
+  group_by(simulation, Number_RE, method) %>%
+  summarize(count = n(), .groups = "drop") %>%
+  mutate(method = factor(method, levels = c("czmk", "zom", "observed")))
+head(num_re_sim)
+ggplot(num_re_sim, aes(x = factor(Number_RE), 
+                       y = count, 
+                       color = method, 
+                       group = method)) +
+  geom_line(size = 1) +
+  geom_point(size = 3) +
+  labs(
+    title = "Total Counts of Number_RE by Method",
+    x = "Number_RE (0, 1, 2, 3)",
+    y = "Count",
+    color = "Method"
+  ) +
+  theme_minimal()
+
+if (savingrds == TRUE){
+  write.csv(num_re_0.15, paste0(dir_rds,"/mff/num_re.csv"), row.names = FALSE)
+}
 
 
 
@@ -519,18 +558,41 @@ sprintf("Overall Time Took: %s", round(end_time - start_time,2))
 
 View(result)
 
-
-
 print("end of script")
 # End of script -------------------------------------------------------------
 #
 #
+mff_allsims %>%
+  group_by(method) %>%
+  summarise(
+    # Summary for Number_RE
+    mff_mean = mean(Number_RE, na.rm = TRUE), 
+    mff_sd = sd(Number_RE, na.rm = TRUE),
+    mff_min = min(Number_RE, na.rm = TRUE),
+    mff_25 = quantile(Number_RE, 0.25, na.rm = TRUE),  # 25th percentile
+    mff_median = median(Number_RE, na.rm = TRUE),  # Median
+    mff_75 = quantile(Number_RE, 0.75, na.rm = TRUE),  # 75th percentile
+    mff_max = max(Number_RE, na.rm = TRUE))
+mff_allsims %>%
+  group_by(method) %>%
+  summarise(
+    # Summary for survival
+    surv_mean = mean(survival, na.rm = TRUE), 
+    surv_sd = sd(survival, na.rm = TRUE),
+    surv_min = min(survival, na.rm = TRUE),
+    surv_25 = quantile(survival, 0.25, na.rm = TRUE),  # 25th percentile
+    surv_median = median(survival, na.rm = TRUE),  # Median
+    surv_75 = quantile(survival, 0.75, na.rm = TRUE),  # 75th percentile
+    surv_max = max(survival, na.rm = TRUE)
+  )
+
+
 # library(reshape2)
 # # Create summary heatmap
 # heatmap_data <- mff.stacked_data %>%
 #   group_by(method, ID) %>%
 #   summarize(mean_TotalEvents = mean(Number_RE))
-#
+# 
 # ggplot(heatmap_data,
 #        aes(x = method, y = as.factor(ID), fill = mean_TotalEvents)) +
 #   geom_tile() +
@@ -547,4 +609,4 @@ print("end of script")
 #     low = "white",   # Light color for low values
 #     high = "blue"   # Dark color for high values
 #   )
-#
+

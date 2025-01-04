@@ -19,7 +19,7 @@ rule2 = "gray_re"
 ################# methods for comparison ###################
 ############################################################
 rda_methods = c("CZMK", "ZOM", "observed")
-skip_method <- !c(TRUE,TRUE,TRUE);
+skip_method <- c(TRUE,!TRUE,!TRUE);
 assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
 loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
@@ -47,73 +47,154 @@ rs = 0.2 # randomSplit = 0.2
 ##################### Bladder Dataset ######################
 ############################################################
 library(tidyverse)
-# toy dataset with RE and terminal death (fake added in)
-
-# bladder2 dataset generated from SAS code #
-file_path <- "~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Scratch/Project3/bladder2.csv"
-# Read the CSV file into a data frame, including headers
-bladder2 <- read.csv(file_path, header = TRUE)
-colnames(bladder2) = c("id", "TStart", "TStop", "A", "Z1", "Z2", "Visit", "Status", "Gaptime")
-
-# this dataset doesnt have terminal events so just
-# BS-ing a few in for now to have that variable as we
-# test the package/code up the method
-# Step 1: Create a new variable status_D that is initially a copy of status
-bladder2$Status_D <- bladder2$Status
-# Step 2: For rows where status is 0, randomly set 90% to 1 in status_D
-# Create a logical vector to identify rows where status is 0
-zero_status_rows <- bladder2$Status == 0
-# Randomly sample 90% of these rows and set them to 1 in status_D
-set.seed(123) # Set seed for reproducibility, if needed
-num_to_change <- sum(zero_status_rows) * 0.9
-change_indices <- sample(which(zero_status_rows), num_to_change)
-bladder2$Status_D[change_indices] <- 1
-# Step 3: Set Status_D to 0 where Status is 1
-# Status = 1 for recurrent event and = 0 for censored or death
-# Status_D = 1 for death and = 0 otherwise
-bladder2$Status_D[bladder2$Status == 1] <- 0
-# Check the result
-head(bladder2)
-
+# # bladder2 dataset generated from SAS code #
+# file_path <- "~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Scratch/Project3/bladder2.csv"
+# # Read the CSV file into a data frame, including headers
+# bladder2 <- read.csv(file_path, header = TRUE)
+# colnames(bladder2) = c("id", "TStart", "TStop", "A", "Z1", "Z2", "Visit", "Status", "Gaptime")
+# # this dataset doesnt have terminal events so just
+# # BS-ing a few in for now to have that variable as we
+# # test the package/code up the method
+# # Step 1: Create a new variable status_D that is initially a copy of status
+# bladder2$Status_D <- bladder2$Status
+# # Step 2: For rows where status is 0, randomly set 90% to 1 in status_D
+# # Create a logical vector to identify rows where status is 0
+# zero_status_rows <- bladder2$Status == 0
+# # Randomly sample 90% of these rows and set them to 1 in status_D
+# set.seed(123) # Set seed for reproducibility, if needed
+# num_to_change <- sum(zero_status_rows) * 0.9
+# change_indices <- sample(which(zero_status_rows), num_to_change)
+# bladder2$Status_D[change_indices] <- 1
+# # Step 3: Set Status_D to 0 where Status is 1
+# # Status = 1 for recurrent event and = 0 for censored or death
+# # Status_D = 1 for death and = 0 otherwise
+# bladder2$Status_D[bladder2$Status == 1] <- 0
+# # Check the result
+# head(bladder2)
 # make it so people who die at time TStart = TStop have an interval where TStart = TStop + 0.001
-bladder2.1 <- bladder2 %>%
-  mutate(
-    TStop = ifelse(TStart == TStop, TStop + 0.001, TStop)  # Avoids TStart = TStop
+# bladder2.1 <- bladder2 %>%
+#   mutate(
+#     TStop = ifelse(TStart == TStop, TStop + 0.001, TStop)  # Avoids TStart = TStop
+#   )
+# # need to add in censoring rows for the last dataset if status_d = 0
+# df_tmp = bladder2.1 %>% 
+#   arrange(id, Visit) %>%
+#   group_by(id) %>%
+#   mutate(
+#     need_to_add_row = ifelse(!(row_number() == n() & Status_D == 0 & Visit > 1), FALSE,
+#                              ifelse(Status == 0 & Status_D == 0, FALSE,
+#                                     TRUE))) %>%
+#   ungroup() %>%
+#   mutate(
+#     max_stop_time = max(TStop)
+#   )
+# new_rows <- df_tmp %>%
+#   filter(need_to_add_row) %>%
+#   mutate(
+#     TStart1 = TStop,
+#     TStop1= max_stop_time,
+#     Visit1 = Visit + 1,
+#     Gaptime1 = max_stop_time - TStop,
+#     Status1 = 0
+#   ) %>%
+#   dplyr::select(id, TStart = TStart1, TStop = TStop1, A, Z1, Z2, Visit=Visit1,
+#                 Status = Status1, Gaptime=Gaptime1, Status_D)
+# new_rows
+# # Combine the original data with the new rows
+# df <- bind_rows(bladder2.1, new_rows) %>%
+#   group_by(id) %>%
+#   arrange(id, Visit) %>%
+#   ungroup() %>%
+#   as.data.frame()
+# df
+
+library(survival)
+# https://vincentarelbundock.github.io/Rdatasets/doc/survival/bladder.html
+# ?bladder1
+# This is the well-known bladder tumor clinical trial conducted by 
+# the Veterans Administration Co-operative Urological Research Group (Byar, 1980). 
+# A total of 116 patients with superficial bladder tumors were randomly
+# assigned to placebo, pyridoxine (vitamin BG), or thiotepa. 
+# The goal of the study was to determine the effectiveness of pyridoxine
+# and thiotepa in reducing the rate of tumor recurrence.
+# By the end of follow-up, there were 87, 57, and 45 recurrences
+# among the 47, 31, and 38 patients in the placebo, pyridoxine,
+# and thiotepa groups, respectively. Some patients died before
+# any tumor recurrence, while others died after recurrences.
+# There were 10, 7, and 11 observed deaths in the placebo, pyridoxine,
+# and thiotepa groups, respectively.
+
+library(tidyverse)
+bladder1 %>% filter(stop == 0)
+blad <- bladder1[!bladder1$id %in% c(1, 49), ] %>%
+  dplyr::select(id, start, stop, status, treatment, number, size, recur, enum) %>%
+  mutate(Status = ifelse(status == 1, 1, 0),
+         Status_D = ifelse(status == 2 | status == 3, 1, 0))
+blad %>% 
+  group_by(treatment) %>% 
+  summarise(
+    death = sum(Status_D, na.rm = TRUE),  # Sum of deaths
+    recurr = sum(Status, na.rm = TRUE), # Sum of recurrences
+    patients = n_distinct(id)        # Count of unique patients
   )
 
+bladder2.1 = blad %>%
+  mutate(A = ifelse(treatment == "placebo", 0,
+                      ifelse(treatment == "pyridoxine", 2,
+                             ifelse(treatment == "thiotepa", 1, NA))),
+         TStart = start,
+         TStop = stop) %>%
+  dplyr::select(-c(treatment, status, start, stop))
+bladder2.1 %>% filter(TStart == TStop)
 
 # need to add in censoring rows for the last dataset if status_d = 0
-df_tmp = bladder2.1 %>% arrange(id, Visit) %>%
+df_tmp = bladder2.1 %>%
+  arrange(id, enum) %>%
   group_by(id) %>%
   mutate(
-    need_to_add_row = ifelse(!(row_number() == n() & Status_D == 0 & Visit > 1), FALSE,
+    need_to_add_row = ifelse(!(row_number() == n() & Status_D == 0 & enum > 1), FALSE,
                              ifelse(Status == 0 & Status_D == 0, FALSE,
                                     TRUE))) %>%
   ungroup() %>%
   mutate(
     max_stop_time = max(TStop)
   )
-new_rows <- df_tmp %>%
+
+df_tmp1 <- df_tmp %>%
+  mutate(
+    next_id = lead(id), # Get the next row's id
+    need_to_add_row = ifelse(enum == 1 & Status == 1 & id != next_id, TRUE, need_to_add_row)
+  ) %>%
+  dplyr::select(-next_id) # Remove intermediate column if not needed
+# View(df_tmp1)
+
+new_rows <- df_tmp1 %>%
   filter(need_to_add_row) %>%
   mutate(
     TStart1 = TStop,
     TStop1= max_stop_time,
-    Visit1 = Visit + 1,
+    Visit1 = enum + 1,
     Gaptime1 = max_stop_time - TStop,
     Status1 = 0
   ) %>%
-  dplyr::select(id, TStart = TStart1, TStop = TStop1, A, Z1, Z2, Visit=Visit1,
-                Status = Status1, Gaptime=Gaptime1, Status_D)
-new_rows
+  mutate(Visit = Visit1,
+         Status = Status1,
+         Gaptime = Gaptime1,
+         TStart = TStart1,
+         TStop = TStop1) %>%
+  dplyr::select(id, TStart, TStop, A, number, size, recur, Visit,
+                Status, Gaptime, Status_D)
+head(new_rows)
 # Combine the original data with the new rows
 df <- bind_rows(bladder2.1, new_rows) %>%
   group_by(id) %>%
-  arrange(id, Visit) %>%
+  arrange(id, enum) %>%
   ungroup() %>%
   as.data.frame()
-df
+# head(df)
+
 bladder_surv = df %>%
-  filter(Status == 0)
+  filter(Status == 0); #View(bladder_surv)
 #checking no. subjects
 # bladder2.1 %>% as.data.frame() %>% dplyr::select(id) %>% distinct() %>% nrow()
 # bladder_surv %>% as.data.frame() %>% dplyr::select(id) %>% distinct() %>% nrow()
@@ -125,20 +206,23 @@ dat2 = df # Phase 2 Endpoint (RE)
 bladder_df = dat2
 dataset_name = "bladder"
 
-bladder_df$id %>% unique() %>% length() # 12 patients (6-12, 56-60)
+bladder_df$id %>% unique() %>% length() # 116 patients
 sub_ids = bladder_df$id %>% unique()
 
 data_to_use = bladder_df %>%
-  dplyr::select(-c(Visit, Gaptime))
+  dplyr::select(-c(enum, Visit, Gaptime))
 a1 = data_to_use %>% filter(A == 1) ;
 end_a1 = a1 %>%
-  dplyr::select(id, Z1, Z2, Status, Status_D, TStop)
+  dplyr::select(id, number, size, recur, Status, Status_D, TStop)
+  # dplyr::select(id, Z1, Z2, Status, Status_D, TStop)
 surv_a1 = a1 %>%
   filter(Status == 0) %>%
-  dplyr::select(id, Z1, Z2, Status, Status_D)
+  dplyr::select(id, number, size, recur, Status, Status_D)
+  # dplyr::select(id, Z1, Z2, Status, Status_D)
 recurr_a1 = a1 %>%
   filter(Status == 1) %>%
-  dplyr::select(id, Z1, Z2, Status, Status_D)
+  dplyr::select(id, number, size, recur, Status, Status_D)
+  # dplyr::select(id, Z1, Z2, Status, Status_D)
 num_unique_people <- n_distinct(recurr_a1$id)
 
 timePointsSurvival = data_to_use %>%
@@ -174,7 +258,7 @@ mean(dat$Status_D==1, na.rm = TRUE)
 mean(dat$Status==1, na.rm = TRUE)
 
 lvls = lapply(Tx.nm, function(x) levels(dat[, x]))
-for (x in 1:length(lvls)) {if (is.null(lvls[[x]])) lvls[[x]] = 0:1}
+for (x in 1:length(lvls)) {if (is.null(lvls[[x]])) lvls[[x]] = 0:2}
 
 
 ############################################################
@@ -224,7 +308,8 @@ values_colsnames <- c(
   # paste0(rda_methods, ".RE"),
   "ns1.CZMK",
   "ns2.CZMK",
-  "train_cens", "train_RE", "train_terminal"
+  "train_cens", "train_RE", "train_terminal",
+  "test_cens", "test_RE", "test_terminal"
 )
 values <- matrix(NA, K, length(values_colsnames),
                  dimnames = list(1:K, values_colsnames))
@@ -273,7 +358,45 @@ for (cv in 1:K) {
 
   values[cv, "train_cens"] = mean(train$Status_D==0 & train$Status == 0); # proportion of people censored
   values[cv, "train_RE"] = mean(train$Status==1, na.rm = T)
-  values[cv, "train_terminal"] = mean(train$Status_D==1, na.rm = T)
+  values[cv, "train_terminal"] = train %>% 
+    filter(Status_D == 1) %>% 
+    summarize(mean = mean(TStop)) %>% 
+    pull(mean)
+  
+  # model1 = "Surv(TStop, Status_D) ~ Z1 + Z2" %>% as.formula()
+  # model2 = "Surv(TStart, TStop, Status) ~ Z1 + Z2" %>% as.formula()
+  model1 = "Surv(TStop, Status_D) ~ number + size + recur" %>% as.formula()
+  model2 = "Surv(TStart, TStop, Status) ~ number + size + recur" %>% as.formula()
+  models_RE = list(model1, model2)
+  
+  data_surv = train %>% filter(Status == 0)
+  missing_in_data_surv <- data_surv$id[!data_surv$id %in% train$id]
+  missing_in_train <- train$id[!train$id %in% data_surv$id]
+  print(missing_in_data_surv) # IDs in data_surv missing from train
+  print(missing_in_train)     # IDs in train missing from data_surv
+  
+  args.CZMK <- list(data = train,
+                    endPoint = "RE",
+                    idName = "id",
+                    epName = "Status",
+                    txName = "A",
+                    models = models_RE,
+                    timePointsSurvival = timePointsSurvival,
+                    timePointsEndpoint = timePointsEndpoint,
+                    tau = tau,
+                    criticalValue1 = "mean",
+                    criticalValue2 = "mean",
+                    evalTime = 1,
+                    splitRule1 = "mean_surv",
+                    splitRule2 = "gray_re",
+                    ERT = FALSE,
+                    uniformSplit = TRUE,
+                    replace = FALSE,
+                    randomSplit = 0.2,
+                    nTree = Ntree,
+                    pooled = FALSE,
+                    tol1 = c(0.1,0.1),
+                    stratifiedSplit = 0.1)
 
   ############################################################################################################
   #### A. rule estimation ####################################################################################
@@ -283,32 +406,6 @@ for (cv in 1:K) {
   if (skip.CZMK != TRUE){
     print(sprintf("Running CZMK for %s CV", cv))
 
-    model1 = "Surv(TStop, Status_D) ~ Z1 + Z2" %>% as.formula()
-    model2 = "Surv(TStart, TStop, Status) ~ Z1 + Z2" %>% as.formula()
-    models_RE = list(model1, model2)
-
-    args.CZMK <- list(data = train,
-                      endPoint = "RE",
-                      idName = "id",
-                      epName = "Status",
-                      txName = "A",
-                      models = models_RE,
-                      timePointsSurvival = timePointsSurvival,
-                      timePointsEndpoint = timePointsEndpoint,
-                      tau = tau,
-                      criticalValue1 = "mean",
-                      criticalValue2 = "mean",
-                      evalTime = 1,
-                      splitRule1 = "mean_surv",
-                      splitRule2 = "gray_re",
-                      ERT = FALSE,
-                      uniformSplit = TRUE,
-                      replace = FALSE,
-                      randomSplit = 0.2,
-                      nTree = Ntree,
-                      pooled = FALSE,
-                      tol1 = c(0.1,0.1),
-                      stratifiedSplit = 0.1)
     values[cv, "ns1.CZMK"] = nodeSizeSurv
     values[cv, "ns2.CZMK"] = nodeSizeEnd
     set.seed(cv)
@@ -401,7 +498,7 @@ for (cv in 1:K) {
 
   ### B6. zero-order model
   if (!err.ZOM) {
-    opt.rule.ZOM[elig, ] = zom.pred[1, ]
+    opt.rule.ZOM[elig, ] = rep(zom.pred[1, ], length(elig))
     opt.rule.ZOM[elig, ] = factor(zom.pred[1, ], levels = lvls[[1]]) # %>% as.numeric()
     print(table(opt.rule.ZOM, useNA = "always"))
   }
@@ -429,6 +526,8 @@ for (cv in 1:K) {
                     Tx.nm,
                     any_of(covariate_names),
                     all_of(event_indicator_string))
+    values[cv, "test_cens"] = mean(test$Status_D==0 & test$Status == 0); # proportion of people censored
+    values[cv, "test_RE"] = mean(test$Status==1, na.rm = T)
 
     # weights
     weight_name <- paste0("weight.", suffix1)
@@ -458,7 +557,7 @@ for (cv in 1:K) {
     }
 
     # observed
-    obs1 <- paste0("observed.", suffix1)
+    obs1 <- "test_terminal" #paste0("observed.", suffix1)
     values[cv, obs1] <- do.call(getValue,
                                 c(arg.val[-which(names(arg.val) == "propensity")],
                                   list(estimated = test.tmp,
@@ -482,9 +581,7 @@ for (cv in 1:K) {
                                     tau = tau,
                                     ert = ert,
                                     rs = rs,
-                                    ntree = Ntree,
-                                    nodesize = nodesize,
-                                    mindeath = mindeath)
+                                    ntree = Ntree)
   saveRDS(values, paste0(fnm, "values_cv",cv,"_values_", nm, rds))
 } # end of cv
 saveRDS(values, paste0(fnm,"Values_", K,"CV_", nm, rds))

@@ -85,7 +85,7 @@ weights_rda <- function(data, weight.formula.list, covariates, event_indicator_s
   # IPCW
   # used to be Surv(time, 1 - d.1) --> make sure what we changed to is right (1-D.0)!
   # D.0 because overall survival and 1-D.0 because censoring survival probability
-  rsf_censoring_string <- paste("Surv(obs_time, 1 - ", event_indicator_string, ")", sep = "")
+  rsf_censoring_string <- paste("Surv(TStop, 1 - ", event_indicator_string, ")", sep = "")
   # rfsrc requires all datatypes to NOT be character, so converting to factor
   data = data %>%
     mutate_if(is.character, as.factor)
@@ -99,7 +99,7 @@ weights_rda <- function(data, weight.formula.list, covariates, event_indicator_s
                      function(i)
                        St2(Sc.hat1$survival[i, ], #rows = people; cols = time of censored --> censoring survival probability for each person at each event time
                            Sc.hat1$time.interest, # the times that had someone censored in test set
-                           t.eval = data$obs_time[i])) # observed time for person i (evaluated time)
+                           t.eval = data$TStop[i])) # observed time for person i (evaluated time)
   # print("hi8")
   # clipping
   Sc.hat3 <<- Sc.hat2 %>% pmax(0.05) %>% pmin(0.95)
@@ -123,7 +123,7 @@ getValue <- function(test,
                      criterion,
                      tau) {
   # weight = apply(actual == estimated, 1, all, na.rm = TRUE) / propensity
-
+  # print(1)
   all2 = function(x) {
     # if everything is NA, return NA. Otherwise, TRUE only if all is TRUE.
     # The naive all() returns NA even if there are only TRUEs except NAs.
@@ -131,7 +131,7 @@ getValue <- function(test,
     if (all(na.index)) return(NA)
     all(x[!na.index])
   }
-
+  # print(2)
   weight_p =
     apply(actual == estimated, 1, all2) %>%
     # When there is at least one NA,
@@ -143,12 +143,15 @@ getValue <- function(test,
     "/" (propensity)
   weight = weight_p * weight.censor
   # evaluate(test[, "T.0"], weight = weight, criterion = criterion, tau = tau)
-  testY = test[, "obs_time"]
+  testY = test[, "TStop"]#[, "obs_time"]
+  # print(3)
   if (criterion[1] == "mean" | criterion[1] == "area") {
+    # print(3.5)
     mean(pmin(tau, testY) * weight)/ mean(weight)
   } else {
     mean(as.numeric(testY >= as.numeric(criterion[2])) * weight)/ mean(weight)
   }
+  # print(4)
 }
 
 # ET <- function(surv, time, tau) {

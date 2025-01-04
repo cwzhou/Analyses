@@ -16,7 +16,8 @@ gdata_RE <- function(N=10,
                      ztype=0, zparam=0.5,
                      zseed = 2025,
                      ctype=1,cparam=2,censor_min, censor_max,
-                     gaptype=0,gapparam1=0.2,gapparam2=0.25,
+                     # gaptype=0,
+                     # gapparam1=0.2,gapparam2=0.25, # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025
                      num_A=2,
                      ncov,
                      tau0=10,
@@ -103,8 +104,8 @@ gdata_RE <- function(N=10,
                         tau=tau0,
                         covariate = z,
                         ncov = ncov,
-                        gapparam1 = gapparam1,
-                        gapparam2 = gapparam2,
+                        # gapparam1 = gapparam1, # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025
+                        # gapparam2 = gapparam2,
                         G = G,
                         censor_time = cc,
                         predHazardFn_D = predHazardFn_D,
@@ -235,7 +236,7 @@ gdata_RE <- function(N=10,
 }
 
 # function for generating failure time from Gumbel bivariate exponential distribution (1960)
-GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y, u.unif = NULL) {
+GumbelBiExp <- function(N,lambda_D,lambda_R,rate = NULL,alpha,y_type=1,y=y, u.unif = NULL) {
   # y_type indicates what type of conditional y we want: 1 = survival time; 2 = gap time
   # if y_type=2 then we want to input gaptime as the y aka gaptime2|gaptime1.
   if (y_type==1){
@@ -252,27 +253,56 @@ GumbelBiExp <- function(N,lambda_D,lambda_R,alpha,y_type=1,y=y, u.unif = NULL) {
   } else{
     u = u.unif
   }
-  # print(sprintf("From Gumbel Bivariate Exp: generated u = %s", u))
-  c = 1-2*exp(-lambda*y); #print(sprintf("1-2exp(-y): %s", round(c,3)))
-  rootsqd = (u-1)/(c*alpha) + ((1+c*alpha)/(2*c*alpha))^2; #print(sprintf("root^2: %s",rootsqd))
-  root = sqrt(rootsqd)
-  expnegx_plus = (1+c*alpha)/(2*c*alpha) + root;
-  expnegx_minus = (1+c*alpha)/(2*c*alpha) - root;
-  # print(sprintf("Indicator that exp(-x) (with PLUS root) > 1: %s", (expnegx_plus > 1)))
-  # print(sprintf("Indicator that exp(-x) (with PLUS root) <= 1: %s", (expnegx_plus <= 1)))
-  expnegx = expnegx_minus*(expnegx_plus>1)+expnegx_plus*(expnegx_plus<=1)
-  # print(sprintf("exp(-x): %s", round(expnegx,3)))
-  tt = -log(expnegx)
-  # print(sprintf("%s (N = %s) is: %s", title, N, head(round(tt,2))))
-  list(tt=tt)
+  # print(title)
+  part_c = rootsqd = root = expnegx_plus = expnegx_minus = expnegx = tt_fail = numeric()
+  for (i in 1:N){
+    if (alpha[i] == 0){
+      # print("Independence")
+      # tt_fail = rexp(N,lambda_0D*exp(t(beta_D)*z))
+      # tt_fail <<- rexp(N, predHazardFn_D(action = 0, covariate = covariate))
+      # rateD = predHazardFn_D(action = 0, covariate = covariate)
+      tt_fail[i] = -(1/rate[i] )*log(1-u[i])
+    } else{
+      # print(sprintf("From Gumbel Bivariate Exp: generated u = %s", u))
+      part_c[i] = 1-2*exp(-lambda[i]*y[i]); #print(sprintf("1-2exp(-y): %s", round(part_c,3)))
+      rootsqd[i] = (u[i]-1)/(part_c[i]*alpha[i]) + ((1+part_c[i]*alpha[i])/(2*part_c[i]*alpha[i]))^2; #print(sprintf("root^2: %s",rootsqd))
+      root[i] = sqrt(rootsqd[i])
+      expnegx_plus[i] = (1+part_c[i]*alpha[i])/(2*part_c[i]*alpha[i]) + root[i];
+      expnegx_minus[i] = (1+part_c[i]*alpha[i])/(2*part_c[i]*alpha[i]) - root[i];
+      # print(sprintf("Indicator that exp(-x) (with PLUS root) > 1: %s", (expnegx_plus > 1)))
+      # print(sprintf("Indicator that exp(-x) (with PLUS root) <= 1: %s", (expnegx_plus <= 1)))
+      expnegx[i] = expnegx_minus[i]*(expnegx_plus[i]>1)+expnegx_plus[i]*(expnegx_plus[i]<=1)
+      # print(sprintf("exp(-x): %s", round(expnegx,3)))
+      tt_fail[i] = -log(expnegx[i])
+      # print(sprintf("failure time for individual %s is: %s.", i, tt_fail[i]))
+    }
+  }
+  # # print(sprintf("From Gumbel Bivariate Exp: generated u = %s", u))
+  # c = 1-2*exp(-lambda*y); #print(sprintf("1-2exp(-y): %s", round(c,3)))
+  # rootsqd = (u-1)/(c*alpha) + ((1+c*alpha)/(2*c*alpha))^2; #print(sprintf("root^2: %s",rootsqd))
+  # root = sqrt(rootsqd)
+  # expnegx_plus = (1+c*alpha)/(2*c*alpha) + root;
+  # expnegx_minus = (1+c*alpha)/(2*c*alpha) - root;
+  # # print(sprintf("Indicator that exp(-x) (with PLUS root) > 1: %s", (expnegx_plus > 1)))
+  # # print(sprintf("Indicator that exp(-x) (with PLUS root) <= 1: %s", (expnegx_plus <= 1)))
+  # expnegx = expnegx_minus*(expnegx_plus>1)+expnegx_plus*(expnegx_plus<=1)
+  # # print(sprintf("exp(-x): %s", round(expnegx,3)))
+  # tt = -log(expnegx)
+  # print(sprintf("First 6 %s (N = %s) is: %s", title, N, head(round(tt_fail,2))))
+  tt_fail <<- tt_fail
+  list(tt_fail=tt_fail)
 }
 
-generate_gaptime <- function(N, lambda_D, lambda_R, alpha, G, u = NULL) {
+generate_gaptime <- function(N, lambda_D, lambda_R, rate, alpha, G, u = NULL) {
   gaptime <- matrix(0, nrow = N, ncol = G)
   for (i in 2:G) { # starting with gaptime2
     # print(sprintf("Generating Gap Time %s", i))
+    # cat("lambda_D", lambda_D, "\n")
+    # cat("lambda_R", lambda_R, "\n")
+    # cat("alpha", alpha, "\n")
     gaptime[,i] <- as.numeric(GumbelBiExp(N = N, lambda_D = lambda_D, lambda_R = lambda_R,
-                                          alpha = alpha, y_type = 2, y = gaptime[i - 1], u = u)$tt)
+                                          rate = rate,
+                                          alpha = alpha, y_type = 2, y = gaptime[, i - 1], u = u)$tt_fail)
     # print(sprintf("End of Gap Time %s", i ))
   }
   return(gaptime)

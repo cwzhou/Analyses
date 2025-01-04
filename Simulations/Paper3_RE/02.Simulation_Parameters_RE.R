@@ -13,22 +13,23 @@ source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
 
-savingrds = FALSE
+savingrds = TRUE
 date_folder = "2025-01-02"
-n.eval = 1000
-n.sim = 5
+n.eval = 400
+n.sim = 4
 sim_data_type = "RE"
 endpoint = sim_data_type
-tau0 = 1.5
+tau0 = 5
 ##### Gap Time Hyperparameters #####
-G = 3 # total gap times
-gaptype = 0 # failure vs gap time indicator
-gapparam1 = 0.1 #rho for failure
-gapparam2 = 0.7 #rho for gap times
+G = 5 # total gap times
+# now defined in F01.DynamicsRE.R 
+# gaptype = 0 # failure vs gap time indicator
+# gapparam1 = 0.1 #rho for failure # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025
+# gapparam2 = 0.7 #rho for gap times
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "zom", "obs");
-skip_method <- !c(TRUE, TRUE, TRUE);
+skip_method <- c(!TRUE, !TRUE, !TRUE);
 n.methods <- length(all_methods)
 # Loop to create logical SKIP objects for each method and assign skip_method
 assign_skip_function(all_methods, skip_method)
@@ -48,8 +49,8 @@ names(arg)[1:num.args] = c("endpoint", "censor",
                            "lambda_0D","lambda_0R",
                            "propensity", "size",
                            "crit_surv", "crit_endpoint")
-print("arg:")
-print(arg)
+# print("arg:")
+# print(arg)
 
 arg1 <- as.numeric(arg[1]) # 1..3 # 1=CR,2=RE,3=MC
 arg2 <- as.numeric(arg[2]) # 1,2 #censoring = 20%, censoring = 50%
@@ -88,7 +89,7 @@ censor <- list(low.censoring = list(
   # we want about 20% censoring
   ctype = 1, # uniform censoring
   censor_min = 0,
-  censor_max = tau0+tau0/2, # higher is less censoring for unif
+  censor_max = tau0/2+tau0/3, # higher is less censoring for unif
   censor_rate = 0  # not used for unif
   ),
   high.censoring = list(
@@ -118,8 +119,8 @@ if (endpoint == "RE"){
   # Covariate effects for recurrence
   betasR <- list(
     beta1 = list(
-      beta.hazard0 = c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
-      beta.hazard1 = c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
+      beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
+      beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
     ),
     beta2 = list(
       beta.hazard0 = c(log(1.5), log(1.8), log(1.3), log(1.4), log(1.2), log(1.0), log(1.4), log(1.6), log(1.1), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
@@ -167,12 +168,12 @@ if (endpoint == "RE"){
   )
   
   # Parameters for treatment+covariate interaction
-  # Parameters for recurrence hazard (treatment effects, same for both lists)
+  # Parameters for recurrence hazard (treatment effects)
   # omegaR: Represents the direct treatment effect on the recurrence hazard, independent of covariates.
   omegaR <- list(
     omegaR1 = list(
-      omegaR.hazard0 = log(3.3),  # Treatment 0 recurrence effect
-      omegaR.hazard1 = log(1.3)   # Treatment 1 recurrence effect
+      omegaR.hazard0 = log(2.3), #log(3.3) # Treatment 0 recurrence effect
+      omegaR.hazard1 = log(1.5) #log(1.3)  # Treatment 1 recurrence effect
     ),
     omegaR2 = list(  # Second list (identical to omegaR1 for now)
       omegaR.hazard0 = log(3),  # Treatment 0 recurrence effect
@@ -307,8 +308,8 @@ if (!dir.exists("output")) dir.create("output")
 if (!dir.exists("figure")) dir.create("figure")
 dir_rds = sprintf("./output/%s", date_folder)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
-print(dir_rds)
-print(dir_fig)
+# print(dir_rds)
+# print(dir_fig)
 if (local == 0){
   if (endpoint == "CR"){
     dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_1/output/%s/%s",
@@ -376,7 +377,7 @@ if (endpoint == "CR"){
   message("endpoint DNE")
 }
 
-print(filename)
+# print(filename)
 
 
 ### 3. Run the simulation
