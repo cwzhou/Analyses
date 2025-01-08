@@ -154,7 +154,7 @@ all_sims_data.mff <- list()
   ### simulation
   for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
   # message("starting run_simulation for sim#", sim)
-    
+
   cat("\n\n##################################################################\n")
   cat("##################################################################\n")
   cat("################## Simulation ",sim, "##################\n")
@@ -163,7 +163,7 @@ all_sims_data.mff <- list()
   cat("##################################################################\n")
   train_seed = sim*10000 + init_seed*3
   test_seed = train_seed + 30306
-  
+
   set.seed(init_seed*sim+505)
   u1_train = runif(n)
   u1_test = runif(n.eval)
@@ -177,7 +177,7 @@ all_sims_data.mff <- list()
   arg.obs.train$u1 = u1_train
   arg.obs.train$u2 = u2_train
   arg.obs.train$u3 = u3_train
-  
+
   # arg.obs.train$zseed = round(arg.obs.train$zseed*sim)
   # arg.czmk.test$zseed = round(test_seed*sim+1)
   # arg.zom.test$zseed = round(test_seed*sim+2)
@@ -212,7 +212,7 @@ all_sims_data.mff <- list()
     training_censored <- n_censored / n_total
     cat("Percentage of censored data:", training_censored*100, "%\n")
     result[sim, "train_cens"] = round(training_censored,3)
-    
+
     # Output --------------------------------------------------------------------
     if (savingrds == TRUE){
       folder_path <- sprintf("./2_pipeline/%s", date_folder)
@@ -252,7 +252,7 @@ all_sims_data.mff <- list()
   a0_ids = a0 %>% pull(ID) %>% unique(); #length(a0_ids)
   a1 = data_to_use %>% filter(Trt == 1); #dim(a1)
   a1_ids = a1 %>% pull(ID) %>% unique(); #length(a1_ids)
-  
+
   mff_to_remove <- c("zom.mff.df", "obs.mff.df", "czmk.mff.df")
   for (obj in mff_to_remove) {
     if (exists(obj, envir = .GlobalEnv)) {
@@ -282,13 +282,13 @@ all_sims_data.mff <- list()
     assign(sprintf("obs_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
   }
   assign(sprintf("rep_obs_sim%s", sim), obs.data.rep, envir = .GlobalEnv)
-  
+
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
   # result["obs_survival"] = survival_val.fn(obs.test.df_surv)
   result[sim, "obs_survival"] = survival_val.fn(obs.test.df_surv)
   obs.mff.result <- endpoint_val.fn(data = obs.test.df_recurr, idName0, epName0, txName0)
-  obs.mff.df <- cbind(simulation = sim, obs.mff.result$mff_tau_df, 
+  obs.mff.df <- cbind(simulation = sim, obs.mff.result$mff_tau_df,
                       survival = obs.test.df_surv$obs_time,
                       method = "observed")
   # result["obs_endpoint"] = obs.mff.result$mean_value
@@ -379,12 +379,12 @@ all_sims_data.mff <- list()
         assign(sprintf("czmk_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
       }
       assign(sprintf("rep_czmk_sim%s", sim), czmk.data.rep, envir = .GlobalEnv)
-      
+
       # result["czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       result[sim,"czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       # czmk.test.df_recurr %>% group_by(ID) %>% summarize(Number_RE = sum(IndR), Trt = mean(Trt))
       czmk.mff.result <<- endpoint_val.fn(data = czmk.test.df_recurr, idName0, epName0, txName0)
-      czmk.mff.df <<- cbind(simulation = sim, czmk.mff.result$mff_tau_df, 
+      czmk.mff.df <<- cbind(simulation = sim, czmk.mff.result$mff_tau_df,
                             survival = czmk.test.df_surv$obs_time,
                             method = "czmk")
       # View(czmk.mff.df); View(result)
@@ -451,7 +451,7 @@ all_sims_data.mff <- list()
       # result["zom_survival"] = survival_val.fn(zom.test.df_surv) #result[sim, "zom_survival"]
       result[sim, "zom_survival"] = survival_val.fn(zom.test.df_surv)
       zom.mff.result <- endpoint_val.fn(data = zom.test.df_recurr, idName0, epName0, txName0)
-      zom.mff.df <- cbind(simulation = sim, zom.mff.result$mff_tau_df, 
+      zom.mff.df <- cbind(simulation = sim, zom.mff.result$mff_tau_df,
                           survival = zom.test.df_surv$obs_time,
                           method = "zom")
       # result["zom_endpoint"] = zom.mff.result$mean_value #result[sim, "zom_endpoint"]
@@ -507,35 +507,15 @@ if (savingrds == TRUE){
   write.csv(mff_allsims, paste0(dir_rds,"/mff/mff_allsims.csv"), row.names = FALSE)
 }
 
-# mff_allsims %>% 
-#   group_by(simulation, Number_RE, method) %>% 
-#   summarize(count = n()) %>% 
+# mff_allsims %>%
+#   group_by(simulation, Number_RE, method) %>%
+#   summarize(count = n()) %>%
 #   View()
 num_re_0.15 = mff_allsims %>%
   group_by(simulation, Number_RE, method) %>%
   summarize(count = n(), .groups = "drop") %>%  # Step 1: Calculate `count`
   group_by(Number_RE, method) %>%
   summarize(mean_count = mean(count, na.rm = TRUE), .groups = "drop")  # Step 2: Calculate mean
-# View(num_re_0.15)
-num_re_sim = mff_allsims %>%
-  group_by(simulation, Number_RE, method) %>%
-  summarize(count = n(), .groups = "drop") %>%
-  mutate(method = factor(method, levels = c("czmk", "zom", "observed")))
-head(num_re_sim)
-ggplot(num_re_sim, aes(x = factor(Number_RE), 
-                       y = count, 
-                       color = method, 
-                       group = method)) +
-  geom_line(size = 1) +
-  geom_point(size = 3) +
-  labs(
-    title = "Total Counts of Number_RE by Method",
-    x = "Number_RE (0, 1, 2, 3)",
-    y = "Count",
-    color = "Method"
-  ) +
-  theme_minimal()
-
 if (savingrds == TRUE){
   write.csv(num_re_0.15, paste0(dir_rds,"/mff/num_re.csv"), row.names = FALSE)
 }
@@ -566,7 +546,7 @@ mff_allsims %>%
   group_by(method) %>%
   summarise(
     # Summary for Number_RE
-    mff_mean = mean(Number_RE, na.rm = TRUE), 
+    mff_mean = mean(Number_RE, na.rm = TRUE),
     mff_sd = sd(Number_RE, na.rm = TRUE),
     mff_min = min(Number_RE, na.rm = TRUE),
     mff_25 = quantile(Number_RE, 0.25, na.rm = TRUE),  # 25th percentile
@@ -577,7 +557,7 @@ mff_allsims %>%
   group_by(method) %>%
   summarise(
     # Summary for survival
-    surv_mean = mean(survival, na.rm = TRUE), 
+    surv_mean = mean(survival, na.rm = TRUE),
     surv_sd = sd(survival, na.rm = TRUE),
     surv_min = min(survival, na.rm = TRUE),
     surv_25 = quantile(survival, 0.25, na.rm = TRUE),  # 25th percentile
@@ -586,13 +566,19 @@ mff_allsims %>%
     surv_max = max(survival, na.rm = TRUE)
   )
 
+mff_allsims %>%
+  filter(simulation == 20) %>%
+  group_by(method) %>%
+  summarize(meanre = mean(Number_RE),
+            meansurv = mean(survival),
+            percent_trt1 = mean(Trt))
 
 # library(reshape2)
 # # Create summary heatmap
 # heatmap_data <- mff.stacked_data %>%
 #   group_by(method, ID) %>%
 #   summarize(mean_TotalEvents = mean(Number_RE))
-# 
+#
 # ggplot(heatmap_data,
 #        aes(x = method, y = as.factor(ID), fill = mean_TotalEvents)) +
 #   geom_tile() +

@@ -115,13 +115,28 @@ weights_rda <- function(data, weight.formula.list, covariates, event_indicator_s
 # weight.censor = arg.val$weight.censor
 # criterion = arg.val$criterion
 # tau = arg.val$tau
-getValue <- function(test,
+getValue <- function(test_dat,
                      actual,
                      estimated,
                      propensity,
                      weight.censor,
                      criterion,
-                     tau) {
+                     tau,
+                     endpoint1) {
+  # test_dat = testing_dataset_surv;
+  # actual = test.tmp;
+  # propensity = weight_prop %>% pull(weight); #weight$propensity[test_indices];
+  # weight.censor = weight_censor %>% pull(weight); #weight$weight.censor[test_indices];
+  # criterion = criterion;
+  # tau = tau;
+  # endpoint1 = endpoint1;
+  # method = "ZOM"
+  # opt_method <- paste0("opt.rule.", method)
+  # estimated = get(opt_method)
+  if (!(endpoint1 %in% c("survival", "mff"))) {
+    stop("error: value must be either 'survival' or 'mff' for now")
+  }
+  
   # weight = apply(actual == estimated, 1, all, na.rm = TRUE) / propensity
   # print(1)
   all2 = function(x) {
@@ -141,9 +156,15 @@ getValue <- function(test,
     # When the second stage is not available in test set, the NA-match cases should still be counted. NA => 1.
     {ifelse(is.na(.), 1, as.numeric(.))} %>%
     "/" (propensity)
+  if (endpoint1 == "survival"){
+    weight.censor = weight.censor
+    testY = test_dat[, "TStop"] #[, "obs_time"]
+  } else{
+    weight.censor = rep(1,length(weight.censor))
+    testY = test_dat[, "recur"]/test_dat[, "TStop"]
+  }
   weight = weight_p * weight.censor
-  # evaluate(test[, "T.0"], weight = weight, criterion = criterion, tau = tau)
-  testY = test[, "TStop"]#[, "obs_time"]
+  # evaluate(test_dat[, "T.0"], weight = weight, criterion = criterion, tau = tau)
   # print(3)
   if (criterion[1] == "mean" | criterion[1] == "area") {
     # print(3.5)

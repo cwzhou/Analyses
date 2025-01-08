@@ -1,10 +1,10 @@
-library(caret);
 library(purrr);
 library(dplyr);
 library(survival)
 library(randomForestSRC);
+library(caret);
 library(itrSurv);library(ggplot2); library(tidyverse);
-library(MASS); library(dplyr);
+library(MASS);
 local = 1
 setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE/")
 source("02.Simulation_Functions_RE.R") # includes F02.ComparatorMethod_Functions.R
@@ -18,28 +18,29 @@ rule2 = "gray_re"
 ############################################################
 ################# methods for comparison ###################
 ############################################################
-rda_methods = c("CZMK", "ZOM", "observed")
-skip_method <- c(TRUE,!TRUE,!TRUE);
+rda_methods = c("CZMK", "ZOM", "OBS")
+skip_method <- c(!TRUE,!TRUE,!TRUE);
 assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
-loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
+loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "OBS")]
 ############################################################
 #################### 0. parameters ####################
 ############################################################
-tol1_param = c(0.1,0,0.3,0.01)
+tol1_param = c(0.05,0) # c(0.03,0)
 t0_crit = 30 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
-tau = 59
+tau = 50
 K = 1 #300 # number of CV
 endpoint = "RE" # endpoint
 Tx.nm = "A"
+init_seed = 123 #116
 
 ## other parameters
-nodeSizeSurv = 5
-nodeSizeEnd = 5
+nodeSizeSurv = 3
+nodeSizeEnd = 3
 minEventSurv = round(sqrt(c(nodeSizeSurv)), 0)
 minEventEnd = round(sqrt(c(nodeSizeEnd)), 0)
-Ntree = 1
+Ntree = 300
 ert = FALSE
 rs = 0.2 # randomSplit = 0.2
 
@@ -77,7 +78,7 @@ library(tidyverse)
 #     TStop = ifelse(TStart == TStop, TStop + 0.001, TStop)  # Avoids TStart = TStop
 #   )
 # # need to add in censoring rows for the last dataset if status_d = 0
-# df_tmp = bladder2.1 %>% 
+# df_tmp = bladder2.1 %>%
 #   arrange(id, Visit) %>%
 #   group_by(id) %>%
 #   mutate(
@@ -111,10 +112,10 @@ library(tidyverse)
 library(survival)
 # https://vincentarelbundock.github.io/Rdatasets/doc/survival/bladder.html
 # ?bladder1
-# This is the well-known bladder tumor clinical trial conducted by 
-# the Veterans Administration Co-operative Urological Research Group (Byar, 1980). 
+# This is the well-known bladder tumor clinical trial conducted by
+# the Veterans Administration Co-operative Urological Research Group (Byar, 1980).
 # A total of 116 patients with superficial bladder tumors were randomly
-# assigned to placebo, pyridoxine (vitamin BG), or thiotepa. 
+# assigned to placebo, pyridoxine (vitamin BG), or thiotepa.
 # The goal of the study was to determine the effectiveness of pyridoxine
 # and thiotepa in reducing the rate of tumor recurrence.
 # By the end of follow-up, there were 87, 57, and 45 recurrences
@@ -130,8 +131,8 @@ blad <- bladder1[!bladder1$id %in% c(1, 49), ] %>%
   dplyr::select(id, start, stop, status, treatment, number, size, recur, enum) %>%
   mutate(Status = ifelse(status == 1, 1, 0),
          Status_D = ifelse(status == 2 | status == 3, 1, 0))
-blad %>% 
-  group_by(treatment) %>% 
+blad %>%
+  group_by(treatment) %>%
   summarise(
     death = sum(Status_D, na.rm = TRUE),  # Sum of deaths
     recurr = sum(Status, na.rm = TRUE), # Sum of recurrences
@@ -151,7 +152,7 @@ bladder2.1 %>% filter(TStart == TStop)
 df_tmp = bladder2.1 %>%
   arrange(id, enum) %>%
   group_by(id) %>%
-  mutate(
+  dplyr::mutate(
     need_to_add_row = ifelse(!(row_number() == n() & Status_D == 0 & enum > 1), FALSE,
                              ifelse(Status == 0 & Status_D == 0, FALSE,
                                     TRUE))) %>%
@@ -182,8 +183,8 @@ new_rows <- df_tmp1 %>%
          Gaptime = Gaptime1,
          TStart = TStart1,
          TStop = TStop1) %>%
-  dplyr::select(id, TStart, TStop, A, number, size, recur, Visit,
-                Status, Gaptime, Status_D)
+  dplyr::select(id, TStart, TStop, A, number, size, recur,
+                Visit, Gaptime, Status, Status_D)
 head(new_rows)
 # Combine the original data with the new rows
 df <- bind_rows(bladder2.1, new_rows) %>%
@@ -208,20 +209,21 @@ dataset_name = "bladder"
 
 bladder_df$id %>% unique() %>% length() # 116 patients
 sub_ids = bladder_df$id %>% unique()
+num_subj = length(sub_ids)
 
 data_to_use = bladder_df %>%
   dplyr::select(-c(enum, Visit, Gaptime))
 a1 = data_to_use %>% filter(A == 1) ;
 end_a1 = a1 %>%
-  dplyr::select(id, number, size, recur, Status, Status_D, TStop)
+  dplyr::select(id, number, size, Status, Status_D, TStop)
   # dplyr::select(id, Z1, Z2, Status, Status_D, TStop)
 surv_a1 = a1 %>%
   filter(Status == 0) %>%
-  dplyr::select(id, number, size, recur, Status, Status_D)
+  dplyr::select(id, number, size, Status, Status_D)
   # dplyr::select(id, Z1, Z2, Status, Status_D)
 recurr_a1 = a1 %>%
   filter(Status == 1) %>%
-  dplyr::select(id, number, size, recur, Status, Status_D)
+  dplyr::select(id, number, size, Status, Status_D)
   # dplyr::select(id, Z1, Z2, Status, Status_D)
 num_unique_people <- n_distinct(recurr_a1$id)
 
@@ -241,25 +243,23 @@ timePointsEndpoint = data_to_use %>%
 all_column_names <- colnames(data_to_use)
 # Define the column names you want to exclude
 excluded_column_names <- c("id", "A", "TStart", "TStop",
-                           "Status_D", "Status")
+                           "Status_D", "Status", "recur")
 # Exclude the specified column names
 covariate_names <- setdiff(all_column_names, excluded_column_names)
 
 # manipulating dataset to obtain truncated status,D.0,D.1,D.2
-dat0 = data_to_use %>%
+dat = data_to_use %>%
   dplyr::select(id, TStart, TStop, A,
                 Status_D, Status,
-                !!!covariate_names)
+                recur,
+                !!!covariate_names) %>%
+  as.data.frame()
 
 #################### 1. data preprocessing
-dat = as.data.frame(dat0)
-
-mean(dat$Status_D==1, na.rm = TRUE)
-mean(dat$Status==1, na.rm = TRUE)
-
+# mean(dat$Status_D==1, na.rm = TRUE)
+# mean(dat$Status==1, na.rm = TRUE) # 62%
 lvls = lapply(Tx.nm, function(x) levels(dat[, x]))
 for (x in 1:length(lvls)) {if (is.null(lvls[[x]])) lvls[[x]] = 0:2}
-
 
 ############################################################
 ###################### 0.2 criterion #######################
@@ -297,20 +297,38 @@ modelPr = create_model_formulas("factor(A)",
 form.weight <- list(modelPr %>% as.formula)
 
 # skeleton
-# Exclude "observed" for train_values and test_values
-traintest_methods <- setdiff(rda_methods, "observed")
-train_values = c(".train.OS", ".train.PropPhase2", ".train.RE")
-test_values = c(".test.OS", ".test.PropPhase2", ".test.RE")
+# Exclude "observed" for prop2_values
+traintest_methods <- setdiff(rda_methods, "OBS")
+prop2_values = c(".PropPhase2")
+# train_values = c(".train.terminal", ".train.RE")
+test_values = c(".test.terminal", ".test.RE")
 values_colsnames <- c(
-  unlist(lapply(traintest_methods, function(method) paste0(method, train_values))),
-  unlist(lapply(traintest_methods, function(method) paste0(method, test_values))),
-  # paste0(rda_methods, ".OS"),
-  # paste0(rda_methods, ".RE"),
+  # unlist(lapply(rda_methods, function(method) paste0(method, train_values))),
+  unlist(lapply(rda_methods, function(method) paste0(method, test_values))),
+  unlist(lapply(traintest_methods, function(method) paste0(method, prop2_values))),
   "ns1.CZMK",
   "ns2.CZMK",
-  "train_cens", "train_RE", "train_terminal",
-  "test_cens", "test_RE", "test_terminal"
-)
+  "train_cens", "test_cens"
+) %>%
+  unlist()
+# Define a custom sorting function
+custom_sort <- function(names) {
+  order(
+    !grepl("train.terminal", names),
+    !grepl("train.RE", names),
+    !grepl("test.terminal", names),
+    !grepl("test.RE", names),
+    !grepl("PropPhase2", names),
+    !grepl("train_cens", names),
+    !grepl("test_cens", names),
+    !grepl("^time_", names),
+    !grepl("^CZMK_", names),
+    !grepl("^ZOM_", names),
+    !grepl("^OBS_", names),
+    names
+  )
+}
+sorted_values_colsnames <- values_colsnames[custom_sort(c(values_colsnames))]
 values <- matrix(NA, K, length(values_colsnames),
                  dimnames = list(1:K, values_colsnames))
 train_eval_result_list = train_eval_result_list_tmp = list()
@@ -330,15 +348,73 @@ tab = data.frame(s1 = rep(NA, K),
                  # s2 = NA,
                  total = NA)
 
+############################################################
+####################### 0.X weights ########################
+############################################################
+# weights
+weights_bladder <- function(data, lvls1) {
+  # treatment was randomized
+  s.dat = data %>% filter(Status == 0)
+  propensity1 = sapply(lvls1, function(x) mean(s.dat$A == x))
+  propensity1 = sapply(s.dat$A, function(s) propensity1[lvls1 == s])
+  propensity  = propensity1
+
+  # IPCW
+  Sc.hat1 <- coxph(Surv(TStop, 1 - Status_D) ~ number + size, data = s.dat)
+  Sc.hat1 <- exp( - predict(Sc.hat1, type = "expected"))
+  Sc.hat <- Sc.hat1
+  weight.censor = s.dat$Status_D/Sc.hat
+
+  return(list(propensity = propensity, weight.censor = weight.censor))
+}
+weight0 = weights_bladder(data = dat, lvls1 = lvls[[1]])
+
+############################################################
+########################## 0.2 cv ##########################
+############################################################
 ## cross-validation
 K = K
+dat_surv = dat %>% filter(Status == 0); head(dat_surv)
 # Create cross-validation folds for individuals
+set.seed(init_seed)
 if (K > 1){
-  folds <- createFolds(sub_ids, k = K, list = TRUE)
+  folds <- createFolds(factor(dat_surv$Status_D), k = K, list = TRUE)
 } else{
-  folds <- createFolds(sub_ids, k = 2, list = TRUE)
+  folds <- createFolds(factor(dat_surv$Status_D), k = 2, list = TRUE)
 }
+# library(plyr)
+# d1 = dat_surv %>% dplyr::select(id, Status_D)
+# # Loop through each fold and compute the proportion of Status_D for each fold
+# fold_prop_res <- lapply(1:K, function(k) {
+#   d1$fold <- ifelse(d1$id %in% sub_ids[folds[[k]]], k, NA)  # Assign fold number
+#   # Summarize the proportion of Status_D for each fold
+#   fold_summary <- ddply(d1[!is.na(d1$fold), ], 'fold', summarise, prop = mean(Status_D))
+#   return(fold_summary)
+# })
+# # Combine results from all folds
+# fold_prop <- do.call(rbind, fold_prop_res); print(fold_prop)
 
+d1 <- dat_surv %>%
+  dplyr::select(id, Status_D)  # Select necessary columns
+# Loop through each fold and compute the proportion of Status_D for each fold
+fold_prop_res <- lapply(1:K, function(k) {
+  # Assign fold number to d1
+  d1$fold <- ifelse(d1$id %in% sub_ids[folds[[k]]], k, NA)
+  # Summarize the proportion of Status_D for each fold using dplyr
+  fold_summary <- d1 %>%
+    filter(!is.na(fold)) %>%
+    group_by(fold) %>%
+    summarise(prop = mean(Status_D)) %>%
+    ungroup()  # Ensure to ungroup after summarizing
+
+  return(fold_summary)
+})
+fold_prop <- bind_rows(fold_prop_res);print(fold_prop)
+
+
+############################################################
+####################### STARTING CV ########################
+############################################################
 for (cv in 1:K) {
   cat(cv, "th cv.\n")
   set.seed(cv)
@@ -346,9 +422,12 @@ for (cv in 1:K) {
   # Get in-sample (training) and out-sample (testing) IDs
   test_ids <- sub_ids[folds[[cv]]]
   train_ids <- setdiff(sub_ids, test_ids)
+  test_indices = folds[[cv]] # outsample person index
+  train_indices = setdiff(c(1:num_subj), test_indices) # insample person index
 
   # Subset data based on IDs
-  train <- dat %>% filter(id %in% train_ids) %>% as.data.frame()
+  train <- dat %>% filter(id %in% train_ids) %>%
+    dplyr::select(-c(recur)) %>% as.data.frame()
   # View(train)
   test  <- dat %>% filter(id %in% test_ids) %>% as.data.frame()
 
@@ -356,25 +435,26 @@ for (cv in 1:K) {
   print(paste("Train size:", nrow(train), "with Unique IDs in Train:", length(unique(train$id))))
   print(paste("Test size:", nrow(test), "with Unique IDs in Test:", length(unique(test$id))))
 
-  values[cv, "train_cens"] = mean(train$Status_D==0 & train$Status == 0); # proportion of people censored
-  values[cv, "train_RE"] = mean(train$Status==1, na.rm = T)
-  values[cv, "train_terminal"] = train %>% 
-    filter(Status_D == 1) %>% 
-    summarize(mean = mean(TStop)) %>% 
-    pull(mean)
-  
+  # proportion of people censored
+  values[cv, "train_cens"] = mean(train$Status_D==0 & train$Status == 0)
+  values[cv, "test_cens"] = mean(test$Status_D==0 & test$Status == 0)
+
   # model1 = "Surv(TStop, Status_D) ~ Z1 + Z2" %>% as.formula()
   # model2 = "Surv(TStart, TStop, Status) ~ Z1 + Z2" %>% as.formula()
-  model1 = "Surv(TStop, Status_D) ~ number + size + recur" %>% as.formula()
-  model2 = "Surv(TStart, TStop, Status) ~ number + size + recur" %>% as.formula()
+  model1 = "Surv(TStop, Status_D) ~ number + size" %>% as.formula()
+  model2 = "Surv(TStart, TStop, Status) ~ number + size" %>% as.formula()
   models_RE = list(model1, model2)
-  
+
   data_surv = train %>% filter(Status == 0)
   missing_in_data_surv <- data_surv$id[!data_surv$id %in% train$id]
   missing_in_train <- train$id[!train$id %in% data_surv$id]
   print(missing_in_data_surv) # IDs in data_surv missing from train
   print(missing_in_train)     # IDs in train missing from data_surv
-  
+
+  # observed policy: training
+  # values[cv, "OBS.train.RE"] = mean(train$Status==1, na.rm = T)
+  # values[cv, "OBS.train.terminal"] # need to-do: figure out this one
+
   args.CZMK <- list(data = train,
                     endPoint = "RE",
                     idName = "id",
@@ -395,7 +475,7 @@ for (cv in 1:K) {
                     randomSplit = 0.2,
                     nTree = Ntree,
                     pooled = FALSE,
-                    tol1 = c(0.1,0.1),
+                    tol1 = tol1_param,
                     stratifiedSplit = 0.1)
 
   ############################################################################################################
@@ -415,9 +495,9 @@ for (cv in 1:K) {
                                     nodeSizeEnd = nodeSizeEnd,
                                     minEventSurv = minEventSurv,
                                     minEventEnd = minEventEnd))))
-    values[cv, "CZMK.train.OS"] = CZMK.i@value[["V1"]][["Et_survival"]]
-    values[cv, "CZMK.train.PropPhase2"] = CZMK.i@value[["V2"]][["PropPhase2"]]
-    values[cv, "CZMK.train.RE"] = CZMK.i@value[["V3"]][["Et_mff"]]
+    # values[cv, "CZMK.train.terminal"] = CZMK.i@value[["V1"]][["Et_survival"]]
+    values[cv, "CZMK.PropPhase2"] = CZMK.i@value[["V2"]][["PropPhase2"]]
+    # values[cv, "CZMK.train.RE"] = CZMK.i@value[["V3"]][["Et_mff"]]
     err.CZMK = class(CZMK.i)[1] == "try-error"
   } else{
     err.CZMK = TRUE
@@ -426,15 +506,16 @@ for (cv in 1:K) {
   ### A6. zero-order model
   if (skip.ZOM != TRUE){
     print(sprintf("Running ZOM for %s CV", cv))
+    set.seed(cv)
     ZOM.i <-
       try(do.call(itrSurv::itrSurv, c(args.CZMK,
                                       list(nodeSizeEnd = 1e+4,
                                            nodeSizeSurv = 1e+4,
                                            minEventEnd = 1e+4,
                                            minEventSurv = 1e+4))))
-    values[cv, "ZOM.train.OS"] = ZOM.i@value[["V1"]][["Et_survival"]]
-    values[cv, "ZOM.train.PropPhase2"] = ZOM.i@value[["V2"]][["PropPhase2"]]
-    values[cv, "ZOM.train.RE"] = ZOM.i@value[["V3"]][["Et_mff"]]
+    # values[cv, "ZOM.train.terminal"] = ZOM.i@value[["V1"]][["Et_survival"]]
+    values[cv, "ZOM.PropPhase2"] = ZOM.i@value[["V2"]][["PropPhase2"]]
+    # values[cv, "ZOM.train.RE"] = ZOM.i@value[["V3"]][["Et_mff"]]
     err.ZOM = class(ZOM.i)[1] == "try-error"
 
     if (!err.ZOM) {
@@ -448,13 +529,12 @@ for (cv in 1:K) {
     err.ZOM = TRUE
   }
 
-
   message("Applying rules to test set.")
   ############################################################################################################
   #### B. Rules applied to a test set ########################################################################
   ############################################################################################################
   ### B0. skeletons for the predicted Trt's
-  opt.rule.pred = data.frame(Trt = rep(NA, dim(test)[1]))
+  opt.rule.pred = data.frame(Trt = rep(NA, length(unique(test$id))))
   opt.rule.pred[,1] = factor(NA, levels = lvls[[1]])
 
   for(method in loop_methods) {
@@ -463,10 +543,18 @@ for (cv in 1:K) {
            envir = .GlobalEnv)
   }
   # Create eligibility for each row based on non-missing values in `Tx.nm`
-  elig <- test %>%
+  elig0 <- test %>%
     dplyr::select(id, !!sym(Tx.nm)) %>%
     group_by(id) %>%
-    mutate(eligibility = !any(is.na(.data[[Tx.nm]]))) %>%
+    dplyr::mutate(eligibility = all(!is.na(.data[[Tx.nm]]))) %>% # Check if all values are TRUE
+    dplyr::mutate(eligibility = ifelse(any(!eligibility), FALSE, eligibility)) %>% # Set all to FALSE if any are FALSE
+    ungroup()
+  elig = elig0 %>%
+    pull(eligibility)
+  id_elig = elig0 %>%
+    dplyr::select(id, eligibility) %>%
+    group_by(id) %>%
+    slice(1) %>%
     ungroup() %>%
     pull(eligibility)
 
@@ -474,9 +562,11 @@ for (cv in 1:K) {
   if (!err.CZMK) {
     for (phase in 1:2){
       opt.CZMK_phase =
-        predict(CZMK.i,
+        itrSurv::predict(CZMK.i,
                 newdata = test[elig, ],
-                Phase = phase)
+                Phase = phase,
+                epName1 = "Status",
+                endPoint = "RE")
       if (phase == 1){
         action1 <<- opt.CZMK_phase$optimal@optimalTx
         StopatP1 <<- opt.CZMK_phase$optimal@Ratio_Stopping_Ind
@@ -491,84 +581,128 @@ for (cv in 1:K) {
                             P1,
                             P2))
     opt.CZMK = tmp_act$Final
-    opt.rule.CZMK[elig, ] = factor(opt.CZMK,
+    opt.rule.CZMK[id_elig, ] = factor(opt.CZMK,
                                    levels = lvls[[1]]) # %>% as.numeric()
     print(table(opt.rule.CZMK, useNA = "always"))
   }
 
   ### B6. zero-order model
   if (!err.ZOM) {
-    opt.rule.ZOM[elig, ] = rep(zom.pred[1, ], length(elig))
-    opt.rule.ZOM[elig, ] = factor(zom.pred[1, ], levels = lvls[[1]]) # %>% as.numeric()
+    opt.rule.ZOM[id_elig, ] = rep(zom.pred[1, ], length(id_elig))
+    opt.rule.ZOM[id_elig, ] = factor(zom.pred[1, ], levels = lvls[[1]]) # %>% as.numeric()
     print(table(opt.rule.ZOM, useNA = "always"))
   }
 
   ############################################################################################################
   #### C. Value estimation ###################################################################################
   ############################################################################################################
-  test.tmp = test %>% transmute(Trt = test[, Tx.nm])
+  test.surv = test %>%
+    filter(Status == 0)
+  test.tmp = test.surv%>%
+    transmute(Trt = test.surv[, Tx.nm])
 
   if (criterion_phase1[1] != criterion_phase2[1]){
     message("WARNING: CRITERION_PHASE1 AND CRITERION_PHASE2 ARE DIFFERENT - MAKE SURE THAT IS WHAT YOU WANT")
   }
-  suffixes = c("OS", "RE")
+  suffixes = c(".test.terminal", ".test.RE")
   for (suffix in 1:length(suffixes)){
     suffix1 = suffixes[suffix]
-    if (suffix1 == "OS"){
+    if (suffix1 == ".test.terminal"){
       event_indicator_string = "Status_D"
       criterion = criterion_phase1
-    } else if (suffix1 == "RE"){
+      endpoint1 = "survival"
+    } else if (suffix1 == ".test.RE"){
       event_indicator_string = "Status"
       criterion = criterion_phase2
+      endpoint1 = "mff"
     }
     testing_dataset = test %>%
       dplyr::select("TStart", "TStop",
+                    "recur",
                     Tx.nm,
                     any_of(covariate_names),
                     all_of(event_indicator_string))
-    values[cv, "test_cens"] = mean(test$Status_D==0 & test$Status == 0); # proportion of people censored
-    values[cv, "test_RE"] = mean(test$Status==1, na.rm = T)
+    testing_dataset_surv = test %>%
+      filter(Status == 0) %>%
+      dplyr::select("TStart", "TStop", "recur",
+                    Tx.nm,
+                    any_of(covariate_names),
+                    all_of(event_indicator_string))
 
-    # weights
-    weight_name <- paste0("weight.", suffix1)
-    weight = weights_rda(data = testing_dataset,
-                         weight.formula.list = form.weight,
-                         covariates = covariate_names,
-                         event_indicator_string = event_indicator_string)
-    arg.val_name <- paste0("arg.val.", suffix1)
-    arg.val = list(test = testing_dataset,
+    # # weights
+    # weight_name <- paste0("weight", suffix1)
+    # weight = weights_rda(data = testing_dataset,
+    #                      weight.formula.list = form.weight,
+    #                      covariates = covariate_names,
+    #                      event_indicator_string = event_indicator_string)
+    # arg.val_name <- paste0("arg.val.", suffix1)
+    # arg.val = list(test = testing_dataset,
+    #                actual = test.tmp,
+    #                propensity = weight$propensity,
+    #                weight.censor = weight$weight.censor,
+    #                criterion = criterion,
+    #                tau = tau)
+
+    weight_prop = cbind(id = test_ids,
+                    weight = weight0$propensity[test_indices]) %>%
+      as.data.frame()
+    weight_censor = cbind(id = test_ids,
+                         weight = weight0$weight.censor[test_indices]) %>%
+      as.data.frame()
+    # Expand weight to match the number of records for each person in the test dataset
+    weight_prop_long <- test %>%
+      # Join the weight dataset to the test dataset by 'id'
+      left_join(weight_prop, by = "id") %>%
+      pull(weight)
+    weight_censor_long <- test %>%
+      # Join the weight dataset to the test dataset by 'id'
+      left_join(weight_censor, by = "id") %>%
+      pull(weight)
+
+    arg.val = list(test_dat = testing_dataset_surv,
                    actual = test.tmp,
-                   propensity = weight$propensity,
-                   weight.censor = weight$weight.censor,
+                   propensity = weight_prop %>%
+                     pull(weight), #weight$propensity[test_indices],
+                   weight.censor = weight_censor %>%
+                     pull(weight), #weight$weight.censor[test_indices],
                    criterion = criterion,
-                   tau = tau)
-
+                   tau = tau,
+                   endpoint1 = endpoint1)
     for (method in loop_methods) {
       err_method <- paste0("err.", method)
       opt_method <- paste0("opt.rule.", method)
       if (!get(err_method)) {
-        # Truncated Mean/Prob (anything other than OS/PC is counted as censored)
-        values[cv, paste0(method, ".", suffix1)] <-
+        # est1 = cbind(id = test_ids,
+        #              est = get(opt_method)) %>% as.data.frame()
+        # est2 = test %>%
+        #   dplyr::select(id) %>%
+        #   left_join(est1, by = "id") %>%
+        #   pull(Trt) %>%
+        #   as.data.frame()
+        est2 = get(opt_method)
+
+        # Truncated Mean/Prob
+        values[cv, paste0(method, suffix1)] <-
           do.call(getValue,
                   c(arg.val,
-                    list(estimated =
-                           get(opt_method))))
+                    list(estimated = est2)))
+                           #get(opt_method))))
       }
     }
+    # if (!err.CSK)  values[cv, "CSK"] = do.call(getValue, c(arg.val, list(estimated = opt.tmp.CSK)))
+    # if (!err.zom)  values[cv, "ZOM"] = do.call(getValue, c(arg.val, list(estimated = opt.tmp.zom)))
 
     # observed
-    obs1 <- "test_terminal" #paste0("observed.", suffix1)
-    values[cv, obs1] <- do.call(getValue,
-                                c(arg.val[-which(names(arg.val) == "propensity")],
-                                  list(estimated = test.tmp,
-                                       propensity = 1)))
+    obs1 <- paste0("OBS", suffix1)
+    values[cv, obs1] <- do.call(getValue, c(arg.val, list(estimated = test.tmp)))
   } # end of suffix
 
   # source("Training_Eval_Results.R")
-
+  message("Printing values")
   print(values[cv, ])
+  message("Printing mean across cv iterations")
   print(apply(values, 2, mean, na.rm = TRUE)) # across columns (over all cv iterations)
-
+  View(values)
   ############################################################################################################
   #### C. saving the results #################################################################################
   ############################################################################################################
@@ -586,3 +720,4 @@ for (cv in 1:K) {
 } # end of cv
 saveRDS(values, paste0(fnm,"Values_", K,"CV_", nm, rds))
 saveRDS(tab, paste0(fnm, "tab_ZOM_", nm, rds))
+

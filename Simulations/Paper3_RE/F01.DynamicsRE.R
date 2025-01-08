@@ -216,8 +216,8 @@ Dynamics <-
     # print(gapparam1)
     gapparam2 <<- ifelse(action == 1, 0.2, 0.7) #0.4, 0.7) #rho for gap times
     alpha1 = 4*gapparam1 # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025
-    alpha2 = 4*gapparam2 
-    
+    alpha2 = 4*gapparam2
+
     if (any(alpha1 == 0)) {
       print("At least one subject has alpha1 = 0 so creating rateD")
       rateD = predHazardFn_D(action = 0, covariate = covariate)
@@ -236,14 +236,14 @@ Dynamics <-
     # gaptime1 <<- rexp(N,pred.hazard2)
     gaptime1 <<- -(1/pred.hazard2)*log(1-u1)
     # print(sprintf("gaptime1: %s", head(gaptime1)))
-    
+
     # print("Generating Failure Time")
     # generate conditional failure time (given gaptime1)
     tt_fail <<- as.numeric(GumbelBiExp(N=N,lambda_D=pred.hazard1,lambda_R=pred.hazard2,
                                        rate = rateD, # needed for if alpha1[i] is 0
                                        alpha=alpha1,y_type=1,y=gaptime1,u=u2)$tt_fail)
     # print(sprintf("failure time: %s", head(tt_fail)))
-    
+
     # Generate G conditional gaptime values for each subject
     if (G>1){
       # gaptimes <- generate_gaptime(N, lambda_D, lambda_R, alpha2, G)
@@ -256,7 +256,7 @@ Dynamics <-
       # print(gaptimes)
       colnames(gaptimes) = "gaptime1"
     }
-    
+
     # Create a dataframe with the gaptime values
     gap_df <- data.frame(ID = 1:N, gaptime0 = rep(0,N),gaptimes);#print(head(gap_df))
     # Pivot the dataset to a longitudinal format
@@ -264,7 +264,7 @@ Dynamics <-
       pivot_longer(cols = starts_with("gaptime"), names_to = "Gap", values_to = "Time_Gap") %>%
       mutate(Gap = as.numeric(gsub("gaptime", "", Gap)));
     # print(head(gap_df_longitudinal))
-    
+
     # Calculate the recurrent times using cumulative sum per ID
     recurrent_df_longitudinal <- gap_df_longitudinal %>%
       group_by(ID) %>%
@@ -276,13 +276,13 @@ Dynamics <-
       mutate(Label = paste0("Recurrent", Recurrent)) %>%
       dplyr::select(-c(Gap, Time_Gap, Recurrent)) %>%
       rename(Time = Time_Recurrent)
-    
+
     # # generate conditional gaptime2 (given gaptime1)
     # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1,u=u3)$tt)
     # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2,u=u4)$tt)
     # gaptime4 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime3,u=u5)$tt)
     # gap_df = data.frame(ID = c(1:N), gaptime1 = gaptime1, gaptime2 = gaptime2, gaptime3 = gaptime3, gaptime4 = gaptime4)
-      
+
     # # print(alpha1)
     # if (alpha1 == 0){
     #   print("Independence")
@@ -292,23 +292,23 @@ Dynamics <-
     #   tt_fail <<- -(1/rateD)*log(1-u1)
     # } else{
     #   # print("============== Gumbel Bivariate Exponential ==============")
-    # 
+    #
     #   # generate first gap time using marginal exp(lamR) distribution
     #   # gaptime1 = rexp(N,lambda_R)
     #   # gaptime1 <<- rexp(N,pred.hazard2)
     #   gaptime1 <<- -(1/pred.hazard2)*log(1-u1)
     #   # print(sprintf("gaptime1: %s", head(gaptime1)))
-    #   
+    #
     #   # print("Generating Failure Time")
     #   # generate conditional failure time (given gaptime1)
     #   tt_fail <<- as.numeric(GumbelBiExp(N=N,lambda_D=pred.hazard1,lambda_R=pred.hazard2,
     #                                      alpha=alpha1,y_type=1,y=gaptime1,u=u2)$tt)
     #   # print(sprintf("failure time: %s", head(tt_fail)))
-    #   
+    #
     #   # print("Checking Plot")
     #   # plot_check = Check_GumbelBiExp(N=N,tt=tt_fail);
     #   # print(plot_check)
-    # 
+    #
     #   # Generate G conditional gaptime values for each subject
     #   if (G>1){
     #     # gaptimes <- generate_gaptime(N, lambda_D, lambda_R, alpha2, G)
@@ -321,7 +321,7 @@ Dynamics <-
     #     # print(gaptimes)
     #     colnames(gaptimes) = "gaptime1"
     #   }
-    # 
+    #
     #   # Create a dataframe with the gaptime values
     #   gap_df <- data.frame(ID = 1:N, gaptime0 = rep(0,N),gaptimes);#print(head(gap_df))
     #   # Pivot the dataset to a longitudinal format
@@ -329,7 +329,7 @@ Dynamics <-
     #     pivot_longer(cols = starts_with("gaptime"), names_to = "Gap", values_to = "Time_Gap") %>%
     #     mutate(Gap = as.numeric(gsub("gaptime", "", Gap)));
     #   # print(head(gap_df_longitudinal))
-    # 
+    #
     #   # Calculate the recurrent times using cumulative sum per ID
     #   recurrent_df_longitudinal <- gap_df_longitudinal %>%
     #     group_by(ID) %>%
@@ -341,7 +341,7 @@ Dynamics <-
     #     mutate(Label = paste0("Recurrent", Recurrent)) %>%
     #     dplyr::select(-c(Gap, Time_Gap, Recurrent)) %>%
     #     rename(Time = Time_Recurrent)
-    # 
+    #
     #   # # generate conditional gaptime2 (given gaptime1)
     #   # gaptime2 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime1,u=u3)$tt)
     #   # gaptime3 <- as.numeric(GumbelBiExp(N=N,lambda_D=lambda_D,lambda_R=lambda_R,alpha=alpha2,y_type=2,y=gaptime2,u=u4)$tt)
@@ -379,7 +379,7 @@ Dynamics <-
     df_surv1 = df_times %>% mutate(obs_time = pmin(Time_Failure, Time_Censor, Time_Tau),
                                    indD = ifelse(Time_Failure <= pmin(Time_Censor, Time_Tau), 1, 0))
     times_act <<- inner_join(df_cov, df_surv1, by = "ID")
-    
+
     # View(df_surv1)
     df_surv2 = inner_join(df_cov, df_surv1, by = "ID") %>%
       dplyr::select(-c(Time_Failure, Time_Censor, Time_Tau))

@@ -1,0 +1,187 @@
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(patchwork)
+
+local = 1
+if (local == 1){
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
+}
+date_result = "2025-01-07" #"2025-01-06"
+mff_allsims = read.csv(sprintf("output/%s/mff/mff_allsims.csv", date_result))
+num_re = read.csv(sprintf("output/%s/mff/num_re.csv", date_result))
+result = readRDS(sprintf("output/%s/simResult_RE_censor1_prop1_n1_betaD.1_gammaD.1_omegaD.1_lambda0D.1_tmp.rds", date_result))
+mff_allsims = mff_allsims %>%
+  mutate(RE_per_YrsLived = Number_RE/survival)
+mff_allsims$method <- factor(mff_allsims$method, levels = c("czmk", "zom", "observed"))
+
+
+# Summary statistics
+mff_means = mff_allsims %>%
+  group_by(simulation, method) %>%
+  summarise(mean_surv = mean(survival),
+            mean_re_yrs = mean(RE_per_YrsLived))
+View(mff_means)
+
+# Get global y-axis limits for both plots
+ymax = max(mff_means$mean_re_yrs, na.rm = TRUE)
+y_max <- max(ceiling(max(mff_means$mean_surv, na.rm = TRUE)),
+             ymax)
+y_min <- 0.5  # Start from 0 for both plots
+set.seed(1)
+# Left Plot: Mean Survival vs Method with Number_RE as Facet
+plot_survival <- ggplot(mff_means, aes(x = method, y = mean_surv, color = method)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.15, height = 0, size = 1) +  # Add jitter for points
+  stat_summary(fun = mean,
+               geom = "point",
+               aes(group = 1),  # Map color to method
+               shape = "square", size = 3, color = "black") +
+  stat_summary(fun = mean, geom = "text",
+               aes(label = round(after_stat(y), 2)),
+               vjust = 2, size = 2, color = "white") +
+  scale_y_continuous(
+    limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
+    breaks = seq(y_min, y_max, by = 0.5),
+    labels = seq(y_min, y_max, by = 0.5),
+    expand = c(0, 0.05)
+  ) +
+  labs(
+    title = "Phase 1 Endpoint Comparison",
+    x = "Method",
+    y = "Truncated Mean Survival (Years)"
+  ) +
+  scale_color_manual(
+    values = c("czmk" = "#6a0dad", "zom" = "#1f77b4", "observed" = "#2ca02c"),
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  ) +
+  scale_x_discrete(
+    limits = c("czmk", "zom", "observed"),  # Order changed here
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 15, hjust = 1)  # Rotate x-axis text for readability
+  )
+
+# Right Plot: Mean RE per Year vs Method with Number_RE as Facet
+plot_re <- ggplot(mff_means, aes(x = method, y = mean_re_yrs, color = method)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.15, height = 0, size = 1) +  # Add jitter for points
+  stat_summary(fun = mean,
+               geom = "point",
+               aes(group = 1),  # Map color to method
+               shape = "square", size = 3, color = "black") +
+  stat_summary(fun = mean, geom = "text",
+               aes(label = round(after_stat(y), 2)),
+               vjust = 2, size = 2, color = "white") +
+  scale_y_continuous(
+    limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
+    breaks = seq(y_min, y_max, by = 0.5),
+    labels = seq(y_min, y_max, by = 0.5),
+    expand = c(0, 0.05)
+  ) +
+  labs(
+    title = "Phase 2 Endpoint Comparison",
+    x = "Method",
+    y = "Mean Number RE per Years Lived"
+  ) +
+  scale_color_manual(
+    values = c("czmk" = "#6a0dad", "zom" = "#1f77b4", "observed" = "#2ca02c"),
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  ) +
+  scale_x_discrete(
+    limits = c("czmk", "zom", "observed"),  # Order changed here
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 15, hjust = 1)  # Rotate x-axis text for readability
+  )
+
+# Combine the two plots side-by-side with aligned legends
+combined_plot <- plot_survival + plot_re +
+  plot_layout(ncol = 2, guides = "collect") &
+  theme(legend.position = "right"); print(combined_plot)
+
+
+
+summary = mff_allsims %>%
+  group_by(method, Number_RE) %>%
+  summarise(#min = min(RE_per_YrsLived),
+            #max = max(RE_per_YrsLived),
+            mean_RE_yrs = mean(RE_per_YrsLived),
+            sd_RE_yrs = sd(RE_per_YrsLived),
+            mean_surv = mean(survival))
+View(summary)
+
+
+ps = ggplot(summary, aes(
+  x = factor(Number_RE),
+  y = mean_surv,
+  color = method,
+  group = method
+)) +
+  geom_point(size = 2, position = position_dodge(width = 0.5)) +  # Dodge points
+  scale_color_brewer(palette = "Set2") +  # Improved color palette
+  labs(
+    title = "",
+    x = "Total Number of RE",
+    y = "Truncated Mean Survival (years)"
+  ) +
+  theme_minimal(base_size = 14) +  # Larger base font size for readability
+  theme(legend.position = "bottom") +
+  scale_color_manual(
+    values = c("czmk" = "#6a0dad", "zom" = "#1f77b4", "observed" = "#2ca02c"),
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  )
+
+pre = ggplot(summary, aes(
+  x = factor(Number_RE),
+  y = mean_RE_yrs,
+  color = method,
+  group = method
+)) +
+  geom_point(size = 2, position = position_dodge(width = 0.5)) +  # Dodge points
+  scale_color_brewer(palette = "Set2") +  # Improved color palette
+  labs(
+    title = "",
+    x = "Total Number of RE",
+    y = "Mean Recurrent Events per Years Lived"
+  ) +
+  theme_minimal(base_size = 14) +  # Larger base font size for readability
+  theme(legend.position = "bottom") +
+  scale_color_manual(
+    values = c("czmk" = "#6a0dad", "zom" = "#1f77b4", "observed" = "#2ca02c"),
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  )
+
+# Combine the two plots side-by-side with aligned legends
+cp <- ps + pre +
+  plot_layout(ncol = 2, guides = "collect") &
+  theme(legend.position = "right"); print(cp)
+
+ggplot(summary, aes(x = method,
+                    y = mean_RE_yrs,
+                    color = method,
+                    group = method)) +
+  geom_point(size = 1) +  # Larger points
+  # geom_line(size = 1.2) +  # Thicker lines
+  # geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3, size = 1) +  # Wider and thicker error bars
+  facet_wrap(~Number_RE, scales = "free_y") +  # Facets by method
+  scale_color_brewer(palette = "Set2") +  # Improved color palette
+  labs(
+    title = "",
+    x = "",
+    y = "Mean Recurrent Events per Years Lived"
+  ) +
+  theme_minimal(base_size = 14) +  # Larger base font size for readability
+  theme(legend.position = "bottom") +
+  scale_color_manual(
+    values = c("czmk" = "#6a0dad", "zom" = "#1f77b4", "observed" = "#2ca02c"),
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  )
+
+
