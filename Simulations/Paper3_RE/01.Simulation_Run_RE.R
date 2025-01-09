@@ -500,8 +500,9 @@ all_sims_data.mff <- list()
   # } # this is for run_simulation for parallel
 
 # Combine all simulations into one big dataset for MFF
-mff_allsims <- do.call(rbind, all_sims_data.mff)
-row.names(mff_allsims) <- NULL
+mff_allsims0 <- do.call(rbind, all_sims_data.mff)
+row.names(mff_allsims0) <- NULL
+mff_allsims <- mff_allsims0 %>% mutate(RE_lived = Number_RE/survival)
 # View(mff_allsims)
 if (savingrds == TRUE){
   write.csv(mff_allsims, paste0(dir_rds,"/mff/mff_allsims.csv"), row.names = FALSE)
@@ -511,13 +512,13 @@ if (savingrds == TRUE){
 #   group_by(simulation, Number_RE, method) %>%
 #   summarize(count = n()) %>%
 #   View()
-num_re_0.15 = mff_allsims %>%
+num_re_prop = mff_allsims %>%
   group_by(simulation, Number_RE, method) %>%
   summarize(count = n(), .groups = "drop") %>%  # Step 1: Calculate `count`
   group_by(Number_RE, method) %>%
-  summarize(mean_count = mean(count, na.rm = TRUE), .groups = "drop")  # Step 2: Calculate mean
+  summarize(mean_count = count/n.eval)  # Step 2: Calculate mean
 if (savingrds == TRUE){
-  write.csv(num_re_0.15, paste0(dir_rds,"/mff/num_re.csv"), row.names = FALSE)
+  write.csv(num_re_prop, paste0(dir_rds,"/mff/num_re.csv"), row.names = FALSE)
 }
 
 
@@ -566,12 +567,12 @@ mff_allsims %>%
     surv_max = max(survival, na.rm = TRUE)
   )
 
-mff_allsims %>%
-  filter(simulation == 20) %>%
-  group_by(method) %>%
-  summarize(meanre = mean(Number_RE),
-            meansurv = mean(survival),
-            percent_trt1 = mean(Trt))
+# mff_allsims %>%
+#   filter(simulation == 20) %>%
+#   group_by(method) %>%
+#   summarize(meanre = mean(Number_RE),
+#             meansurv = mean(survival),
+#             percent_trt1 = mean(Trt))
 
 # library(reshape2)
 # # Create summary heatmap
@@ -595,4 +596,11 @@ mff_allsims %>%
 #     low = "white",   # Light color for low values
 #     high = "blue"   # Dark color for high values
 #   )
+
+mff_allsims %>% 
+  group_by(method, Trt) %>% 
+  summarise(per_trt = n()/(n.eval*n.sim), 
+            mean_surv = mean(survival), 
+            mean_RE = mean(Number_RE), 
+            mean_RE_lived = mean(RE_lived))
 

@@ -243,6 +243,7 @@ Dynamics <-
                                        rate = rateD, # needed for if alpha1[i] is 0
                                        alpha=alpha1,y_type=1,y=gaptime1,u=u2)$tt_fail)
     # print(sprintf("failure time: %s", head(tt_fail)))
+    tt_fail_min_vec <<- pmax(tt_fail, 0.1)
 
     # Generate G conditional gaptime values for each subject
     if (G>1){
@@ -370,7 +371,12 @@ Dynamics <-
 
     #steps to put together in one dataset
     trunc_cens_time = pmin(censor_time, tau0)
-    df_times <<- data.frame(ID = c(1:N), Time_Failure=tt_fail, Time_Censor=censor_time, Time_Tau=tau0, Truncated_Censor_Time = trunc_cens_time)
+    # df_times <<- data.frame(ID = c(1:N), Time_Failure=tt_fail,
+    #                         Time_Censor=censor_time, Time_Tau=tau0,
+    #                         Truncated_Censor_Time = trunc_cens_time)
+    df_times <<- data.frame(ID = c(1:N), Time_Failure=tt_fail_min_vec, 
+                            Time_Censor=censor_time, Time_Tau=tau0, 
+                            Truncated_Censor_Time = trunc_cens_time)
     # View(df_times)
 
     # survival dataset (1row/person)

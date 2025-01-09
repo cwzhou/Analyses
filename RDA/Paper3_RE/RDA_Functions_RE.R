@@ -159,16 +159,18 @@ getValue <- function(test_dat,
   if (endpoint1 == "survival"){
     weight.censor = weight.censor
     testY = test_dat[, "TStop"] #[, "obs_time"]
+    tau1 = tau
   } else{
     weight.censor = rep(1,length(weight.censor))
     testY = test_dat[, "recur"]/test_dat[, "TStop"]
+    tau1 = test_dat[,"recur"]/tau
   }
   weight = weight_p * weight.censor
   # evaluate(test_dat[, "T.0"], weight = weight, criterion = criterion, tau = tau)
   # print(3)
   if (criterion[1] == "mean" | criterion[1] == "area") {
     # print(3.5)
-    mean(pmin(tau, testY) * weight)/ mean(weight)
+    mean(pmin(tau1, testY) * weight)/ mean(weight)
   } else {
     mean(as.numeric(testY >= as.numeric(criterion[2])) * weight)/ mean(weight)
   }

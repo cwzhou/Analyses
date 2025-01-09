@@ -30,10 +30,10 @@ tol1_param = c(0.05,0) # c(0.03,0)
 t0_crit = 30 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
 tau = 50
-K = 1 #300 # number of CV
+K = 2 #300 # number of CV
 endpoint = "RE" # endpoint
 Tx.nm = "A"
-init_seed = 123 #116
+init_seed = 116
 
 ## other parameters
 nodeSizeSurv = 3
@@ -435,10 +435,13 @@ for (cv in 1:K) {
   print(paste("Train size:", nrow(train), "with Unique IDs in Train:", length(unique(train$id))))
   print(paste("Test size:", nrow(test), "with Unique IDs in Test:", length(unique(test$id))))
 
-  # proportion of people censored
-  values[cv, "train_cens"] = mean(train$Status_D==0 & train$Status == 0)
-  values[cv, "test_cens"] = mean(test$Status_D==0 & test$Status == 0)
-
+  # Calculate the proportion of censored data conditionally on Status == 0
+  train_censored <- train %>% filter(Status == 0)
+  test_censored <- test %>% filter(Status == 0)
+  
+  values[cv, "train_cens"] <- mean(train_censored$Status_D == 0)
+  values[cv, "test_cens"] <- mean(test_censored$Status_D == 0)
+  
   # model1 = "Surv(TStop, Status_D) ~ Z1 + Z2" %>% as.formula()
   # model2 = "Surv(TStart, TStop, Status) ~ Z1 + Z2" %>% as.formula()
   model1 = "Surv(TStop, Status_D) ~ number + size" %>% as.formula()

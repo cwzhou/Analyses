@@ -13,13 +13,13 @@ source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
 
-savingrds = TRUE
-date_folder = "2025-01-08"
-n.eval = 5000
-n.sim = 200
+savingrds = FALSE
+date_folder = "2025-01-09"
+n.eval = 500
+n.sim = 1
 sim_data_type = "RE"
 endpoint = sim_data_type
-tau0 = 5
+tau0 = 10
 ##### Gap Time Hyperparameters #####
 G = 10 #5 # total gap times
 # now defined in F01.DynamicsRE.R
@@ -37,8 +37,11 @@ assign_skip_function(all_methods, skip_method)
 ### 0. Get the setting number.
 arg <- commandArgs(trailingOnly = TRUE)
 num.args = 14
+num.params = 8
 if (length(arg) < num.args) {
-  arg = c(2,rep(1, num.args-1)) # by default, with RE endpoint as default
+  arg = c(2, 1,
+          rep(1,num.params),
+          2, 1, 1, 1) #c(2,rep(1, num.args-1)) # by default, with RE endpoint as default
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))
 }
@@ -89,7 +92,7 @@ censor <- list(low.censoring = list(
   # we want about 20% censoring
   ctype = 1, # uniform censoring
   censor_min = 0,
-  censor_max = tau0/2+tau0/3, # higher is less censoring for unif
+  censor_max = tau0/7, # higher is less censoring for unif
   censor_rate = 0  # not used for unif
   ),
   high.censoring = list(
@@ -106,25 +109,36 @@ if (endpoint == "RE"){
   # no intercept b/c survival
   # Covariate effects for survival
   betasD <- list(
-    beta1 = list(
-      beta.hazard0 = c(log(1.3), log(0.9), log(1.3), log(1.2), log(1.8)),  # Covariate effects for Treatment 0 (5 parameters)
-      beta.hazard1 = c(log(1.1), log(0.2), log(1.1), log(0.95), log(1.15))  # Covariate effects for Treatment 1 (5 parameters)
+    betaD1 = list(
+      betaD.hazard0 = c(log(1), log(1), log(1), log(1), log(1)),
+      betaD.hazard1 = c(log(4), log(4), log(5), log(4), log(3))  # Covariate effects for Treatment 0 (5 parameters)
+        # Covariate effects for Treatment 1 (5 parameters)
     ),
-    beta2 = list(
-      beta.hazard0 = c(log(1.5), log(1.2), log(0.7), log(1.0), log(1.3), log(1.5), log(1.0), log(1.6), log(1.3), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
-      beta.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
+    betaD2 = list(
+      betaD.hazard0 = c(log(1.5), log(1.2), log(0.7), log(1.0), log(1.3), log(1.5), log(1.0), log(1.6), log(1.3), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
+      betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
+    # betasD <- list(
+  #   betaD1 = list(
+  #     betaD.hazard0 = c(log(1.3), log(0.9), log(1.3), log(1.2), log(1.8)),  # Covariate effects for Treatment 0 (5 parameters)
+  #     betaD.hazard1 = c(log(2.1), log(0.2), log(1.1), log(0.95), log(1.15))  # Covariate effects for Treatment 1 (5 parameters)
+  #   ),
+  #   betaD2 = list(
+  #     betaD.hazard0 = c(log(1.5), log(1.2), log(0.7), log(1.0), log(1.3), log(1.5), log(1.0), log(1.6), log(1.3), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
+  #     betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
+  #   )
+  # )
 
   # Covariate effects for recurrence
   betasR <- list(
-    beta1 = list(
-      beta.hazard0 = c(log(2.8), log(3.9), log(0.2), log(1.05), log(1.1)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
-      beta.hazard1 = c(log(2.1), log(2.6), log(1.1), log(1.25), log(0.31)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
+    betaR1 = list(
+      betaR.hazard0 = c(log(2.8), log(3.9), log(0.2), log(1.05), log(1.1)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
+      betaR.hazard1 = c(log(2.1), log(2.6), log(1.1), log(1.25), log(0.31)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
     ),
-    beta2 = list(
-      beta.hazard0 = c(log(1.5), log(1.8), log(1.3), log(1.4), log(1.2), log(1.0), log(1.4), log(1.6), log(1.1), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
-      beta.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
+    betaR2 = list(
+      betaR.hazard0 = c(log(1.5), log(1.8), log(1.3), log(1.4), log(1.2), log(1.0), log(1.4), log(1.6), log(1.1), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
+      betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
 
@@ -205,9 +219,9 @@ if (endpoint == "RE"){
     )
   )
 
-  ncovD.list <- lapply(betasD, function(x) length(x$beta.hazard1) )
-  ncovR.list <- lapply(betasR, function(x) length(x$beta.hazard1) )
-  if (ncovD.list$beta1 == ncovR.list$beta1){
+  ncovD.list <- lapply(betasD, function(x) length(x$betaD.hazard1) )
+  ncovR.list <- lapply(betasR, function(x) length(x$betaR.hazard1) )
+  if (ncovD.list$betaD1 == ncovR.list$betaR1){
     ncov.list <- ncovD.list
   } else{
     stop("02.Simulation_Parameters_RE.R: number of covariate for betas D and R don't align.")
@@ -288,16 +302,16 @@ if (endpoint == "RE"){
   # lambda_R = lambda_0R*exp(t(beta_R)%*%z + omega_R * A + A * t(gamma_R) %*% z)
   predHazardFn_D <- function(action, covariate) {
     ifelse(action == 1,
-           lambda0D.hazard1 * exp(cbind(covariate) %*% beta.hazard1 + omegaD.hazard1 * action + action * cbind(covariate) %*% gammaD.hazard1),
-           lambda0D.hazard0 * exp(cbind(covariate) %*% beta.hazard0 + omegaD.hazard0 * action + action * cbind(covariate) %*% gammaD.hazard0)
+           lambda0D.hazard1 * exp(cbind(covariate) %*% betaD.hazard1 + omegaD.hazard1 * action + action * cbind(covariate) %*% gammaD.hazard1),
+           lambda0D.hazard0 * exp(cbind(covariate) %*% betaD.hazard0 + omegaD.hazard0 * action + action * cbind(covariate) %*% gammaD.hazard0)
            # lambda0D.hazard1 * cbind(covariate) %*% exp(beta.hazard1) + omegaD.hazard1 * action + action * cbind(covariate) %*% gammaD.hazard1,
            # lambda0D.hazard0 * cbind(covariate) %*% exp(beta.hazard0)  + omegaD.hazard0 * action + action * cbind(covariate) %*% gammaD.hazard0
     )
   }
   predHazardFn_R <- function(action, covariate) {
     ifelse(action == 1,
-           lambda0R.hazard1 * exp(cbind(covariate) %*% beta.hazard1 + omegaR.hazard1 * action + action * cbind(covariate) %*% gammaR.hazard1),
-           lambda0R.hazard0 * exp(cbind(covariate) %*% beta.hazard0 + omegaR.hazard0 * action + action * cbind(covariate) %*% gammaR.hazard0)
+           lambda0R.hazard1 * exp(cbind(covariate) %*% betaR.hazard1 + omegaR.hazard1 * action + action * cbind(covariate) %*% gammaR.hazard1),
+           lambda0R.hazard0 * exp(cbind(covariate) %*% betaR.hazard0 + omegaR.hazard0 * action + action * cbind(covariate) %*% gammaR.hazard0)
            # lambda0R.hazard1 * cbind(covariate) %*% exp(beta.hazard1) + omegaR.hazard1 * action + action * cbind(covariate) %*% gammaR.hazard1,
            # lambda0R.hazard0 * cbind(covariate) %*% exp(beta.hazard0) + omegaR.hazard0 * action + action * cbind(covariate) %*% gammaR.hazard0
     )
