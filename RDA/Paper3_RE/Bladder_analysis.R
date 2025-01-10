@@ -5,10 +5,16 @@ library(randomForestSRC);
 library(caret);
 library(itrSurv);library(ggplot2); library(tidyverse);
 library(MASS);
-local = 1
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE/")
-source("02.Simulation_Functions_RE.R") # includes F02.ComparatorMethod_Functions.R
-setwd("../../RDA/Paper3_RE/")
+local = 0
+if (local == 1){
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE/")
+  source("02.Simulation_Functions_RE.R") # includes F02.ComparatorMethod_Functions.R
+  setwd("../../RDA/Paper3_RE/")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper3_RE")
+  source("02.Simulation_Functions_RE.R") # includes F02.ComparatorMethod_Functions.R
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/RDA/Paper3_RE")
+}
 source("RDA_Functions_RE.R")    # All the library and source files
 ############################################################
 ######### temporary testing things out parameters ##########
@@ -438,10 +444,10 @@ for (cv in 1:K) {
   # Calculate the proportion of censored data conditionally on Status == 0
   train_censored <- train %>% filter(Status == 0)
   test_censored <- test %>% filter(Status == 0)
-  
+
   values[cv, "train_cens"] <- mean(train_censored$Status_D == 0)
   values[cv, "test_cens"] <- mean(test_censored$Status_D == 0)
-  
+
   # model1 = "Surv(TStop, Status_D) ~ Z1 + Z2" %>% as.formula()
   # model2 = "Surv(TStart, TStop, Status) ~ Z1 + Z2" %>% as.formula()
   model1 = "Surv(TStop, Status_D) ~ number + size" %>% as.formula()
