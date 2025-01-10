@@ -219,7 +219,12 @@ all_sims_data.mff <- list()
 
     # Output --------------------------------------------------------------------
     if (savingrds == TRUE){
-      folder_path <- sprintf("./2_pipeline/%s", date_folder)
+      if (local == 1){
+        folder_path <- sprintf("./2_pipeline/%s", date_folder)
+      } else{
+        folder_path <- sprintf("/work/users/c/w/cwzhou/Proj3RE/2_pipeline/%s",
+                               date_folder)
+      }
       # Create the folder if it doesn't exist
       if (!dir.exists(folder_path)) {
         dir.create(folder_path, recursive = TRUE)

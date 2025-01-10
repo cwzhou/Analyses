@@ -335,11 +335,28 @@ if (endpoint == "RE"){
     )
   }
 }
-
-if (!dir.exists("output")) dir.create("output")
-if (!dir.exists("figure")) dir.create("figure")
-dir_rds = sprintf("./output/%s", date_folder)
+if (local == 1) {
+  base_dir <- "./output/"
+  figure_dir <- "./figure/"
+  dir_rds = sprintf("./output/%s", date_folder)
+  } else {
+  base_dir <- "/work/users/c/w/cwzhou/Proj3RE/output/"
+  figure_dir <- "/work/users/c/w/cwzhou/Proj3RE/figure/"
+  dir_rds = sprintf("%s/%s", base_dir, date_folder)
+  }
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
+if (!dir.exists(base_dir)) {
+  dir.create(base_dir, recursive = TRUE)
+}
+if (!dir.exists(figure_dir)) {
+  dir.create(figure_dir, recursive = TRUE)
+}
+if (!dir.exists(dir_rds)) {
+  dir.create(dir_rds, recursive = TRUE)
+}
+if (!dir.exists(dir_fig)) {
+  dir.create(dir_fig, recursive = TRUE)
+}
 # print(dir_rds)
 # print(dir_fig)
 if (local == 0){
