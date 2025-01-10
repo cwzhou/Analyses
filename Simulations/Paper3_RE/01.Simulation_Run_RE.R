@@ -199,7 +199,7 @@ all_sims_data.mff <- list()
     ph1_obs_train <<-pred.hazard1
     gap1_obs_train <<- gaptime1
     tt_obs_train <<- tt_fail
-    df_recurr = sim.train$dataset_recurrent; #View(df_recurr)
+    df_recurr = sim.train$dataset_recurrent; ##View(df_recurr)
     df_surv = sim.train$dataset_survival; head(df_surv)
     name = sprintf("%s_%s",sim.train$name, sim_data_type); #print(name)
     # update this to include name_surv
@@ -302,7 +302,7 @@ all_sims_data.mff <- list()
                       method = "observed")
   # result["obs_endpoint"] = obs.mff.result$mean_value
   result[sim, "obs_endpoint"] = obs.mff.result$mean_value
-  # View(obs.mff.df); View(result)
+  # #View(obs.mff.df); #View(result)
 
     # test.name = sprintf("Test.%s_%s",test.sim$name, sim_data_type); print(name)
   # # update this to include name_surv
@@ -363,8 +363,8 @@ all_sims_data.mff <- list()
       set.seed(test_seed)
       # TO DO: MAKE SURE THE COVARIATES ARE THE SAME FOR CZMK AND ZOM TEST SET
       czmk.data.rep <- do.call(gdata_RE, arg.czmk.test); #head(czmk.data.rep$dataset_survival$Z1)
-      czmk.test.df_recurr = czmk.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
-      czmk.test.df_surv = czmk.data.rep$dataset_survival; #View(czmk.test.df_surv)
+      czmk.test.df_recurr = czmk.data.rep$dataset_recurrent; ##View(czmk.test.df_recurr)
+      czmk.test.df_surv = czmk.data.rep$dataset_survival; ##View(czmk.test.df_surv)
       # czmk.times_test <<- times_act
       # ph1_czmk_test <<- pred.hazard1
       # gap1_czmk_test <<- gaptime1
@@ -396,7 +396,7 @@ all_sims_data.mff <- list()
       czmk.mff.df <<- cbind(simulation = sim, czmk.mff.result$mff_tau_df,
                             survival = czmk.test.df_surv$obs_time,
                             method = "czmk")
-      # View(czmk.mff.df); View(result)
+      # #View(czmk.mff.df); #View(result)
       # result["czmk_endpoint"] = czmk.mff.result$mean_value #result[sim, "czmk_endpoint"]
       result[sim, "czmk_endpoint"] = czmk.mff.result$mean_value
     } # end of if czmk.error
@@ -455,8 +455,8 @@ all_sims_data.mff <- list()
         assign(sprintf("zom_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
       }
       assign(sprintf("rep_zom_sim%s", sim), zom.data.rep, envir = .GlobalEnv)
-      zom.test.df_recurr = zom.data.rep$dataset_recurrent; #View(czmk.test.df_recurr)
-      zom.test.df_surv = zom.data.rep$dataset_survival; #View(czmk.test.df_surv)
+      zom.test.df_recurr = zom.data.rep$dataset_recurrent; ##View(czmk.test.df_recurr)
+      zom.test.df_surv = zom.data.rep$dataset_survival; ##View(czmk.test.df_surv)
       # result["zom_survival"] = survival_val.fn(zom.test.df_surv) #result[sim, "zom_survival"]
       result[sim, "zom_survival"] = survival_val.fn(zom.test.df_surv)
       zom.mff.result <- endpoint_val.fn(data = zom.test.df_recurr, idName0, epName0, txName0)
@@ -513,7 +513,7 @@ all_sims_data.mff <- list()
   cat("---------------------------------------------------\n")
   cat("------------ End of Simulation", sim, "------------\n")
   print(result[sim,])
-  # View(result)
+  # #View(result)
   cat("---------------------------------------------------\n")
   } # for (sim in 1:n.sim) but removed for parallelizing
   # return(result) # this is for parallel
@@ -522,7 +522,7 @@ all_sims_data.mff <- list()
 # Combine all simulations into one big dataset for MFF
 mff_allsims <- do.call(rbind, all_sims_data.mff)
 row.names(mff_allsims) <- NULL
-View(mff_allsims)
+# #View(mff_allsims)
 if (savingrds == TRUE){
   write.csv(mff_allsims, paste0(dir_rds,"/mff/mff_allsims.csv"), row.names = FALSE)
 }
@@ -530,7 +530,7 @@ if (savingrds == TRUE){
 # mff_allsims %>%
 #   group_by(simulation, Number_RE, method) %>%
 #   summarize(count = n()) %>%
-#   View()
+#   #View()
 num_re_prop = mff_allsims %>%
   group_by(simulation, Number_RE, method) %>%
   summarize(count = n(), .groups = "drop") %>%  # Step 1: Calculate `count`
@@ -556,7 +556,7 @@ end_time = Sys.time()
 message("End of Script: 01.Simulation_Run_RE.R")
 sprintf("Overall Time Took: %s", round(end_time - start_time,2))
 
-# View(result)
+# #View(result)
 
 print("end of script")
 # End of script -------------------------------------------------------------
