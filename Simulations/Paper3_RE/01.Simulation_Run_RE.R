@@ -2,7 +2,7 @@
 # Description: [Brief description of the purpose and objectives of the simulation]
 # Author: Christina Zhou
 # Date: 07.02.2023
-local = 1
+local = 0
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
 } else{
