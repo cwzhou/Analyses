@@ -2,7 +2,7 @@
 # Description: [Brief description of the purpose and objectives of the simulation]
 # Author: Christina Zhou
 # Date: 07.02.2023
-local = 0
+local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
 } else{
@@ -508,7 +508,7 @@ all_sims_data.mff <- list()
   cat("---------------------------------------------------\n")
   cat("------------ End of Simulation", sim, "------------\n")
   print(result[sim,])
-  View(result)
+  # View(result)
   cat("---------------------------------------------------\n")
   } # for (sim in 1:n.sim) but removed for parallelizing
   # return(result) # this is for parallel
@@ -551,7 +551,7 @@ end_time = Sys.time()
 message("End of Script: 01.Simulation_Run_RE.R")
 sprintf("Overall Time Took: %s", round(end_time - start_time,2))
 
-View(result)
+# View(result)
 
 print("end of script")
 # End of script -------------------------------------------------------------
