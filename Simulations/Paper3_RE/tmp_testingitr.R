@@ -12,7 +12,7 @@ n.sim = 1000
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
-ntree1 = 100
+ntree1 = 150
 ##### Gap Time Hyperparameters #####
 G = 10 #5 # total gap times
 # now defined in F01.DynamicsRE.R
