@@ -4,9 +4,11 @@
 # Date: 11.12.2024
 
 ### DATA TYPE ###
-local = 1
+local = 0
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper3_RE")
 }
 # Libraries --------------------------------------------------------------
 source("02.Simulation_Libraries_RE.R")

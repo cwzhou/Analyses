@@ -2,8 +2,12 @@
 # Description: [Brief description of the purpose and objectives of the simulation]
 # Author: Christina Zhou
 # Date: 07.02.2023
-
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
+local = 0
+if (local == 1){
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper3_RE")
+}
 source("02.Simulation_Parameters_RE.R")
 start_time = Sys.time()
 
@@ -472,18 +476,18 @@ all_sims_data.mff <- list()
   # Stack the datasets
   mff.stacked_data0 <- do.call(rbind, mff.dataset_list)
   row.names(mff.stacked_data0) <- NULL
-  mff.stacked_data = mff.stacked_data0 %>%
+  mff.stacked_data = mff.stacked_data0 %>% 
     mutate(simulation = sim,
            RE_lived = Number_RE/survival)
   # Append to the list of all simulations' data
   all_sims_data.mff[[sim]] <- mff.stacked_data
-
+  
   message("Simulation #", sim)
   mff.stacked_data %>%
-    group_by(method, Trt) %>%
-    summarise(per_trt = round(n()/(n.eval)*100,2),
-              mean_surv = mean(survival),
-              mean_RE = mean(Number_RE),
+    group_by(method, Trt) %>% 
+    summarise(per_trt = round(n()/(n.eval)*100,2), 
+              mean_surv = mean(survival), 
+              mean_RE = mean(Number_RE), 
               mean_RE_lived = mean(RE_lived)) %>%
     print()
   message("Simulation #", sim)
@@ -504,7 +508,7 @@ all_sims_data.mff <- list()
   cat("---------------------------------------------------\n")
   cat("------------ End of Simulation", sim, "------------\n")
   print(result[sim,])
-  # View(result)
+  View(result)
   cat("---------------------------------------------------\n")
   } # for (sim in 1:n.sim) but removed for parallelizing
   # return(result) # this is for parallel
@@ -513,7 +517,7 @@ all_sims_data.mff <- list()
 # Combine all simulations into one big dataset for MFF
 mff_allsims <- do.call(rbind, all_sims_data.mff)
 row.names(mff_allsims) <- NULL
-# View(mff_allsims)
+View(mff_allsims)
 if (savingrds == TRUE){
   write.csv(mff_allsims, paste0(dir_rds,"/mff/mff_allsims.csv"), row.names = FALSE)
 }
@@ -547,7 +551,7 @@ end_time = Sys.time()
 message("End of Script: 01.Simulation_Run_RE.R")
 sprintf("Overall Time Took: %s", round(end_time - start_time,2))
 
-# View(result)
+View(result)
 
 print("end of script")
 # End of script -------------------------------------------------------------
@@ -607,33 +611,33 @@ mff_allsims %>%
 #     high = "blue"   # Dark color for high values
 #   )
 
-mff_allsims %>%
-  group_by(simulation,method, Trt) %>%
-  summarise(per_trt = round(n()/(n.eval)*100,2),
-            mean_surv = mean(survival),
-            mean_RE = mean(Number_RE),
+mff_allsims %>% 
+  group_by(simulation,method, Trt) %>% 
+  summarise(per_trt = round(n()/(n.eval)*100,2), 
+            mean_surv = mean(survival), 
+            mean_RE = mean(Number_RE), 
             # mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
-mff_allsims %>%
-  group_by(method, Trt) %>%
-  summarise(per_trt = round(n()/(n.eval*n.sim)*100,2),
-            mean_surv = mean(survival),
-            mean_RE = mean(Number_RE),
+mff_allsims %>% 
+  group_by(method, Trt) %>% 
+  summarise(per_trt = round(n()/(n.eval*n.sim)*100,2), 
+            mean_surv = mean(survival), 
+            mean_RE = mean(Number_RE), 
             # mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
-mff_allsims %>%
-  group_by(simulation, method) %>%
+mff_allsims %>% 
+  group_by(simulation, method) %>% 
   summarise(per_trt1 = mean(Trt)*100,
-            mean_RE = mean(Number_RE),
-            mean_surv = mean(survival),
+            mean_RE = mean(Number_RE), 
+            mean_surv = mean(survival), 
             # mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
-mff_allsims %>%
-  group_by(method) %>%
-  summarise(mean_surv = mean(survival),
-            mean_RE = mean(Number_RE),
+mff_allsims %>% 
+  group_by(method) %>% 
+  summarise(mean_surv = mean(survival), 
+            mean_RE = mean(Number_RE), 
             mean_RE_lived = mean(RE_lived))
 
