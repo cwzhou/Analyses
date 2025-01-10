@@ -16,7 +16,7 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-01-20"
+date_folder = "2025-02-01"
 n.eval = 1000
 n.sim = 500
 sim_data_type = "RE"
