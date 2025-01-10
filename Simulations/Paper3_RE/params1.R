@@ -15,12 +15,12 @@ source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
 date_folder = "2025-01-09"
-n.eval = 5000
+n.eval = 500
 n.sim = 500
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
-ntree1 = 300
+ntree1 = 100
 ##### Gap Time Hyperparameters #####
 G = 10 #5 # total gap times
 # now defined in F01.DynamicsRE.R
@@ -250,7 +250,7 @@ propensity <-   # (int), covariate (1~5)
        rct  = list(beta.propensity = function(p) c(rep(0, p))))  # RCT
 
 # arg6 size
-size <- list(small.sample.size = list(n = 500),
+size <- list(small.sample.size = list(n = 300),
              large.sample.size = list(n = 1000))
 
 # arg7 and 8 crit
