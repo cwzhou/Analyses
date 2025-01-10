@@ -1,16 +1,9 @@
 setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
-### DATA TYPE ###
-local = 1
-if (local == 1){
-  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
-} else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper3_RE")
-}
 # Libraries --------------------------------------------------------------
 source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
-
+local = 1
 savingrds = FALSE
 date_folder = "2025-02-01"
 n.eval = 1000
@@ -29,7 +22,7 @@ G = 10 #5 # total gap times
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "zom", "obs");
-skip_method <- c(TRUE, !TRUE, !TRUE);
+skip_method <- c(!TRUE, TRUE, TRUE);
 n.methods <- length(all_methods)
 # Loop to create logical SKIP objects for each method and assign skip_method
 assign_skip_function(all_methods, skip_method)
@@ -410,7 +403,6 @@ if (endpoint == "CR"){
 cv.nodesize = FALSE
 message("End of Simulation_Parameters_RE.R")
 
-source("02.Simulation_Parameters_RE.R")
 start_time = Sys.time()
 
 # Generate column names based on methods for result
@@ -1028,7 +1020,8 @@ mff_allsims %>%
 
 mff_allsims %>% 
   group_by(method, Trt) %>% 
-  summarise(per_trt = round(n()/(n.eval*n.sim)*100,2), 
+  summarise(per_trt = round(n()/(n.eval)*100,2), 
+            #per_trt = round(n()/(n.eval*n.sim)*100,2), 
             mean_surv = mean(survival), 
             mean_RE = mean(Number_RE), 
             # mean_RE_yr = mean(Number_RE/survival),
