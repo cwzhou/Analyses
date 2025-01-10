@@ -348,7 +348,7 @@ if (local == 0){
                           generate_failure_method,
                           date_folder)
   } else if (endpoint == "RE"){
-    dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_3/output/%s",
+    dir_rds_tmp = sprintf("/work/users/c/w/cwzhou/Proj3RE/output/%s",
                           date_folder)
   } else{
     message("endpoint DNE")
