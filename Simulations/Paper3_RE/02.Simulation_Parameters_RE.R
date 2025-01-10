@@ -22,7 +22,7 @@ n.sim = 500
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
-ntree1 = 300
+ntree1 = 200
 ##### Gap Time Hyperparameters #####
 G = 10 #5 # total gap times
 # now defined in F01.DynamicsRE.R
@@ -144,7 +144,7 @@ if (endpoint == "RE"){
   #     betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
   #   )
   # )
-  
+
   betasR <- list(
     betaR1 = list(
       betaR.hazard0 = c(log(7.4), log(2.8), log(5.3), log(4.4), log(3.2)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
