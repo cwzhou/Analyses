@@ -243,7 +243,8 @@ Dynamics <-
                                        rate = rateD, # needed for if alpha1[i] is 0
                                        alpha=alpha1,y_type=1,y=gaptime1,u=u2)$tt_fail)
     # print(sprintf("failure time: %s", head(tt_fail)))
-    tt_fail_min_vec <<- pmax(tt_fail, 0.1)
+    # tt_fail_min_vec <<- pmax(tt_fail, 0.1)
+    tt_fail_min_vec <- tt_fail
 
     # Generate G conditional gaptime values for each subject
     if (G>1){

@@ -85,7 +85,9 @@ gdata_RE <- function(N=10,
   
   # generating censoring time
   if (ctype == 0){cc <- rexp(N,cparam)}
-  if (ctype == 1){cc <- runif(N,min=0,max=tau0)}
+  if (ctype == 1){
+    if (is.null(censor_max)){censor_max = tau0}
+    cc <- runif(N,min=0,max=censor_max)}
   if (ctype == 99){
     print("!!!!! no censoring. !!!!!")
     cc = rep(10^250, N) #arbitrary large number so never censored via cc = censor time (could still be censored by tau0 though so fix in future)

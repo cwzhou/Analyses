@@ -4,7 +4,8 @@
 # Date: 07.02.2023
 
 setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
-source("02.Simulation_Parameters_RE.R")
+# source("02.Simulation_Parameters_RE.R")
+source("params1.R")
 start_time = Sys.time()
 
 # Generate column names based on methods for result
@@ -61,10 +62,10 @@ endpoint_val.fn <- function(data, idName, epName, txName) {
         Trt = mean(!!sym(txName))
       ) %>% as.data.frame()
     print(head(mff_tau_df))
-
+    
     # Calculate the mean across people
     mean_value <- mean(mff_tau_df$Number_RE, na.rm = TRUE)
-
+    
     # Return both the dataset and the mean value
     return(list(mff_tau_df = mff_tau_df, mean_value = mean_value))
   }
@@ -135,26 +136,26 @@ all_sims_data.mff <- list()
 # Define the function that runs a single simulation
 # run_simulation <- function(sim){
 
-  # Create the data frame with the 'sim' column
-  # result <- data.frame(sim.no = sim)
-  result <- data.frame(sim = 1:n.sim)
-  # Add columns to the result data frame
-  result[sorted_column_names] <- NA
-  attr(result, "criterion_phase1") <- list(criterion = criterion_phase1) #, crit.value = crit.value_phase1)
-  attr(result, "criterion_phase2") <- list(criterion = criterion_phase2) #, crit.value = crit.value_phase2)
+# Create the data frame with the 'sim' column
+# result <- data.frame(sim.no = sim)
+result <- data.frame(sim = 1:n.sim)
+# Add columns to the result data frame
+result[sorted_column_names] <- NA
+attr(result, "criterion_phase1") <- list(criterion = criterion_phase1) #, crit.value = crit.value_phase1)
+attr(result, "criterion_phase2") <- list(criterion = criterion_phase2) #, crit.value = crit.value_phase2)
 
-  # flow: obs (1) -> optimal (n.mc), obs.no.censor (n.mc)
-  print(Sys.time())
+# flow: obs (1) -> optimal (n.mc), obs.no.censor (n.mc)
+print(Sys.time())
 
-  ######################################################################
-  ######################################################################
-  ######################################################################
-  ######################################################################
-  ######################################################################
-  ### simulation
-  for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
+######################################################################
+######################################################################
+######################################################################
+######################################################################
+######################################################################
+### simulation
+for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
   # message("starting run_simulation for sim#", sim)
-
+  
   cat("\n\n##################################################################\n")
   cat("##################################################################\n")
   cat("################## Simulation ",sim, "##################\n")
@@ -163,7 +164,7 @@ all_sims_data.mff <- list()
   cat("##################################################################\n")
   train_seed = sim*10000 + init_seed*3
   test_seed = train_seed + 30306
-
+  
   set.seed(init_seed*sim+505)
   u1_train = runif(n)
   u1_test = runif(n.eval)
@@ -177,69 +178,69 @@ all_sims_data.mff <- list()
   arg.obs.train$u1 = u1_train
   arg.obs.train$u2 = u2_train
   arg.obs.train$u3 = u3_train
-
+  
   # arg.obs.train$zseed = round(arg.obs.train$zseed*sim)
   # arg.czmk.test$zseed = round(test_seed*sim+1)
   # arg.zom.test$zseed = round(test_seed*sim+2)
   # arg.obs.no.censor$zseed = round(test_seed*sim+3)
-
+  
   cat ("%%% Training Data for", sim_data_type, "Simulation:",sim,"%%%\n")
   tt(1)
-
+  
   # if (sim_data_type == "RE"){
-    message("Recurrent Events Survival Data Simulation")
-    message("using train_seed (", train_seed, ") to generate training data")
-    set.seed(train_seed)
-    sim.train = do.call(gdata_RE, arg.obs.train)
-    obs.times_train <<- times_act
-    ph1_obs_train <<-pred.hazard1
-    gap1_obs_train <<- gaptime1
-    tt_obs_train <<- tt_fail
-    df_recurr = sim.train$dataset_recurrent; #View(df_recurr)
-    df_surv = sim.train$dataset_survival; head(df_surv)
-    name = sprintf("%s_%s",sim.train$name, sim_data_type); #print(name)
-    # update this to include name_surv
-    assign(name, df_recurr)
-    assign(sprintf("df_sim%s", sim), df_surv)
-    # head_recurr = head(df_recurr); head_recurr
-    # kable(head_recurr, format = "latex", caption = "Recurrent Events Dataset Example")
-
-    # Calculate the number of censored observations
-    n_censored <- sum(df_surv$indD == 0)  # Count of censored observations
-    # Calculate the total number of observations
-    n_total <- nrow(df_surv)  # Total number of rows in the dataset
-    # Calculate the percentage of censored data
-    training_censored <- n_censored / n_total
-    cat("Percentage of censored data:", training_censored*100, "%\n")
-    result[sim, "train_cens"] = round(training_censored,3)
-
-    # Output --------------------------------------------------------------------
-    if (savingrds == TRUE){
-      folder_path <- sprintf("./2_pipeline/%s", date_folder)
-      # Create the folder if it doesn't exist
-      if (!dir.exists(folder_path)) {
-        dir.create(folder_path, recursive = TRUE)
-      }
-      write_csv(df_recurr, file = sprintf("%s/01_recurr_%s.csv", folder_path, name))
-      write_csv(df_surv, file = sprintf("%s/01_surv_%s.csv", folder_path, name))
+  message("Recurrent Events Survival Data Simulation")
+  message("using train_seed (", train_seed, ") to generate training data")
+  set.seed(train_seed)
+  sim.train = do.call(gdata_RE, arg.obs.train)
+  obs.times_train <<- times_act
+  ph1_obs_train <<-pred.hazard1
+  gap1_obs_train <<- gaptime1
+  tt_obs_train <<- tt_fail
+  df_recurr = sim.train$dataset_recurrent; #View(df_recurr)
+  df_surv = sim.train$dataset_survival; head(df_surv)
+  name = sprintf("%s_%s",sim.train$name, sim_data_type); #print(name)
+  # update this to include name_surv
+  assign(name, df_recurr)
+  assign(sprintf("df_sim%s", sim), df_surv)
+  # head_recurr = head(df_recurr); head_recurr
+  # kable(head_recurr, format = "latex", caption = "Recurrent Events Dataset Example")
+  
+  # Calculate the number of censored observations
+  n_censored <- sum(df_surv$indD == 0)  # Count of censored observations
+  # Calculate the total number of observations
+  n_total <- nrow(df_surv)  # Total number of rows in the dataset
+  # Calculate the percentage of censored data
+  training_censored <- n_censored / n_total
+  cat("Percentage of censored data:", training_censored*100, "%\n")
+  result[sim, "train_cens"] = round(training_censored,3)
+  
+  # Output --------------------------------------------------------------------
+  if (savingrds == TRUE){
+    folder_path <- sprintf("./2_pipeline/%s", date_folder)
+    # Create the folder if it doesn't exist
+    if (!dir.exists(folder_path)) {
+      dir.create(folder_path, recursive = TRUE)
     }
-    # }
-
+    write_csv(df_recurr, file = sprintf("%s/01_recurr_%s.csv", folder_path, name))
+    write_csv(df_surv, file = sprintf("%s/01_surv_%s.csv", folder_path, name))
+  }
+  # }
+  
   data_to_use = df_recurr
   tau = max(data_to_use$R_closed)
-
+  
   timePointsSurvival = data_to_use %>%
     filter(IndD == 1) %>%
     dplyr::select(R_closed) %>%
     distinct() %>%
     unlist(use.names = F); length(timePointsSurvival)
-
+  
   timePointsEndpoint = data_to_use %>%
     filter(IndR == 1) %>%
     dplyr::select(R_closed) %>%
     distinct() %>%
     unlist(use.names = F); length(timePointsEndpoint)
-
+  
   model1 = paste0("Surv(R_closed, IndD) ~ ",
                   paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>%
     as.formula()
@@ -247,19 +248,19 @@ all_sims_data.mff <- list()
                   paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>%
     as.formula()
   models_RE = list(model1, model2)
-
+  
   a0 = data_to_use %>% filter(Trt == 0); #dim(a0)
   a0_ids = a0 %>% pull(ID) %>% unique(); #length(a0_ids)
   a1 = data_to_use %>% filter(Trt == 1); #dim(a1)
   a1_ids = a1 %>% pull(ID) %>% unique(); #length(a1_ids)
-
+  
   mff_to_remove <- c("zom.mff.df", "obs.mff.df", "czmk.mff.df")
   for (obj in mff_to_remove) {
     if (exists(obj, envir = .GlobalEnv)) {
       rm(list = obj, envir = .GlobalEnv)
     }
   }
-
+  
   # # # obs policy value (testing)
   message("using test_seed to generate obs testing data")
   set.seed(test_seed)
@@ -282,7 +283,7 @@ all_sims_data.mff <- list()
     assign(sprintf("obs_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
   }
   assign(sprintf("rep_obs_sim%s", sim), obs.data.rep, envir = .GlobalEnv)
-
+  
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
   # result["obs_survival"] = survival_val.fn(obs.test.df_surv)
@@ -294,8 +295,8 @@ all_sims_data.mff <- list()
   # result["obs_endpoint"] = obs.mff.result$mean_value
   result[sim, "obs_endpoint"] = obs.mff.result$mean_value
   # View(obs.mff.df); View(result)
-
-    # test.name = sprintf("Test.%s_%s",test.sim$name, sim_data_type); print(name)
+  
+  # test.name = sprintf("Test.%s_%s",test.sim$name, sim_data_type); print(name)
   # # update this to include name_surv
   # assign(test.name, test.df_recurr)
   # # test.head_recurr = head(test.df_recurr); test.head_recurr
@@ -314,7 +315,7 @@ all_sims_data.mff <- list()
   # result["time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"]
   result[sim, "time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"]
   rm(obs.data.rep); gc()
-
+  
   # czmk
   cat("\n******************************\n")
   # estimation
@@ -348,7 +349,7 @@ all_sims_data.mff <- list()
     # if (!czmk.error) result["czmk_n_phase2"] <- mean(arg.czmk.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) #result[sim, "czmk_n_phase2"]
     if (!czmk.error) result[sim,"czmk_n_phase2"] <- mean(arg.czmk.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0)
     rm(optimal.czmk); gc()
-
+    
     cat ("  \n 1. czmk - Evaluation for RE Simulation",sim,"\n")
     if (!czmk.error) {
       set.seed(test_seed)
@@ -361,7 +362,7 @@ all_sims_data.mff <- list()
       # gap1_czmk_test <<- gaptime1
       # tt_czmk_test <<- tt
       # rep_czmk <<- czmk.data.rep
-
+      
       # Define your variables in a list for cleaner handling
       variables_to_assign <- list(
         times_test = times_act,
@@ -379,7 +380,7 @@ all_sims_data.mff <- list()
         assign(sprintf("czmk_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
       }
       assign(sprintf("rep_czmk_sim%s", sim), czmk.data.rep, envir = .GlobalEnv)
-
+      
       # result["czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       result[sim,"czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       # czmk.test.df_recurr %>% group_by(ID) %>% summarize(Number_RE = sum(IndR), Trt = mean(Trt))
@@ -396,7 +397,7 @@ all_sims_data.mff <- list()
     arg.czmk.test$policy <- NULL; gc()
     rm(czmk.data.rep); gc()
   } # if skip.czmk
-
+  
   cat("\n******************************\n")
   # estimation
   cat ("2. Estimation - zero-order model for RE Simulation",sim,"\n")
@@ -461,8 +462,8 @@ all_sims_data.mff <- list()
     result[sim, "time.zom"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
     arg.zom.test$policy <- NULL; gc()
     rm(zom.data.rep); gc()
-    } # if !skip.zom
-
+  } # if !skip.zom
+  
   # Initialize an empty list to collect datasets
   mff.dataset_list <- list()
   # Check if each dataset exists and add it to the list
@@ -487,7 +488,7 @@ all_sims_data.mff <- list()
               mean_RE_lived = mean(RE_lived)) %>%
     print()
   message("Simulation #", sim)
-
+  
   ### saving and cleaning
   if (savingrds == TRUE){
     message('saving rds tmp')
@@ -506,9 +507,9 @@ all_sims_data.mff <- list()
   print(result[sim,])
   View(result)
   cat("---------------------------------------------------\n")
-  } # for (sim in 1:n.sim) but removed for parallelizing
-  # return(result) # this is for parallel
-  # } # this is for run_simulation for parallel
+} # for (sim in 1:n.sim) but removed for parallelizing
+# return(result) # this is for parallel
+# } # this is for run_simulation for parallel
 
 # Combine all simulations into one big dataset for MFF
 mff_allsims <- do.call(rbind, all_sims_data.mff)
@@ -609,31 +610,24 @@ mff_allsims %>%
 
 mff_allsims %>% 
   group_by(simulation,method, Trt) %>% 
-  summarise(per_trt = round(n()/(n.eval)*100,2), 
+  summarise(per_trt = n()/(n.eval), 
             mean_surv = mean(survival), 
             mean_RE = mean(Number_RE), 
-            # mean_RE_yr = mean(Number_RE/survival),
+            mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
 mff_allsims %>% 
   group_by(method, Trt) %>% 
-  summarise(per_trt = round(n()/(n.eval*n.sim)*100,2), 
+  summarise(per_trt = n()/(n.eval*n.sim), 
             mean_surv = mean(survival), 
             mean_RE = mean(Number_RE), 
-            # mean_RE_yr = mean(Number_RE/survival),
-            mean_RE_lived = mean(RE_lived))
-
-mff_allsims %>% 
-  group_by(simulation, method) %>% 
-  summarise(per_trt1 = mean(Trt)*100,
-            mean_RE = mean(Number_RE), 
-            mean_surv = mean(survival), 
-            # mean_RE_yr = mean(Number_RE/survival),
+            mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
 mff_allsims %>% 
   group_by(method) %>% 
-  summarise(mean_surv = mean(survival), 
+  summarise(per_trt = n()/(n.eval*n.sim), 
+            mean_surv = mean(survival), 
             mean_RE = mean(Number_RE), 
             mean_RE_lived = mean(RE_lived))
 

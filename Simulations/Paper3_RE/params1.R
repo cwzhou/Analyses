@@ -14,8 +14,8 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-01-10"
-n.eval = 1000
+date_folder = "2025-01-09"
+n.eval = 5000
 n.sim = 500
 sim_data_type = "RE"
 endpoint = sim_data_type
@@ -30,7 +30,7 @@ G = 10 #5 # total gap times
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "zom", "obs");
-skip_method <- c(!TRUE, !TRUE, !TRUE);
+skip_method <- !c(TRUE, TRUE, TRUE);
 n.methods <- length(all_methods)
 # Loop to create logical SKIP objects for each method and assign skip_method
 assign_skip_function(all_methods, skip_method)
@@ -95,14 +95,14 @@ censor <- list(low.censoring = list(
   censor_min = 0,
   censor_max = tau0/3, # higher is less censoring for unif
   censor_rate = 0  # not used for unif
-  ),
-  high.censoring = list(
+),
+high.censoring = list(
   # we want about 50% censoring
   ctype = 1, # uniform censoring
   censor_min = 0,
   censor_max = 0.7*tau0, # lower is more censoring for unif
   censor_rate = 0 # not used for unif
-  ))
+))
 
 
 # arg3-10 betas, gammas, omegas, lambda0s
@@ -113,14 +113,14 @@ if (endpoint == "RE"){
     betaD1 = list(
       betaD.hazard0 = c(log(2.2), log(1.2), log(1.7), log(2.5), log(1.7)),
       betaD.hazard1 = c(log(1.4), log(2.7), log(1.5), log(1.9), log(1.1))  # Covariate effects for Treatment 0 (5 parameters)
-        # Covariate effects for Treatment 1 (5 parameters)
+      # Covariate effects for Treatment 1 (5 parameters)
     ),
     betaD2 = list(
       betaD.hazard0 = c(log(1.5), log(1.2), log(0.7), log(1.0), log(1.3), log(1.5), log(1.0), log(1.6), log(1.3), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
       betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-    # betasD <- list(
+  # betasD <- list(
   #   betaD1 = list(
   #     betaD.hazard0 = c(log(1.3), log(0.9), log(1.3), log(1.2), log(1.8)),  # Covariate effects for Treatment 0 (5 parameters)
   #     betaD.hazard1 = c(log(2.1), log(0.2), log(1.1), log(0.95), log(1.15))  # Covariate effects for Treatment 1 (5 parameters)
@@ -130,7 +130,7 @@ if (endpoint == "RE"){
   #     betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
   #   )
   # )
-
+  
   # Covariate effects for recurrence
   # betasR <- list(
   #   betaR1 = list(
@@ -153,7 +153,7 @@ if (endpoint == "RE"){
       betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-
+  
   # Interaction between treatment and covariates for survival
   # gammaD: Represents the interaction effect between treatment and covariates on the survival hazard.
   gammaD <- list(
@@ -170,7 +170,7 @@ if (endpoint == "RE"){
       gammaD.hazard1 = c(log(0.8), log(1.0), log(1.3), log(1.1), log(1.0), log(1.2), log(1.3), log(1.5), log(1.4), log(1.0))   # Interaction effects for Treatment 1 (10 parameters)
     )
   )
-
+  
   # Interaction between treatment and covariates for recurrence
   # gammaR: Represents the interaction effect between treatment and covariates on the recurrence hazard.
   gammaR <- list(
@@ -183,7 +183,7 @@ if (endpoint == "RE"){
       gammaR.hazard1 = c(log(1.0), log(1.1), log(1.4), log(1.2), log(1.3), log(1.2), log(1.5), log(1.6), log(1.3), log(1.4))   # Interaction for Treatment 1 recurrence (10 parameters)
     )
   )
-
+  
   # Parameters for interaction: disease for treatment
   # omegaD: Represents the direct treatment effect on the survival hazard, independent of covariates.
   omegaD <- list(
@@ -196,7 +196,7 @@ if (endpoint == "RE"){
       omegaD.hazard1 = log(3)   # Treatment 1 survival effect
     )
   )
-
+  
   # Parameters for treatment+covariate interaction
   # Parameters for recurrence hazard (treatment effects)
   # omegaR: Represents the direct treatment effect on the recurrence hazard, independent of covariates.
@@ -210,7 +210,7 @@ if (endpoint == "RE"){
       omegaR.hazard1 = log(3)   # Treatment 1 recurrence effect
     )
   )
-
+  
   # Baseline hazards for survival (disease-related, same for both lists)
   lambda0D <- list(
     lambda0D1 = list(
@@ -222,7 +222,7 @@ if (endpoint == "RE"){
       lambda0D.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-
+  
   # Baseline hazards for recurrence (same for both lists)
   lambda0R <- list(
     lambda0R1 = list(
@@ -234,7 +234,7 @@ if (endpoint == "RE"){
       lambda0R.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-
+  
   ncovD.list <- lapply(betasD, function(x) length(x$betaD.hazard1) )
   ncovR.list <- lapply(betasR, function(x) length(x$betaR.hazard1) )
   if (ncovD.list$betaD1 == ncovR.list$betaR1){
@@ -250,7 +250,7 @@ propensity <-   # (int), covariate (1~5)
        rct  = list(beta.propensity = function(p) c(rep(0, p))))  # RCT
 
 # arg6 size
-size <- list(small.sample.size = list(n = 300),
+size <- list(small.sample.size = list(n = 500),
              large.sample.size = list(n = 1000))
 
 # arg7 and 8 crit
@@ -270,7 +270,7 @@ if (endpoint == "RE"){
   )
   crit_endpoint <- list(crit1 = crit3#,
                         # crit2 = crit4
-                        )
+  )
 }
 
 setting = c(all_methods = all_methods,
@@ -295,7 +295,7 @@ setting = c(all_methods = all_methods,
             size[[arg12]],
             crit_surv[[arg13]],
             crit_endpoint[[arg14]]
-            )
+)
 
 ### 2. put a selected setting into the global environment
 cat("setting (endpoint, censor, beta_D, beta_R,
@@ -375,7 +375,7 @@ if (endpoint == "CR"){
   } else{
     stop("we dont have this generate_failure_method coded yet.")
   }
-
+  
 } else if (endpoint == "RE"){
   filename = paste0(dir_rds, "/simResult_RE",
                     "_censor", arg2, "_prop", arg11,
@@ -385,7 +385,7 @@ if (endpoint == "CR"){
                     "_omegaD.", arg7,
                     "_lambda0D.", arg9,
                     ".rds")
-
+  
   # arg1 <- as.numeric(arg[1]) # 1..3 # 1=CR,2=RE,3=MC
   # arg2 <- as.numeric(arg[2]) # 1,2 #censoring = 20%, censoring = 50%
   # arg3 <- as.numeric(arg[3]) # 1..4 4 possible beta_D combinations
@@ -401,8 +401,8 @@ if (endpoint == "CR"){
   # arg13 <- as.numeric(arg[13]) # 1..3 3 possible crit for surv (mean, mean.prob.combo, prob)
   # arg14 <- as.numeric(arg[14]) # 1..3 3 possible crit for ep (mean, mean.prob.combo, prob)
   # arg.date <- if (is.na(arg[num.args+1]) | arg[num.args+1] == "") date_folder else as.character(arg[num.args+1])
-
-
+  
+  
 } else{
   message("endpoint DNE")
 }
