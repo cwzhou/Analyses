@@ -342,12 +342,42 @@ train_eval_result_list = train_eval_result_list_tmp = list()
 nm = paste0(criterion_phase1[1],
             crit_tmp, "_rule1",
             rule1, "_rule2", rule2, "_tau", tau)
-fnm = paste0("./output/", endpoint, "/",dataset_name,"/", Sys.Date(), "/") # folder name
-if (!dir.exists(sprintf("./output/%s", endpoint))) dir.create(sprintf("./output/%s", endpoint))
-if (!dir.exists(sprintf("./output/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./output/%s/%s", endpoint, dataset_name))
-if (!dir.exists(sprintf("./figure/%s", endpoint))) dir.create(sprintf("./figure/%s", endpoint))
-if (!dir.exists(sprintf("./figure/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./figure/%s/%s", endpoint, dataset_name))
-if (!dir.exists(fnm)) dir.create(fnm)
+# if (local == 1){
+#   fnm = paste0("./output/", endpoint, "/",dataset_name,"/", Sys.Date(), "/") # folder name
+# } else{
+#   fnm = paste0("/work/users/c/w/cwzhou/Proj3RE/output/", endpoint, "/",dataset_name,"/", Sys.Date(), "/")
+# }
+# if (!dir.exists(sprintf("./output/%s", endpoint))) dir.create(sprintf("./output/%s", endpoint))
+# if (!dir.exists(sprintf("./output/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./output/%s/%s", endpoint, dataset_name))
+# if (!dir.exists(sprintf("./figure/%s", endpoint))) dir.create(sprintf("./figure/%s", endpoint))
+# if (!dir.exists(sprintf("./figure/%s/%s", endpoint, dataset_name))) dir.create(sprintf("./figure/%s/%s", endpoint, dataset_name))
+# if (!dir.exists(fnm)) dir.create(fnm)
+if (local == 1) {
+  base_dir <- "./output/"
+  figure_dir <- "./figure/"
+  fnm <- paste0(base_dir, endpoint, "/", dataset_name, "/", Sys.Date(), "/") # folder name
+} else {
+  base_dir <- "/work/users/c/w/cwzhou/Proj3RE/output/"
+  figure_dir <- "/work/users/c/w/cwzhou/Proj3RE/figure/"
+  fnm <- paste0(base_dir, endpoint, "/", dataset_name, "/", Sys.Date(), "/") # folder name
+}
+
+# Create necessary directories
+if (!dir.exists(file.path(base_dir, endpoint))) {
+  dir.create(file.path(base_dir, endpoint), recursive = TRUE)
+}
+if (!dir.exists(file.path(base_dir, endpoint, dataset_name))) {
+  dir.create(file.path(base_dir, endpoint, dataset_name), recursive = TRUE)
+}
+if (!dir.exists(file.path(figure_dir, endpoint))) {
+  dir.create(file.path(figure_dir, endpoint), recursive = TRUE)
+}
+if (!dir.exists(file.path(figure_dir, endpoint, dataset_name))) {
+  dir.create(file.path(figure_dir, endpoint, dataset_name), recursive = TRUE)
+}
+if (!dir.exists(fnm)) {
+  dir.create(fnm, recursive = TRUE)
+}
 rds = paste0("_", Sys.Date(), ".rds")
 
 tab = data.frame(s1 = rep(NA, K),
@@ -711,7 +741,7 @@ for (cv in 1:K) {
   print(values[cv, ])
   message("Printing mean across cv iterations")
   print(apply(values, 2, mean, na.rm = TRUE)) # across columns (over all cv iterations)
-  View(values)
+  # View(values)
   ############################################################################################################
   #### C. saving the results #################################################################################
   ############################################################################################################
