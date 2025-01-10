@@ -18,7 +18,7 @@ source("02.Simulation_Functions_RE.R")
 savingrds = TRUE
 date_folder = "2025-01-20"
 n.eval = 1000
-n.sim = 3 #500
+n.sim = 500
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
@@ -148,7 +148,7 @@ if (endpoint == "RE"){
   betasR <- list(
     betaR1 = list(
       betaR.hazard0 = c(log(7.4), log(2.8), log(5.3), log(4.4), log(3.2)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
-      betaR.hazard1 = c(log(3.8), log(20.5), log(12.1), log(15.7), log(10)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
+      betaR.hazard1 = c(log(3.8), log(20.5), log(12.1), log(15.7), log(16)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
     ),
     betaR2 = list(
       betaR.hazard0 = c(log(1.5), log(1.8), log(1.3), log(1.4), log(1.2), log(1.0), log(1.4), log(1.6), log(1.1), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
