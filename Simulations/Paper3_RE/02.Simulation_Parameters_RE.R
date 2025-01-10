@@ -7,8 +7,6 @@
 local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
-} else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper3_RE")
 }
 # Libraries --------------------------------------------------------------
 source("02.Simulation_Libraries_RE.R")
@@ -16,9 +14,9 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-01-10"
+date_folder = "2025-01-20"
 n.eval = 1000
-n.sim = 500
+n.sim = 3 #500
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
@@ -144,7 +142,7 @@ if (endpoint == "RE"){
   #     betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
   #   )
   # )
-
+  
   betasR <- list(
     betaR1 = list(
       betaR.hazard0 = c(log(7.4), log(2.8), log(5.3), log(4.4), log(3.2)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
@@ -335,25 +333,21 @@ if (endpoint == "RE"){
     )
   }
 }
-if (local == 1) {
-  if (!dir.exists("output")) dir.create("output")
-  if (!dir.exists("figure")) dir.create("figure")
-  dir_rds = sprintf("./output/%s", date_folder)
-  dir_fig = dir_rds %>% gsub("output/", "figure/", .)
-} else {
-  dir_rds <- "/work/users/c/w/cwzhou/Proj3RE/output/"
-  dir_fig <- dir_rds %>% gsub("output/", "figure/", .)
-}
-print(dir_rds)
-print(dir_fig)
 
+if (!dir.exists("output")) dir.create("output")
+if (!dir.exists("figure")) dir.create("figure")
+dir_rds = sprintf("./output/%s", date_folder)
+dir_fig = dir_rds %>% gsub("output/", "figure/", .)
+# print(dir_rds)
+# print(dir_fig)
 if (local == 0){
   if (endpoint == "CR"){
     dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_1/output/%s/%s",
                           generate_failure_method,
                           date_folder)
   } else if (endpoint == "RE"){
-    dir_rds_tmp = sprintf("%s/%s", dir_rds, date_folder)
+    dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_3/output/%s",
+                          date_folder)
   } else{
     message("endpoint DNE")
   }
