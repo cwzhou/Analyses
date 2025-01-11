@@ -12,7 +12,7 @@ n.sim = 1000
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
-ntree1 = 150
+ntree1 = 300
 ##### Gap Time Hyperparameters #####
 G = 10 #5 # total gap times
 # now defined in F01.DynamicsRE.R
@@ -22,7 +22,7 @@ G = 10 #5 # total gap times
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "zom", "obs");
-skip_method <- c(!TRUE, TRUE, TRUE);
+skip_method <- c(!TRUE, !TRUE, !TRUE);
 n.methods <- length(all_methods)
 # Loop to create logical SKIP objects for each method and assign skip_method
 assign_skip_function(all_methods, skip_method)
@@ -643,6 +643,9 @@ print(Sys.time())
     distinct() %>%
     unlist(use.names = F); length(timePointsEndpoint)
   
+
+  # tau0 = max(timePointsSurvival)
+
   model1 = paste0("Surv(R_closed, IndD) ~ ",
                   paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>%
     as.formula()
