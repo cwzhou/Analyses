@@ -1,3 +1,5 @@
+# sbatch -p general -N 1 --mem=100GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_20250111_500nsims_300ntree.txt"
+
 # Title: Setting hyperparameters for Simulation Scripts
 # Description: [Brief description of the purpose and objectives of the simulation]
 # Author: Christina Zhou
@@ -16,7 +18,7 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-02-02"
+date_folder = "2025-01-11"
 n.eval = 1000
 n.sim = 500
 sim_data_type = "RE"
