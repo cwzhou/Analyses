@@ -16,13 +16,13 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-02-01"
+date_folder = "2025-02-02"
 n.eval = 1000
 n.sim = 500
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
-ntree1 = 150
+ntree1 = 100
 ##### Gap Time Hyperparameters #####
 G = 10 #5 # total gap times
 # now defined in F01.DynamicsRE.R
