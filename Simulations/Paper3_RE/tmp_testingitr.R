@@ -7,7 +7,7 @@ local = 1
 savingrds = FALSE
 date_folder = "2025-02-01"
 n.eval = 1000
-sim = 29
+sim = 10
 n.sim = 1000
 sim_data_type = "RE"
 endpoint = sim_data_type
@@ -122,7 +122,7 @@ if (endpoint == "RE"){
   #     betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
   #   )
   # )
-  
+
   # Covariate effects for recurrence
   # betasR <- list(
   #   betaR1 = list(
@@ -134,7 +134,7 @@ if (endpoint == "RE"){
   #     betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
   #   )
   # )
-  
+
   betasR <- list(
     betaR1 = list(
       betaR.hazard0 = c(log(7.4), log(2.8), log(5.3), log(4.4), log(3.2)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
@@ -145,7 +145,7 @@ if (endpoint == "RE"){
       betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-  
+
   # Interaction between treatment and covariates for survival
   # gammaD: Represents the interaction effect between treatment and covariates on the survival hazard.
   gammaD <- list(
@@ -162,7 +162,7 @@ if (endpoint == "RE"){
       gammaD.hazard1 = c(log(0.8), log(1.0), log(1.3), log(1.1), log(1.0), log(1.2), log(1.3), log(1.5), log(1.4), log(1.0))   # Interaction effects for Treatment 1 (10 parameters)
     )
   )
-  
+
   # Interaction between treatment and covariates for recurrence
   # gammaR: Represents the interaction effect between treatment and covariates on the recurrence hazard.
   gammaR <- list(
@@ -175,7 +175,7 @@ if (endpoint == "RE"){
       gammaR.hazard1 = c(log(1.0), log(1.1), log(1.4), log(1.2), log(1.3), log(1.2), log(1.5), log(1.6), log(1.3), log(1.4))   # Interaction for Treatment 1 recurrence (10 parameters)
     )
   )
-  
+
   # Parameters for interaction: disease for treatment
   # omegaD: Represents the direct treatment effect on the survival hazard, independent of covariates.
   omegaD <- list(
@@ -188,7 +188,7 @@ if (endpoint == "RE"){
       omegaD.hazard1 = log(3)   # Treatment 1 survival effect
     )
   )
-  
+
   # Parameters for treatment+covariate interaction
   # Parameters for recurrence hazard (treatment effects)
   # omegaR: Represents the direct treatment effect on the recurrence hazard, independent of covariates.
@@ -202,7 +202,7 @@ if (endpoint == "RE"){
       omegaR.hazard1 = log(3)   # Treatment 1 recurrence effect
     )
   )
-  
+
   # Baseline hazards for survival (disease-related, same for both lists)
   lambda0D <- list(
     lambda0D1 = list(
@@ -214,7 +214,7 @@ if (endpoint == "RE"){
       lambda0D.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-  
+
   # Baseline hazards for recurrence (same for both lists)
   lambda0R <- list(
     lambda0R1 = list(
@@ -226,7 +226,7 @@ if (endpoint == "RE"){
       lambda0R.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-  
+
   ncovD.list <- lapply(betasD, function(x) length(x$betaD.hazard1) )
   ncovR.list <- lapply(betasR, function(x) length(x$betaR.hazard1) )
   if (ncovD.list$betaD1 == ncovR.list$betaR1){
@@ -384,7 +384,7 @@ if (endpoint == "CR"){
   } else{
     stop("we dont have this generate_failure_method coded yet.")
   }
-  
+
 } else if (endpoint == "RE"){
   filename = paste0(dir_rds, "/simResult_RE",
                     "_censor", arg2, "_prop", arg11,
@@ -394,7 +394,7 @@ if (endpoint == "CR"){
                     "_omegaD.", arg7,
                     "_lambda0D.", arg9,
                     ".rds")
-  
+
 } else{
   message("endpoint DNE")
 }
@@ -459,10 +459,10 @@ endpoint_val.fn <- function(data, idName, epName, txName) {
         Trt = mean(!!sym(txName))
       ) %>% as.data.frame()
     print(head(mff_tau_df))
-    
+
     # Calculate the mean across people
     mean_value <- mean(mff_tau_df$Number_RE, na.rm = TRUE)
-    
+
     # Return both the dataset and the mean value
     return(list(mff_tau_df = mff_tau_df, mean_value = mean_value))
   }
@@ -552,7 +552,7 @@ print(Sys.time())
 ### simulation
 # for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
   # message("starting run_simulation for sim#", sim)
-  
+
   cat("\n\n##################################################################\n")
   cat("##################################################################\n")
   cat("################## Simulation ",sim, "##################\n")
@@ -561,7 +561,7 @@ print(Sys.time())
   cat("##################################################################\n")
   train_seed = sim*10000 + init_seed*3
   test_seed = train_seed + 30306
-  
+
   set.seed(init_seed*sim+505)
   u1_train = runif(n)
   u1_test = runif(n.eval)
@@ -575,15 +575,15 @@ print(Sys.time())
   arg.obs.train$u1 = u1_train
   arg.obs.train$u2 = u2_train
   arg.obs.train$u3 = u3_train
-  
+
   # arg.obs.train$zseed = round(arg.obs.train$zseed*sim)
   # arg.czmk.test$zseed = round(test_seed*sim+1)
   # arg.zom.test$zseed = round(test_seed*sim+2)
   # arg.obs.no.censor$zseed = round(test_seed*sim+3)
-  
+
   cat ("%%% Training Data for", sim_data_type, "Simulation:",sim,"%%%\n")
   tt(1)
-  
+
   # if (sim_data_type == "RE"){
   message("Recurrent Events Survival Data Simulation")
   message("using train_seed (", train_seed, ") to generate training data")
@@ -601,7 +601,7 @@ print(Sys.time())
   assign(sprintf("df_sim%s", sim), df_surv)
   # head_recurr = head(df_recurr); head_recurr
   # kable(head_recurr, format = "latex", caption = "Recurrent Events Dataset Example")
-  
+
   # Calculate the number of censored observations
   n_censored <- sum(df_surv$indD == 0)  # Count of censored observations
   # Calculate the total number of observations
@@ -610,7 +610,7 @@ print(Sys.time())
   training_censored <- n_censored / n_total
   cat("Percentage of censored data:", training_censored*100, "%\n")
   result[sim, "train_cens"] = round(training_censored,3)
-  
+
   # Output --------------------------------------------------------------------
   if (savingrds == TRUE){
     if (local == 1){
@@ -627,22 +627,22 @@ print(Sys.time())
     write_csv(df_surv, file = sprintf("%s/01_surv_%s.csv", folder_path, name))
   }
   # }
-  
+
   data_to_use = df_recurr
   tau = max(data_to_use$R_closed)
-  
+
   timePointsSurvival = data_to_use %>%
     filter(IndD == 1) %>%
     dplyr::select(R_closed) %>%
     distinct() %>%
     unlist(use.names = F); length(timePointsSurvival)
-  
+
   timePointsEndpoint = data_to_use %>%
     filter(IndR == 1) %>%
     dplyr::select(R_closed) %>%
     distinct() %>%
     unlist(use.names = F); length(timePointsEndpoint)
-  
+
 
   # tau0 = max(timePointsSurvival)
 
@@ -653,19 +653,19 @@ print(Sys.time())
                   paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>%
     as.formula()
   models_RE = list(model1, model2)
-  
+
   a0 = data_to_use %>% filter(Trt == 0); #dim(a0)
   a0_ids = a0 %>% pull(ID) %>% unique(); #length(a0_ids)
   a1 = data_to_use %>% filter(Trt == 1); #dim(a1)
   a1_ids = a1 %>% pull(ID) %>% unique(); #length(a1_ids)
-  
+
   mff_to_remove <- c("zom.mff.df", "obs.mff.df", "czmk.mff.df")
   for (obj in mff_to_remove) {
     if (exists(obj, envir = .GlobalEnv)) {
       rm(list = obj, envir = .GlobalEnv)
     }
   }
-  
+
   # # # obs policy value (testing)
   message("using test_seed to generate obs testing data")
   set.seed(test_seed)
@@ -688,7 +688,7 @@ print(Sys.time())
     assign(sprintf("obs_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
   }
   assign(sprintf("rep_obs_sim%s", sim), obs.data.rep, envir = .GlobalEnv)
-  
+
   obs.test.df_recurr = obs.data.rep$dataset_recurrent;
   obs.test.df_surv = obs.data.rep$dataset_survival;
   # result["obs_survival"] = survival_val.fn(obs.test.df_surv)
@@ -700,7 +700,7 @@ print(Sys.time())
   # result["obs_endpoint"] = obs.mff.result$mean_value
   result[sim, "obs_endpoint"] = obs.mff.result$mean_value
   # #View(obs.mff.df); #View(result)
-  
+
   # test.name = sprintf("Test.%s_%s",test.sim$name, sim_data_type); print(name)
   # # update this to include name_surv
   # assign(test.name, test.df_recurr)
@@ -720,7 +720,7 @@ print(Sys.time())
   # result["time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"]
   result[sim, "time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"]
   rm(obs.data.rep); gc()
-  
+
   # czmk
   cat("\n******************************\n")
   # estimation
@@ -754,7 +754,7 @@ print(Sys.time())
     # if (!czmk.error) result["czmk_n_phase2"] <- mean(arg.czmk.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) #result[sim, "czmk_n_phase2"]
     if (!czmk.error) result[sim,"czmk_n_phase2"] <- mean(arg.czmk.test$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0)
     rm(optimal.czmk); gc()
-    
+
     cat ("  \n 1. czmk - Evaluation for RE Simulation",sim,"\n")
     if (!czmk.error) {
       set.seed(test_seed)
@@ -767,7 +767,7 @@ print(Sys.time())
       # gap1_czmk_test <<- gaptime1
       # tt_czmk_test <<- tt
       # rep_czmk <<- czmk.data.rep
-      
+
       # Define your variables in a list for cleaner handling
       variables_to_assign <- list(
         times_test = times_act,
@@ -785,7 +785,7 @@ print(Sys.time())
         assign(sprintf("czmk_sim%s_%s", sim, name), variables_to_assign[[name]], envir = .GlobalEnv)
       }
       assign(sprintf("rep_czmk_sim%s", sim), czmk.data.rep, envir = .GlobalEnv)
-      
+
       # result["czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       result[sim,"czmk_survival"] = survival_val.fn(czmk.test.df_surv)
       # czmk.test.df_recurr %>% group_by(ID) %>% summarize(Number_RE = sum(IndR), Trt = mean(Trt))
@@ -802,7 +802,7 @@ print(Sys.time())
     arg.czmk.test$policy <- NULL; gc()
     rm(czmk.data.rep); gc()
   } # if skip.czmk
-  
+
   cat("\n******************************\n")
   # estimation
   cat ("2. Estimation - zero-order model for RE Simulation",sim,"\n")
@@ -868,7 +868,7 @@ print(Sys.time())
     arg.zom.test$policy <- NULL; gc()
     rm(zom.data.rep); gc()
   } # if !skip.zom
-  
+
   # Initialize an empty list to collect datasets
   mff.dataset_list <- list()
   # Check if each dataset exists and add it to the list
@@ -878,22 +878,22 @@ print(Sys.time())
   # Stack the datasets
   mff.stacked_data0 <- do.call(rbind, mff.dataset_list)
   row.names(mff.stacked_data0) <- NULL
-  mff.stacked_data = mff.stacked_data0 %>% 
+  mff.stacked_data = mff.stacked_data0 %>%
     mutate(simulation = sim,
            RE_lived = Number_RE/survival)
   # Append to the list of all simulations' data
   all_sims_data.mff[[sim]] <- mff.stacked_data
-  
+
   message("Simulation #", sim)
   mff.stacked_data %>%
-    group_by(method, Trt) %>% 
-    summarise(per_trt = round(n()/(n.eval)*100,2), 
-              mean_surv = mean(survival), 
-              mean_RE = mean(Number_RE), 
+    group_by(method, Trt) %>%
+    summarise(per_trt = round(n()/(n.eval)*100,2),
+              mean_surv = mean(survival),
+              mean_RE = mean(Number_RE),
               mean_RE_lived = mean(RE_lived)) %>%
     print()
   message("Simulation #", sim)
-  
+
   ### saving and cleaning
   if (savingrds == TRUE){
     message('saving rds tmp')
@@ -1013,35 +1013,35 @@ mff_allsims %>%
 #     high = "blue"   # Dark color for high values
 #   )
 
-mff_allsims %>% 
-  group_by(simulation,method, Trt) %>% 
-  summarise(per_trt = round(n()/(n.eval)*100,2), 
-            mean_surv = mean(survival), 
-            mean_RE = mean(Number_RE), 
+mff_allsims %>%
+  group_by(simulation,method, Trt) %>%
+  summarise(per_trt = round(n()/(n.eval)*100,2),
+            mean_surv = mean(survival),
+            mean_RE = mean(Number_RE),
             # mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
-mff_allsims %>% 
-  group_by(method, Trt) %>% 
-  summarise(per_trt = round(n()/(n.eval)*100,2), 
-            #per_trt = round(n()/(n.eval*n.sim)*100,2), 
-            mean_surv = mean(survival), 
-            mean_RE = mean(Number_RE), 
+mff_allsims %>%
+  group_by(method, Trt) %>%
+  summarise(per_trt = round(n()/(n.eval)*100,2),
+            #per_trt = round(n()/(n.eval*n.sim)*100,2),
+            mean_surv = mean(survival),
+            mean_RE = mean(Number_RE),
             # mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
-mff_allsims %>% 
-  group_by(simulation, method) %>% 
+mff_allsims %>%
+  group_by(simulation, method) %>%
   summarise(per_trt1 = mean(Trt)*100,
-            mean_RE = mean(Number_RE), 
-            mean_surv = mean(survival), 
+            mean_RE = mean(Number_RE),
+            mean_surv = mean(survival),
             # mean_RE_yr = mean(Number_RE/survival),
             mean_RE_lived = mean(RE_lived))
 
-mff_allsims %>% 
-  group_by(method) %>% 
-  summarise(mean_surv = mean(survival), 
-            mean_RE = mean(Number_RE), 
+mff_allsims %>%
+  group_by(method) %>%
+  summarise(mean_surv = mean(survival),
+            mean_RE = mean(Number_RE),
             mean_RE_lived = mean(RE_lived))
 
 print("end of script")
