@@ -7,7 +7,6 @@ if (local == 1){
 source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
-local = 1
 savingrds = FALSE
 date_folder = "2025-01-11"
 n.eval = 1000
