@@ -1020,5 +1020,19 @@ mff_allsims %>%
             mean_RE = mean(Number_RE),
             mean_RE_lived = mean(RE_lived))
 
+
+mff_allsims %>%
+  group_by(method) %>%
+  summarise(per_trt1 = mean(Trt)*100,
+            mean_surv = mean(survival),
+            mean_RE = mean(Number_RE),
+            mean_RE_lived = mean(RE_lived))
+
+mff_allsims %>%
+  group_by(Trt) %>%
+  summarise(mean_surv = mean(survival),
+            mean_RE = mean(Number_RE),
+            mean_RE_lived = mean(RE_lived))
+
 print("end of script")
 
