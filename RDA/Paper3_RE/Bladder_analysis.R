@@ -5,7 +5,7 @@ library(randomForestSRC);
 library(caret);
 library(itrSurv);library(ggplot2); library(tidyverse);
 library(MASS);
-local = 0
+local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE/")
   source("02.Simulation_Functions_RE.R") # includes F02.ComparatorMethod_Functions.R
@@ -35,8 +35,8 @@ loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "OBS")]
 tol1_param = c(0.05,0) # c(0.03,0)
 t0_crit = 30 #2200 # 6-mo survival
 pooled1 = FALSE # stratified = lower nodesize; pooled = can have larger nodesize
-tau = 50
-K = 2 #300 # number of CV
+tau = 54
+K = 5 # number of CV
 endpoint = "RE" # endpoint
 Tx.nm = "A"
 init_seed = 116
@@ -307,7 +307,7 @@ form.weight <- list(modelPr %>% as.formula)
 traintest_methods <- setdiff(rda_methods, "OBS")
 prop2_values = c(".PropPhase2")
 # train_values = c(".train.terminal", ".train.RE")
-test_values = c(".test.terminal", ".test.RE")
+test_values = c(".terminal", ".RE")
 values_colsnames <- c(
   # unlist(lapply(rda_methods, function(method) paste0(method, train_values))),
   unlist(lapply(rda_methods, function(method) paste0(method, test_values))),
@@ -322,8 +322,8 @@ custom_sort <- function(names) {
   order(
     !grepl("train.terminal", names),
     !grepl("train.RE", names),
-    !grepl("test.terminal", names),
-    !grepl("test.RE", names),
+    !grepl("terminal", names),
+    !grepl("RE", names),
     !grepl("PropPhase2", names),
     !grepl("train_cens", names),
     !grepl("test_cens", names),
@@ -643,14 +643,14 @@ for (cv in 1:K) {
   if (criterion_phase1[1] != criterion_phase2[1]){
     message("WARNING: CRITERION_PHASE1 AND CRITERION_PHASE2 ARE DIFFERENT - MAKE SURE THAT IS WHAT YOU WANT")
   }
-  suffixes = c(".test.terminal", ".test.RE")
+  suffixes = c(".terminal", ".RE")
   for (suffix in 1:length(suffixes)){
     suffix1 = suffixes[suffix]
-    if (suffix1 == ".test.terminal"){
+    if (suffix1 == ".terminal"){
       event_indicator_string = "Status_D"
       criterion = criterion_phase1
       endpoint1 = "survival"
-    } else if (suffix1 == ".test.RE"){
+    } else if (suffix1 == ".RE"){
       event_indicator_string = "Status"
       criterion = criterion_phase2
       endpoint1 = "mff"
