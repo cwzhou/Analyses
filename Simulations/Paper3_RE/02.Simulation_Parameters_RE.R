@@ -1,4 +1,6 @@
-# sbatch -p general -N 1 --mem=100GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_20250111_500nsims_300ntree.txt"
+# sbatch -p general -N 1 --mem=100GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_20250112_500nsims_300ntree.txt"
+# For local: install.packages('~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
+# For cluster: install.packages('/nas/longleaf/home/cwzhou/Dissertation/itrSurv/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
 
 # Title: Setting hyperparameters for Simulation Scripts
 # Description: [Brief description of the purpose and objectives of the simulation]

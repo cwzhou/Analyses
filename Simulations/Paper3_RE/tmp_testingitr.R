@@ -1,5 +1,9 @@
-setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
-# Libraries --------------------------------------------------------------
+local = 0
+if (local == 1){
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper3_RE")
+}# Libraries --------------------------------------------------------------
 source("02.Simulation_Libraries_RE.R")
 # Functions -----------------------------------------------------------------
 source("02.Simulation_Functions_RE.R")
@@ -7,7 +11,7 @@ local = 1
 savingrds = FALSE
 date_folder = "2025-01-11"
 n.eval = 1000
-sim = 605
+sim = 40
 n.sim = 1000
 sim_data_type = "RE"
 endpoint = sim_data_type
@@ -111,7 +115,7 @@ if (endpoint == "RE"){
       betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-  
+
   betasR <- list(
     betaR1 = list(
       betaR.hazard0 = c(log(1.1), log(1), log(1.1), log(0.9), log(1)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
@@ -122,7 +126,7 @@ if (endpoint == "RE"){
       betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-  
+
   # Interaction between treatment and covariates for survival
   # gammaD: Represents the interaction effect between treatment and covariates on the survival hazard.
   gammaD <- list(
@@ -135,7 +139,7 @@ if (endpoint == "RE"){
       gammaD.hazard1 = c(log(0.8), log(1.0), log(1.3), log(1.1), log(1.0), log(1.2), log(1.3), log(1.5), log(1.4), log(1.0))   # Interaction effects for Treatment 1 (10 parameters)
     )
   )
-  
+
   # Interaction between treatment and covariates for recurrence
   # gammaR: Represents the interaction effect between treatment and covariates on the recurrence hazard.
   gammaR <- list(
@@ -148,7 +152,7 @@ if (endpoint == "RE"){
       gammaR.hazard1 = c(log(1.0), log(1.1), log(1.4), log(1.2), log(1.3), log(1.2), log(1.5), log(1.6), log(1.3), log(1.4))   # Interaction for Treatment 1 recurrence (10 parameters)
     )
   )
-  
+
   # Parameters for interaction: disease for treatment
   # omegaD: Represents the direct treatment effect on the survival hazard, independent of covariates.
   omegaD <- list(
@@ -161,7 +165,7 @@ if (endpoint == "RE"){
       omegaD.hazard1 = log(3)   # Treatment 1 survival effect
     )
   )
-  
+
   # Parameters for treatment+covariate interaction
   # Parameters for recurrence hazard (treatment effects)
   # omegaR: Represents the direct treatment effect on the recurrence hazard, independent of covariates.
@@ -175,7 +179,7 @@ if (endpoint == "RE"){
       omegaR.hazard1 = log(3)   # Treatment 1 recurrence effect
     )
   )
-  
+
   # Baseline hazards for survival (disease-related, same for both lists)
   lambda0D <- list(
     lambda0D1 = list(
@@ -187,7 +191,7 @@ if (endpoint == "RE"){
       lambda0D.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-  
+
   # Baseline hazards for recurrence (same for both lists)
   lambda0R <- list(
     lambda0R1 = list(
@@ -199,7 +203,7 @@ if (endpoint == "RE"){
       lambda0R.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-  
+
   ncovD.list <- lapply(betasD, function(x) length(x$betaD.hazard1) )
   ncovR.list <- lapply(betasR, function(x) length(x$betaR.hazard1) )
   if (ncovD.list$betaD1 == ncovR.list$betaR1){
