@@ -1,4 +1,4 @@
-# sbatch -p general -N 1 --mem=100GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_101-200.txt"
+# sbatch -p general -N 1 --mem=80GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_401-500.txt"
 
 # sbatch -p general -N 1 --mem=100GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_20250112_500nsims_300ntree.txt"
 # For local: install.packages('~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
@@ -22,8 +22,8 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-01-13"
-n.sim_start = 101 # 1
+date_folder = "2025-01-16"
+n.sim_start = 401 # 1
 # "2025-01-12" is 1-100 sims;
 # "2025-01-13" is 101-200 sims;
 # "2025-01-14" is 201-300 sims;
@@ -326,15 +326,15 @@ if (endpoint == "RE"){
   }
 }
 if (local == 1) {
-  base_dir <- "./output/"
-  figure_dir <- "./figure/"
+  base_dir <- "./output"
+  figure_dir <- "./figure"
   dir_rds = sprintf("./output/%s", date_folder)
   } else {
-  base_dir <- "/work/users/c/w/cwzhou/Proj3RE/output/"
-  figure_dir <- "/work/users/c/w/cwzhou/Proj3RE/figure/"
+  base_dir <- "/work/users/c/w/cwzhou/Proj3RE/output"
+  figure_dir <- "/work/users/c/w/cwzhou/Proj3RE/figure"
   dir_rds = sprintf("%s/%s", base_dir, date_folder)
   }
-dir_fig = dir_rds %>% gsub("output/", "figure/", .)
+dir_fig = dir_rds %>% gsub("output", "figure", .)
 if (!dir.exists(base_dir)) {
   dir.create(base_dir, recursive = TRUE)
 }
