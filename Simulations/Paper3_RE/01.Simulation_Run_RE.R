@@ -141,7 +141,8 @@ all_sims_data.mff <- list()
 
   # Create the data frame with the 'sim' column
   # result <- data.frame(sim.no = sim)
-  result <- data.frame(sim = 1:n.sim)
+  # result <- data.frame(sim = 1:n.sim)
+  result <- data.frame(sim = n.sim_start:n.sim_end)
   # Add columns to the result data frame
   result[sorted_column_names] <- NA
   attr(result, "criterion_phase1") <- list(criterion = criterion_phase1) #, crit.value = crit.value_phase1)
@@ -156,7 +157,8 @@ all_sims_data.mff <- list()
   ######################################################################
   ######################################################################
   ### simulation
-  for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
+  for (sim in n.sim_start:n.sim_end){
+  # for (sim in 1:n.sim){ # for-loop for sims (if NOT parallelization)
   # message("starting run_simulation for sim#", sim)
 
   cat("\n\n##################################################################\n")
