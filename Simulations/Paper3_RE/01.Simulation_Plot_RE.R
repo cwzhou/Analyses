@@ -3,6 +3,7 @@ library(tidyr)
 library(dplyr)
 library(patchwork)
 
+read_data = 0
 local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
@@ -14,24 +15,47 @@ if (local == 1){
 #   # result = readRDS(sprintf("output/%s/simResult_RE_censor1_prop2_n1_betaD.1_gammaD.1_omegaD.1_lambda0D.1_tmp.rds", date_result))
 # }
 
-date_result_list <- c("2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16")
-mff_sims_list <- list()
-for (date_result in date_result_list) {
-  file_path <- sprintf("output/%s/mff/mff_allsims.csv", date_result)
-  if (file.exists(file_path)) {
-    mff_sims <- read.csv(file_path)
-    mff_sims_list[[length(mff_sims_list) + 1]] <- mff_sims
-  } else {
-    warning(sprintf("File not found: %s", file_path))
+if (read_data == 1){
+  date_result_list <- c("2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16")
+  mff_sims_list <- list()
+  for (date_result in date_result_list) {
+    file_path <- sprintf("output/%s/mff/mff_allsims.csv", date_result)
+    if (file.exists(file_path)) {
+      mff_sims <- read.csv(file_path)
+      mff_sims_list[[length(mff_sims_list) + 1]] <- mff_sims
+    } else {
+      warning(sprintf("File not found: %s", file_path))
+    }
   }
+  # Combine all data frames into a single data frame
+  mff_allsims0 <- do.call(rbind, mff_sims_list)
+  print(head(mff_allsims0)); print(tail(mff_allsims0))
+  print(length(unique(mff_allsims0$simulation)))
+  mff_allsims = mff_allsims0 %>%
+    mutate(RE_per_YrsLived = Number_RE/survival)
+  mff_allsims$method <- factor(mff_allsims$method, levels = c("czmk", "zom", "observed"))
+} else{
+  message("not reading data because already done")
 }
-# Combine all data frames into a single data frame
-mff_allsims0 <- do.call(rbind, mff_sims_list)
-print(head(mff_allsims0)); print(tail(mff_allsims0))
-print(length(unique(mff_allsims0$simulation)))
-mff_allsims = mff_allsims0 %>%
-  mutate(RE_per_YrsLived = Number_RE/survival)
-mff_allsims$method <- factor(mff_allsims$method, levels = c("czmk", "zom", "observed"))
+n.sim = length(unique(mff_allsims0$simulation))
+
+
+mean1 = mff_allsims %>% 
+  group_by(simulation, method) %>% 
+  summarize(meanRE = mean(Number_RE), 
+            meanSURV = mean(survival), 
+            meanTRT1 = mean(Trt), 
+            meanREYRS = mean(RE_lived))
+
+mean2 = mean1 %>% 
+  group_by(method) %>%
+  summarise(meanRE1 = mean(meanRE),
+            meanSURV1 = mean(meanSURV), 
+            meanTRT11 = mean(meanTRT1), 
+            meanREYRS1 = mean(meanREYRS))
+
+View(mean1)
+View(mean2)
 
 ##############################################################################################
 ##############################################################################################
