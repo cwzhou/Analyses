@@ -3,7 +3,7 @@ library(tidyr)
 library(dplyr)
 library(patchwork)
 
-read_data = 0
+read_data = 1
 local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
@@ -16,7 +16,9 @@ if (local == 1){
 # }
 
 if (read_data == 1){
-  date_result_list <- c("2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16")
+  date_result_list <- c("2025-01-11", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16",
+                        "2025-01-17", "2025-01-18", #"2025-01-19",
+                        "2025-01-20", "2025-01-21")
   mff_sims_list <- list()
   for (date_result in date_result_list) {
     file_path <- sprintf("output/%s/mff/mff_allsims.csv", date_result)
@@ -32,6 +34,12 @@ if (read_data == 1){
   print(head(mff_allsims0)); print(tail(mff_allsims0))
   print(length(unique(mff_allsims0$simulation)))
   mff_allsims = mff_allsims0 %>%
+    mutate(RE_cat = ifelse(Number_RE <= 2.5, 'Low',
+                           ifelse(Number_RE > 2.5 & Number_RE <= 4, 'Med',
+                                  'High'))) %>%
+    mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
+    # mutate(RE_cat = ifelse(Number_RE <= 3, 'Less','More')) %>%
+    # mutate(RE_cat = factor(RE_cat, levels = c("Less", "More"))) %>%
     mutate(RE_per_YrsLived = Number_RE/survival)
   mff_allsims$method <- factor(mff_allsims$method, levels = c("czmk", "zom", "observed"))
 } else{
@@ -40,22 +48,22 @@ if (read_data == 1){
 n.sim = length(unique(mff_allsims0$simulation))
 
 
-mean1 = mff_allsims %>% 
-  group_by(simulation, method) %>% 
-  summarize(meanRE = mean(Number_RE), 
-            meanSURV = mean(survival), 
-            meanTRT1 = mean(Trt), 
+mean1 = mff_allsims %>%
+  group_by(simulation, method) %>%
+  summarize(meanRE = mean(Number_RE),
+            meanSURV = mean(survival),
+            meanTRT1 = mean(Trt),
             meanREYRS = mean(RE_lived))
 
-mean2 = mean1 %>% 
+mean2 = mean1 %>%
   group_by(method) %>%
   summarise(meanRE1 = mean(meanRE),
-            meanSURV1 = mean(meanSURV), 
-            meanTRT11 = mean(meanTRT1), 
+            meanSURV1 = mean(meanSURV),
+            meanTRT11 = mean(meanTRT1),
             meanREYRS1 = mean(meanREYRS))
 
-View(mean1)
-View(mean2)
+# View(mean1)
+# View(mean2)
 
 ##############################################################################################
 ##############################################################################################
@@ -88,7 +96,7 @@ plot_survival <- ggplot(mff_means, aes(x = method, y = mean_surv, color = method
                shape = "square", size = 3, color = "black") +
   stat_summary(fun = mean, geom = "text",
                aes(label = round(after_stat(y), 2)),
-               vjust = 2, size = 5, color = "black") +
+               vjust = -2, size = 5, color = "black") +
   scale_y_continuous(
     limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
     breaks = seq(y_min, y_max, by = 0.5),
@@ -170,15 +178,20 @@ combined_plot <- plot_survival + plot_re +
 ##############################################################################################
 ##############################################################################################
 # by Number_RE
+# mff_means1 = mff_allsims %>%
+#   group_by(simulation, Number_RE, method) %>%
+#   summarise(mean_surv = mean(survival),
+#             mean_re_yrs = mean(RE_per_YrsLived))
 mff_means1 = mff_allsims %>%
-  group_by(simulation, Number_RE, method) %>%
-  summarise(mean_surv = mean(survival),
-            mean_re_yrs = mean(RE_per_YrsLived))
+  group_by(simulation, RE_cat, method) %>%
+    summarise(mean_surv = mean(survival),
+              mean_re_yrs = mean(RE_per_YrsLived))
+
 # head(mff_means1)
 set.seed(11)
 # Left Plot: Mean Survival vs Method with Number_RE as Facet
 plot_survival1 <-  ggplot(mff_means1,
-                          aes(x = factor(Number_RE),
+                          aes(x = RE_cat, #factor(Number_RE),
                               y = mean_surv,
                               color = method)) +
   geom_boxplot(position = position_dodge(0.8)) +  # Adjust the dodge width if necessary
@@ -215,7 +228,7 @@ plot_survival1 <-  ggplot(mff_means1,
 
 # Right Plot: Mean RE per Year vs Method with Number_RE as Facet
 plot_re1 <- ggplot(mff_means1,
-                   aes(x = factor(Number_RE),
+                   aes(x = RE_cat, #factor(Number_RE),
                        y = mean_re_yrs,
                        color = method)) +
   geom_boxplot(position = position_dodge(0.8)) +  # Adjust the dodge width if necessary
@@ -266,7 +279,11 @@ combined_plot1 <- plot_survival1 + plot_re1 +
 ##############################################################################################
 ##############################################################################################
 summary = mff_allsims %>%
-  group_by(method, Number_RE) %>%
+  mutate(RE_cat = ifelse(Number_RE <= 3, 'Low',
+                         ifelse(Number_RE > 3 & Number_RE <= 6, 'Med',
+                                'High'))) %>%
+  mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
+  group_by(method, RE_cat) %>% #Number_RE) %>%
   summarise(#min = min(RE_per_YrsLived),
             #max = max(RE_per_YrsLived),
             mean_RE_yrs = mean(RE_per_YrsLived),
@@ -275,13 +292,13 @@ summary = mff_allsims %>%
 # View(summary)
 
 ps = ggplot(summary, aes(
-  x = factor(Number_RE),
+  x = factor(RE_cat),
   y = mean_surv,
   color = method,
   group = method
 )) +
   geom_point(size = 2, position = position_dodge(width = 0.5)) +  # Dodge points
-  scale_color_brewer(palette = "Set2") +  # Improved color palette
+  # scale_color_brewer(palette = "Set2") +  # Improved color palette
   labs(
     title = "",
     x = "Total Number of RE",
@@ -297,13 +314,13 @@ ps = ggplot(summary, aes(
   )
 
 pre = ggplot(summary, aes(
-  x = factor(Number_RE),
+  x = factor(RE_cat),
   y = mean_RE_yrs,
   color = method,
   group = method
 )) +
   geom_point(size = 2, position = position_dodge(width = 0.5)) +  # Dodge points
-  scale_color_brewer(palette = "Set2") +  # Improved color palette
+  # scale_color_brewer(palette = "Set2") +  # Improved color palette
   labs(
     title = "",
     x = "Total Number of RE",
