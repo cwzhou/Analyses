@@ -1,4 +1,4 @@
-# sbatch -p general -N 1 --mem=8GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_750_2025-01-195.txt"
+# sbatch -p general -N 1 --mem=8GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_701-800_updated.txt"
 
 # sbatch -p general -N 1 --mem=10GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_20250112_500nsims_300ntree.txt"
 # For local: install.packages('~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
@@ -22,8 +22,8 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-01-195"
-n.sim_start = 750 # 1
+date_folder = "2025-01-19"
+n.sim_start = 701 # 1
 # "2025-01-12" is 1-100 sims;
 # "2025-01-13" is 101-200 sims;
 # "2025-01-14" is 201-300 sims;
@@ -34,7 +34,7 @@ n.sim_start = 750 # 1
 # "2025-01-19" is 701-800 sims;
 # "2025-01-20" is 801-900 sims;
 # "2025-01-21" is 901-1000 sims;
-n.sim = 1 #100
+n.sim = 100
 n.sim_end = n.sim_start - 1 + n.sim # n.sim
 sim_data_type = "RE"
 endpoint = sim_data_type
