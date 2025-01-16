@@ -3,4 +3,5 @@
 /2_pipeline/
 *.txt
 *.out
-tmp_testingitr.R
+*.pptx
+*.ppt
