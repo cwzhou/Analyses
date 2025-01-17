@@ -1,4 +1,4 @@
-# sbatch -p general -N 1 --mem=8GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_701-800_updated.txt"
+# sbatch -p general -N 1 --mem=6GB -n 2 -t 5-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_G4_001-100.txt"
 
 # sbatch -p general -N 1 --mem=10GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_20250112_500nsims_300ntree.txt"
 # For local: install.packages('~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
@@ -22,8 +22,8 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-01-19"
-n.sim_start = 701 # 1
+date_folder = "2025-02-01"
+n.sim_start = 1
 # "2025-01-12" is 1-100 sims;
 # "2025-01-13" is 101-200 sims;
 # "2025-01-14" is 201-300 sims;
@@ -42,7 +42,7 @@ n.eval = 1000
 tau0 = 10
 ntree1 = 300
 ##### Gap Time Hyperparameters #####
-G = 10 #5 # total gap times
+G = 4 #10 # total gap times
 # now defined in F01.DynamicsRE.R
 # gaptype = 0 # failure vs gap time indicator
 # gapparam1 = 0.1 #rho for failure # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025

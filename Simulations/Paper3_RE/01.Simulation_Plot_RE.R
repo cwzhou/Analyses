@@ -16,9 +16,12 @@ if (local == 1){
 # }
 
 if (read_data == 1){
-  date_result_list <- c("2025-01-11", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16",
-                        "2025-01-17", "2025-01-18", #"2025-01-19",
-                        "2025-01-20", "2025-01-21")
+  date_result_list <- c("2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05", "2025-01-06",
+                        "2025-01-07", #"2025-01-18", 
+                        "2025-01-09", "2025-01-10", "2025-01-11")
+  # c("2025-01-11", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16",
+                        # "2025-01-17", "2025-01-18", #"2025-01-19",
+                        # "2025-01-20", "2025-01-21")
   mff_sims_list <- list()
   for (date_result in date_result_list) {
     file_path <- sprintf("output/%s/mff/mff_allsims.csv", date_result)
@@ -356,7 +359,7 @@ ggplot(summary, aes(x = method,
   geom_point(size = 1) +  # Larger points
   # geom_line(size = 1.2) +  # Thicker lines
   # geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3, size = 1) +  # Wider and thicker error bars
-  facet_wrap(~Number_RE, scales = "free_y") +  # Facets by method
+  facet_wrap(~factor(RE_cat), scales = "free_y") +  # Facets by method
   # scale_color_brewer(palette = "Set2") +  # Improved color palette
   labs(
     title = "",
