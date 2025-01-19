@@ -16,9 +16,12 @@ if (local == 1){
 # }
 
 if (read_data == 1){
-  date_result_list <- c("2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05", "2025-01-06",
-                        "2025-01-07", #"2025-01-18", 
-                        "2025-01-09", "2025-01-10", "2025-01-11")
+  date_result_list <- c("2025-02-01", "2025-02-02", "2025-02-03") #, "2025-02-04",
+  # , "2025-02-05", "2025-02-06", "2025-02-07", "2025-02-08", 
+                        # "2025-02-09", "2025-02-10", "2025-02-11")
+    # c("2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05", "2025-01-06",
+                        # "2025-01-07", #"2025-01-18", 
+                        # "2025-01-09", "2025-01-10", "2025-01-11")
   # c("2025-01-11", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16",
                         # "2025-01-17", "2025-01-18", #"2025-01-19",
                         # "2025-01-20", "2025-01-21")
@@ -34,10 +37,10 @@ if (read_data == 1){
   }
   # Combine all data frames into a single data frame
   mff_allsims0 <- do.call(rbind, mff_sims_list)
-  print(head(mff_allsims0)); print(tail(mff_allsims0))
-  print(length(unique(mff_allsims0$simulation)))
+  # print(head(mff_allsims0)); print(tail(mff_allsims0))
+  # print(length(unique(mff_allsims0$simulation)))
   mff_allsims = mff_allsims0 %>%
-    mutate(RE_cat = ifelse(Number_RE <= 2.5, 'Low',
+    mutate(RE_cat = ifelse(Number_RE <= 1.5, 'Low',
                            ifelse(Number_RE > 2.5 & Number_RE <= 4, 'Med',
                                   'High'))) %>%
     mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
