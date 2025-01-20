@@ -1,4 +1,4 @@
-local = 0
+local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
 } else{
@@ -10,14 +10,14 @@ source("02.Simulation_Functions_RE.R")
 savingrds = FALSE
 date_folder = "2025-01-11"
 n.eval = 1000
-sim = 750
+sim = sample(1:n.sim, 1); print(sim)
 n.sim = 1000
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
 ntree1 = 300
 ##### Gap Time Hyperparameters #####
-G = 10 #5 # total gap times
+G = 4 #5 # total gap times
 # now defined in F01.DynamicsRE.R
 # gaptype = 0 # failure vs gap time indicator
 # gapparam1 = 0.1 #rho for failure # alpha1/2 depends on treatment, so moved gapparam1/2 to F01.DynamicsRE.R, as of Jan 3, 2025
@@ -117,8 +117,8 @@ if (endpoint == "RE"){
 
   betasR <- list(
     betaR1 = list(
-      betaR.hazard0 = c(log(1.1), log(1), log(1.1), log(0.9), log(1)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
-      betaR.hazard1 = c(log(3), log(2), log(3), log(2), log(3)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
+      betaR.hazard0 = c(log(0.1), log(4), log(1.1), log(0.9), log(1)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
+      betaR.hazard1 = c(log(0.3), log(0.2), log(0.7), log(2), log(0.3)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
     ),
     betaR2 = list(
       betaR.hazard0 = c(log(1.5), log(1.8), log(1.3), log(1.4), log(1.2), log(1.0), log(1.4), log(1.6), log(1.1), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
@@ -131,7 +131,7 @@ if (endpoint == "RE"){
   gammaD <- list(
     gammaD1 = list(
       gammaD.hazard0 = c(log(1), log(1), log(1), log(1), log(1)),  # Interaction effects for Treatment 0 (5 parameters)
-      gammaD.hazard1 = c(log(1.1), log(0.4), log(2.1), log(0.6), log(1.1))   # Interaction effects for Treatment 1 (5 parameters)
+      gammaD.hazard1 = c(log(2.1), log(3.4), log(2.1), log(3.6), log(1.1))   # Interaction effects for Treatment 1 (5 parameters)
     ),
     gammaD2 = list(
       gammaD.hazard0 = c(log(1.2), log(0.9), log(1.1), log(1.5), log(1.3), log(1.0), log(1.2), log(1.1), log(1.4), log(1.2)),  # Interaction effects for Treatment 0 (10 parameters)

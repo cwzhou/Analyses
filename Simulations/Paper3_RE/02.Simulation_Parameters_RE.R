@@ -22,7 +22,7 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-02-01"
+date_folder = "2025-03-01"
 n.sim_start = 1
 # "2025-01-12" is 1-100 sims;
 # "2025-01-13" is 101-200 sims;
@@ -130,52 +130,52 @@ if (endpoint == "RE"){
   # Covariate effects for survival
   betasD <- list(
     betaD1 = list(
-      betaD.hazard0 = c(log(2), log(2), log(2), log(2), log(2)), # Covariate effects for Treatment 0 (5 parameters)
-      betaD.hazard1 = c(log(0.9), log(0.9), log(0.9), log(0.9), log(0.9))  # Covariate effects for Treatment 1 (5 parameters)
+      betaD.hazard0 = c(log(2.4), log(1.7), log(3), log(2), log(4)), # Covariate effects for Treatment 0 (5 parameters)
+      betaD.hazard1 = c(log(0.9), log(1.4), log(4.5), log(0.3), log(0.6))  # Covariate effects for Treatment 1 (5 parameters)
     ),
     betaD2 = list(
       betaD.hazard0 = c(log(1.5), log(1.2), log(0.7), log(1.0), log(1.3), log(1.5), log(1.0), log(1.6), log(1.3), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
       betaD.hazard1 = c(log(1.0), log(0.8), log(1.3), log(1.1), log(0.9), log(1.2), log(1.4), log(1.3), log(1.1), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-
+  
   betasR <- list(
     betaR1 = list(
-      betaR.hazard0 = c(log(2), log(2), log(2), log(2), log(2)),  # Higher increases total RE/yrs lived # Covariate effects for Treatment 0 (5 parameters)
-      betaR.hazard1 = c(log(0.9), log(0.9), log(0.9), log(0.9), log(0.9)) # Lower decreases totalRE per years lived # Covariate effects for Treatment 1 (5 parameters)
+      betaR.hazard0 = c(log(0.1), log(4), log(1.1), log(0.9), log(1)), #beta.hazard0 = c(log(0.8), log(3.9), log(0.2), log(0.05), log(1.1)), #c(log(1.8), log(1.9), log(1.2), log(1.5), log(1.1)),  # Covariate effects for Treatment 0 (5 parameters)
+      betaR.hazard1 = c(log(0.3), log(0.2), log(0.7), log(2), log(0.3)) #beta.hazard1 = c(log(3.1), log(5.6), log(2.1), log(1.25), log(0.11)) #c(log(1.1), log(0.6), log(2.1), log(1.25), log(1.5))   # Covariate effects for Treatment 1 (5 parameters)
     ),
     betaR2 = list(
       betaR.hazard0 = c(log(1.5), log(1.8), log(1.3), log(1.4), log(1.2), log(1.0), log(1.4), log(1.6), log(1.1), log(0.9)),  # Covariate effects for Treatment 0 (10 parameters)
       betaR.hazard1 = c(log(1.0), log(1.2), log(1.7), log(1.4), log(1.3), log(1.1), log(1.5), log(1.6), log(1.3), log(1.2))   # Covariate effects for Treatment 1 (10 parameters)
     )
   )
-
+  
   # Interaction between treatment and covariates for survival
   # gammaD: Represents the interaction effect between treatment and covariates on the survival hazard.
   gammaD <- list(
     gammaD1 = list(
       gammaD.hazard0 = c(log(1), log(1), log(1), log(1), log(1)),  # Interaction effects for Treatment 0 (5 parameters)
-      gammaD.hazard1 = c(log(0.9), log(0.9), log(0.9), log(0.9), log(0.9))   # Interaction effects for Treatment 1 (5 parameters)
+      gammaD.hazard1 = c(log(2.1), log(3.4), log(2.1), log(3.6), log(1.1))   # Interaction effects for Treatment 1 (5 parameters)
     ),
     gammaD2 = list(
       gammaD.hazard0 = c(log(1.2), log(0.9), log(1.1), log(1.5), log(1.3), log(1.0), log(1.2), log(1.1), log(1.4), log(1.2)),  # Interaction effects for Treatment 0 (10 parameters)
       gammaD.hazard1 = c(log(0.8), log(1.0), log(1.3), log(1.1), log(1.0), log(1.2), log(1.3), log(1.5), log(1.4), log(1.0))   # Interaction effects for Treatment 1 (10 parameters)
     )
   )
-
+  
   # Interaction between treatment and covariates for recurrence
   # gammaR: Represents the interaction effect between treatment and covariates on the recurrence hazard.
   gammaR <- list(
     gammaR1 = list(
       gammaR.hazard0 = c(log(1), log(1), log(1), log(1), log(1)),  # Interaction for Treatment 0 recurrence (5 parameters)
-      gammaR.hazard1 = c(log(2), log(2), log(2), log(2), log(2))  # Interaction for Treatment 1 recurrence (5 parameters)
+      gammaR.hazard1 = c(log(5.1), log(7.9), log(1.4), log(3.7), log(5.2))  # Interaction for Treatment 1 recurrence (5 parameters)
     ),
     gammaR2 = list(
       gammaR.hazard0 = c(log(1.3), log(1.2), log(1.6), log(1.1), log(1.4), log(1.0), log(1.3), log(1.5), log(1.2), log(1.1)),  # Interaction for Treatment 0 recurrence (10 parameters)
       gammaR.hazard1 = c(log(1.0), log(1.1), log(1.4), log(1.2), log(1.3), log(1.2), log(1.5), log(1.6), log(1.3), log(1.4))   # Interaction for Treatment 1 recurrence (10 parameters)
     )
   )
-
+  
   # Parameters for interaction: disease for treatment
   # omegaD: Represents the direct treatment effect on the survival hazard, independent of covariates.
   omegaD <- list(
@@ -188,21 +188,21 @@ if (endpoint == "RE"){
       omegaD.hazard1 = log(3)   # Treatment 1 survival effect
     )
   )
-
+  
   # Parameters for treatment+covariate interaction
   # Parameters for recurrence hazard (treatment effects)
   # omegaR: Represents the direct treatment effect on the recurrence hazard, independent of covariates.
   omegaR <- list(
     omegaR1 = list(
-      omegaR.hazard0 = log(1), # Treatment 0 recurrence effect
-      omegaR.hazard1 = log(0.3) #log(<1) GIVES lower number of RE for trt1 vs trt0  # Treatment 1 recurrence effect
+      omegaR.hazard0 = log(1), #log(3.3), #log(2.3), #log(3.3) # Treatment 0 recurrence effect
+      omegaR.hazard1 = log(0.6) #log(<1) GIVES lower number of RE for trt1 vs trt0  # Treatment 1 recurrence effect
     ),
     omegaR2 = list(  # Second list (identical to omegaR1 for now)
       omegaR.hazard0 = log(3),  # Treatment 0 recurrence effect
       omegaR.hazard1 = log(3)   # Treatment 1 recurrence effect
     )
   )
-
+  
   # Baseline hazards for survival (disease-related, same for both lists)
   lambda0D <- list(
     lambda0D1 = list(
@@ -214,7 +214,7 @@ if (endpoint == "RE"){
       lambda0D.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-
+  
   # Baseline hazards for recurrence (same for both lists)
   lambda0R <- list(
     lambda0R1 = list(
@@ -226,7 +226,7 @@ if (endpoint == "RE"){
       lambda0R.hazard1 = c(1)   # Consistent baseline hazard
     )
   )
-
+  
   ncovD.list <- lapply(betasD, function(x) length(x$betaD.hazard1) )
   ncovR.list <- lapply(betasR, function(x) length(x$betaR.hazard1) )
   if (ncovD.list$betaD1 == ncovR.list$betaR1){
