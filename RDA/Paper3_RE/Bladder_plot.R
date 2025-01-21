@@ -112,8 +112,8 @@ data.long = values %>%
     draw_label("Figure X. Application to Bladder Dataset using 5-Fold Cross-Validation", x = 0.5, y = 0.95, size = 10, hjust = 0.5) +
     draw_plot(p.grid, x = 0, y = 0, width = 1, height = 0.9);print(p.final)
 
-  ggsave(nm.tmp %>%
-           gsub("output/", "figure/", .) %>%
-           gsub("Values", "Figure", .) %>%
-           gsub("\\.rds", "\\.png", .),
+  ggsave(paste0(fnm %>%
+           gsub("output/", "figure/", .), "BladderFigure_", K, "CV.png"),
          width = 10, height = 4)
+
+  
