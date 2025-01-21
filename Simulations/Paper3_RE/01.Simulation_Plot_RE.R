@@ -16,15 +16,25 @@ if (local == 1){
 # }
 
 if (read_data == 1){
-  date_result_list <- c("2025-02-01", "2025-02-02", "2025-02-03", "2025-02-04",
-                        "2025-02-05", "2025-02-06", "2025-02-07", "2025-02-09",
-                        "2025-02-10", "2025-02-11")
+  date_result_list <- 
+    c(#"2025-03-01",
+      "2025-03-02","2025-03-03",
+      "2025-03-04","2025-03-05","2025-03-06",
+      "2025-03-07","2025-03-08","2025-03-09",
+      "2025-03-10","2025-03-11")
+    # c("2025-03-02.1", "2025-03-02.2", "2025-03-02.3", "2025-03-02.4", "2025-03-02.5", 
+    #   "2025-03-02.6", "2025-03-02.7", "2025-03-02.8", "2025-03-02.9"
+    #                     )
+    # c("2025-02-01", "2025-02-02", "2025-02-03", "2025-02-04",
+    #                     "2025-02-05", "2025-02-06", "2025-02-07", "2025-02-09",
+    #                     "2025-02-10", "2025-02-11")
     # c("2025-01-01", "2025-01-02", "2025-01-03", "2025-01-04", "2025-01-05", "2025-01-06",
-                        # "2025-01-07", #"2025-01-18", 
-                        # "2025-01-09", "2025-01-10", "2025-01-11")
-  # c("2025-01-11", "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16",
-                        # "2025-01-17", "2025-01-18", #"2025-01-19",
-                        # "2025-01-20", "2025-01-21")
+    # "2025-01-07", #"2025-01-18",
+    # "2025-01-09", "2025-01-10", "2025-01-11")
+  # c(#"2025-01-11", 
+  #   "2025-01-13", "2025-01-14", "2025-01-15", "2025-01-16",
+  # "2025-01-17", "2025-01-18", #"2025-01-19",
+  # "2025-01-20", "2025-01-21") # need to add "older" after output/
   mff_sims_list <- list()
   for (date_result in date_result_list) {
     file_path <- sprintf("output/%s/mff/mff_allsims.csv", date_result)
@@ -40,19 +50,19 @@ if (read_data == 1){
   # print(head(mff_allsims0)); print(tail(mff_allsims0))
   # print(length(unique(mff_allsims0$simulation)))
   mff_allsims = mff_allsims0 %>%
-    mutate(RE_cat = ifelse(Number_RE <= 1.5, 'Low',
-                           ifelse(Number_RE > 2.5 & Number_RE <= 4, 'Med',
-                                  'High'))) %>%
-    mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
-    # mutate(RE_cat = ifelse(Number_RE <= 3, 'Less','More')) %>%
-    # mutate(RE_cat = factor(RE_cat, levels = c("Less", "More"))) %>%
+    # mutate(RE_cat = ifelse(Number_RE <= 1.5, 'Low',
+    #                        ifelse(Number_RE > 2.5 & Number_RE <= 4, 'Med',
+    #                               'High'))) %>%
+    # mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
+    mutate(RE_cat = ifelse(Number_RE <= 2, '[0,2]','(2,4]')) %>%
+    mutate(RE_cat = factor(RE_cat, levels = c('[0,2]','(2,4]'))) %>%
     mutate(RE_per_YrsLived = Number_RE/survival)
   mff_allsims$method <- factor(mff_allsims$method, levels = c("czmk", "zom", "observed"))
 } else{
   message("not reading data because already done")
 }
 n.sim = length(unique(mff_allsims0$simulation))
-
+mff_00 = mff_allsims
 
 mean1 = mff_allsims %>%
   group_by(simulation, method) %>%
@@ -184,14 +194,14 @@ combined_plot <- plot_survival + plot_re +
 ##############################################################################################
 ##############################################################################################
 # by Number_RE
-# mff_means1 = mff_allsims %>%
-#   group_by(simulation, Number_RE, method) %>%
-#   summarise(mean_surv = mean(survival),
-#             mean_re_yrs = mean(RE_per_YrsLived))
 mff_means1 = mff_allsims %>%
-  group_by(simulation, RE_cat, method) %>%
-    summarise(mean_surv = mean(survival),
-              mean_re_yrs = mean(RE_per_YrsLived))
+  group_by(simulation, Number_RE, method) %>%
+  summarise(mean_surv = mean(survival),
+            mean_re_yrs = mean(RE_per_YrsLived))
+# mff_means1 = mff_allsims %>%
+#   group_by(simulation, RE_cat, method) %>%
+#     summarise(mean_surv = mean(survival),
+#               mean_re_yrs = mean(RE_per_YrsLived))
 # mff_means1 = mff_allsims %>%
 #   group_by(method, RE_cat) %>%
 #   summarise(mean_surv = mean(survival),
@@ -202,7 +212,7 @@ mff_means1 = mff_allsims %>%
 set.seed(11)
 # Left Plot: Mean Survival vs Method with Number_RE as Facet
 plot_survival1 <-  ggplot(mff_means1,
-                          aes(x = RE_cat, #factor(Number_RE),
+                          aes(x = factor(Number_RE), #as.factor(RE_cat),
                               y = mean_surv,
                               color = method)) +
   geom_boxplot(position = position_dodge(0.8)) +  # Adjust the dodge width if necessary
@@ -218,7 +228,7 @@ plot_survival1 <-  ggplot(mff_means1,
                color = "black", size = 3, vjust = -1) +
   labs(
     title = "Phase 1 Endpoint Comparison",
-    x = "Method",
+    x = "",
     y = "Mean Truncated\nSurvival in years"
   ) +
   scale_color_manual(
@@ -239,7 +249,7 @@ plot_survival1 <-  ggplot(mff_means1,
 
 # Right Plot: Mean RE per Year vs Method with Number_RE as Facet
 plot_re1 <- ggplot(mff_means1,
-                   aes(x = RE_cat, #factor(Number_RE),
+                   aes(x = factor(Number_RE),
                        y = mean_re_yrs,
                        color = method)) +
   geom_boxplot(position = position_dodge(0.8)) +  # Adjust the dodge width if necessary
@@ -255,7 +265,7 @@ plot_re1 <- ggplot(mff_means1,
                color = "black", size = 3, vjust = -1) +
   labs(
     title = "Phase 2 Endpoint Comparison",
-    x = "Method",
+    # x = "Method",
     y = "Mean Number RE\nper Years Lived"
   ) +
   scale_color_manual(
@@ -290,8 +300,8 @@ combined_plot1 <- plot_survival1 + plot_re1 +
 ##############################################################################################
 ##############################################################################################
 summary = mff_allsims %>%
-  mutate(RE_cat = ifelse(Number_RE <= 3, 'Low',
-                         ifelse(Number_RE > 3 & Number_RE <= 6, 'Med',
+  mutate(RE_cat = ifelse(Number_RE <= 2, 'Low',
+                         ifelse(Number_RE > 2 & Number_RE <= 6, 'Med',
                                 'High'))) %>%
   mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
   group_by(method, RE_cat) %>% #Number_RE) %>%
@@ -308,7 +318,7 @@ ps = ggplot(summary, aes(
   color = method,
   group = method
 )) +
-  geom_point(size = 2, position = position_dodge(width = 0.5)) +  # Dodge points
+  geom_point(size = 4, position = position_dodge(width = 0.5)) +  # Dodge points
   # scale_color_brewer(palette = "Set2") +  # Improved color palette
   labs(
     title = "",
@@ -330,7 +340,7 @@ pre = ggplot(summary, aes(
   color = method,
   group = method
 )) +
-  geom_point(size = 2, position = position_dodge(width = 0.5)) +  # Dodge points
+  geom_point(size = 4, position = position_dodge(width = 0.5)) +  # Dodge points
   # scale_color_brewer(palette = "Set2") +  # Improved color palette
   labs(
     title = "",
@@ -364,7 +374,7 @@ ggplot(summary, aes(x = method,
                     y = mean_RE_yrs,
                     color = method,
                     group = method)) +
-  geom_point(size = 1) +  # Larger points
+  geom_point(size = 3) +  # Larger points
   # geom_line(size = 1.2) +  # Thicker lines
   # geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3, size = 1) +  # Wider and thicker error bars
   facet_wrap(~factor(RE_cat), scales = "free_y") +  # Facets by method
