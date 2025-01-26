@@ -50,7 +50,13 @@ To run the code, you need the following:
 
 ## Summary
 
-This GitHub repository contains two folders: ~/Simulations and ~/RDA, which store reproducible codes for all computational work in the manuscript.
+This GitHub repository contains two folders: ~/Simulations and ~/RDA, which store reproducible codes for all computational work in the manuscript. Within each folder, Project1_CR is for the competing risk endpoint, Project2_multiCR is N/A for now, and Project3_RE is for the recurrent event endpoint. Please select accordingly.
+
+1. Competing Risks (CR)
+   1. Simulations
+        * For cluster computing, run the bash script CR_S2value.sh to submit all jobs implementing each simulation setting on Slurm.
+   3. RDA
+2. Recurrent Events (RE)
 
 1. Simulations
 The following R packages should be installed before running:
