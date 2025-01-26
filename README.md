@@ -83,7 +83,10 @@ The `~/RDA/Paper1_CR` folder contains the analysis code for the PAD observationa
    Since the PAD data is not publicly available, please ensure you have access to the dataset before running the analysis code.
 
 2. **Run the Analysis Code**  
-   The scripts in this folder will perform the analysis, using the cohort data and the parameters specified in the simulation settings. Refer to the code and modify any data paths or necessary parameters as needed for your environment.
+   The scripts in this folder will perform the analysis, using the cohort data and the parameters specified in the simulation settings. Refer to the code and modify any data paths or necessary parameters as needed for your environment. Specifically, run **`CR04.PAD_analysis.R`**.
+
+3. **Plotting Results**
+   Use the script **`CR05.PAD_summary.R`** to plot the results.
 
 ### 2. multi CR
 Ignore for now.
