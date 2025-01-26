@@ -8,11 +8,8 @@ The estimator utilizes the R package "itrSurv" from https://github.com/cwzhou/it
 1. [Overview](#overview)
 2. [Directory Structure](#directory-structure)
 3. [Requirements](#requirements)
-4. [Usage Instructions](#usage-instructions)
-   - [Simulations](#simulations)
-   - [Applications](#applications)
-5. [Reproducibility](#reproducibility)
-6. [References](#references)
+4. [Usage Instructions and Reproducibility](#usage-reproduce)
+5. [References](#references)
 ---
 
 ## Overview
@@ -52,23 +49,21 @@ install.packages("itrSurv")
 ...
 * need to update this list
 
-## Summary
+## Usage Instructions and Reproducibility
 
 This GitHub repository contains two folders: ~/Simulations and ~/RDA, which store reproducible codes for all computational work in the manuscript. Within each folder, Project1_CR is for the competing risk endpoint, Project2_multiCR is N/A for now, and Project3_RE is for the recurrent event endpoint. Please select accordingly.
 
 1. Competing Risks (CR)
-:folder: Simulations
+   #### Simulations
 For cluster computing, run the bash script CR_S2value.sh to submit all jobs implementing each simulation setting on Slurm.
 
-:folder: RDA
+   #### RDA
 The PAD observational cohort data is not publically available but the analysis code is provided here.
 
 2. Recurrent Events (RE)
 :folder: Simulations
 
 :folder: RDA
-
-## File Descriptions
 
 ## References
 1. Zhou, Christina W., Nikki LB Freeman, Katharine L. McGinigle, and Michael R. Kosorok. "Optimal individualized treatment regimes for survival data with competing risks." arXiv preprint arXiv:2411.08315 (2024).
