@@ -56,7 +56,7 @@ This repository contains two main folders: `~/Simulations` and `~/RDA`. These fo
 ### 1. Competing Risks (CR)
 #### Simulations
 
-The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to generate the results from the manuscript for both the exponential simulation setting and the Fine-Gray simulation setting. To run the simulations:
+The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to generate the results from the manuscript. There are two simulation settings: 1) generating independent failure tiems from an exponential distribution, and 2) simulating dependent failures times based on the simulation settings from Fine-Gray [2]. The simulation setting is specified by the parameter `generate_failure_method` (see below). To run the simulations:
 
 1. **Edit Simulation Parameters**  
    Open the script `CR00.Simulation_Parameters.R` and modify the following parameters as necessary:
@@ -121,6 +121,6 @@ For specific jobs, run CR01.Simulation_Run.R.
 The PAD observational cohort data is not publically available but the analysis code is provided here.
 
 ## References
-1. Zhou, Christina W., Nikki LB Freeman, Katharine L. McGinigle, and Michael R. Kosorok. "Optimal individualized treatment regimes for survival data with competing risks." arXiv preprint arXiv:2411.08315 (2024).
-2. Fine-Gray
-3. Ghosh-Lin
+1. Zhou, C. W., Freeman, N. L., McGinigle, K. L., & Kosorok, M. R. (2024). Optimal individualized treatment regimes for survival data with competing risks. arXiv preprint arXiv:2411.08315.
+2. Fine, J. P., & Gray, R. J. (1999). A Proportional Hazards Model for the Subdistribution of a Competing Risk. Journal of the American Statistical Association, 94(446), 496–509. https://doi.org/10.1080/01621459.1999.10474144
+3. Ghosh, D., & Lin, D. Y. (2000). Nonparametric analysis of recurrent events and death. Biometrics, 56(2), 554–562. https://doi.org/10.1111/j.0006-341x.2000.00554.x
