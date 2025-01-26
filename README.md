@@ -24,7 +24,7 @@ This repository aims to ensure transparency and reproducibility for the analyses
 ## Directory Structure
 
 Below is the simplified directory structure for relevant scripts.
- 
+```bash
 ├── RDA /                    # Scripts for real-data application analyses  
 │   ├── Paper1_CR/           # Implementation Scripts for Competing Risk Endpoint  
 │   │   ├── 3_output/        # RDS Output  
@@ -39,6 +39,7 @@ Below is the simplified directory structure for relevant scripts.
 │   └── Paper3_RE/           # Implementation Scripts for Recurrent Event
 ├── requirements.txt         # List of R package dependencies  
 └── README.md                # This file  
+```
 
 ## Requirements
 To run the code, you need the following:
