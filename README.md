@@ -56,17 +56,20 @@ install.packages("itrSurv")
 This GitHub repository contains two folders: ~/Simulations and ~/RDA, which store reproducible codes for all computational work in the manuscript. Within each folder, Project1_CR is for the competing risk endpoint, Project2_multiCR is N/A for now, and Project3_RE is for the recurrent event endpoint. Please select accordingly.
 
 1. Competing Risks (CR)
-:folder:Simulations
+:folder: Simulations
 For cluster computing, run the bash script CR_S2value.sh to submit all jobs implementing each simulation setting on Slurm.
 
-:folder:RDA
+:folder: RDA
 The PAD observational cohort data is not publically available but the analysis code is provided here.
 
 2. Recurrent Events (RE)
-:folder:Simulations
+:folder: Simulations
 
-:folder:RDA
+:folder: RDA
 
 ## File Descriptions
 
 ## References
+1. Zhou, Christina W., Nikki LB Freeman, Katharine L. McGinigle, and Michael R. Kosorok. "Optimal individualized treatment regimes for survival data with competing risks." arXiv preprint arXiv:2411.08315 (2024).
+2. Fine-Gray
+3. Ghosh-Lin
