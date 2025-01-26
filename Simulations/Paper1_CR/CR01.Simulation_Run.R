@@ -42,8 +42,6 @@ result_sub = final_results %>%
                 obs_endpoint, czmk_endpoint,
                 csk_endpoint, pmcr_endpoint,
                 aipwe_endpoint, zom_endpoint)
-
-
 means = apply(result_sub, 2, mean, na.rm=TRUE)
 sds = apply(result_sub, 2, sd, na.rm=TRUE)
 mean_sd = cbind(means,sds)
@@ -53,6 +51,17 @@ long_res = list(statistics = final_results,
                 # true_P2_eval = true3,
                 # p2.df = p2.df,
                 mean_sd = mean_sd)
+
+result_sub0 = final_results0 %>%
+  dplyr::select(obs_survival, czmk_survival,
+                csk_survival, pmcr_survival,
+                aipwe_survival, zom_survival,
+                obs_endpoint, czmk_endpoint,
+                csk_endpoint, pmcr_endpoint,
+                aipwe_endpoint, zom_endpoint)
+means0 = apply(result_sub0, 2, mean, na.rm=TRUE)
+sds0 = apply(result_sub0, 2, sd, na.rm=TRUE)
+mean_sd0 = cbind(means0,sds0)
 
 #not saving result_ext right now (statistics = result not statistics = result_ext)
 if (savingrds == TRUE){

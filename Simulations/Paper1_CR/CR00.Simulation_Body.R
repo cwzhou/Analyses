@@ -484,6 +484,7 @@ message("data.df")
   cat("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
   n.stages = 1
   if (!skip.csk) {
+    library(dtrSurv)
     cat ("  3. csk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # dtrSurv (Cho et al)
     models_dtr <- paste0("Surv(obs_time, D.0) ~ ",
@@ -534,6 +535,9 @@ message("data.df")
     result["time.csk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.csk"]
     arg.csk$policy <- NULL; gc()
     rm(csk.data.rep); gc()
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
   }
 
 
@@ -756,9 +760,6 @@ message("data.df")
                                                 minEventSurv = 1L,
                                                 nodeSizeEnd = 1e+9,
                                                 nodeSizeSurv = 1e+9)))
-                                           
-                                           
-                                           minEvent = 1)))
     # optimal.zom <- try(itrSurv:::itrSurv(data = data.df,
     #                                      txName = "Trt",
     #                                      models = models_itr,
@@ -823,9 +824,13 @@ message("data.df")
     m11 = NA
   }
   if (!skip.csk){
+    library(dtrSurv)
     P2_csk <<- rep_csk[p2, ]
     m2 = mean(P2_csk$CIF_eval)
     m21 = mean(P2_csk$OS_eval)
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
   } else{
     m2 = NA
     m21 = NA

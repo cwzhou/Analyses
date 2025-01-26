@@ -6,7 +6,7 @@ library(dplyr);
 library(survival)
 library(DTRreg);
 library(randomForestSRC);
-library(dtrSurv)
+#library(dtrSurv) # we only use library for CSK method if-statements
 library(itrSurv);library(ggplot2); library(tidyverse);
 library(MASS); library(dplyr);
 local = 1
@@ -25,8 +25,8 @@ rule2 = "gray_cr" # other option: csh_cr
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 rda_methods = c("CZMK", "CSK", "PMCR", "AIPWE",
                 "ZOM", "CSKzom", "observed")
-skip_method <- !c(TRUE,TRUE,TRUE,TRUE,
-                 TRUE,!TRUE,TRUE);
+skip_method <- c(!TRUE,TRUE,TRUE,TRUE,
+                 !TRUE,TRUE,TRUE);
 assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
 loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
@@ -271,8 +271,10 @@ dat0 = data %>%
       set.seed(cv)
       CZMK.i <-
         try(do.call(itrSurv::itrSurv,
-                    c(args.CZMK, list(nodeSize = nodesize,
-                                      minEvent = mindeath))))
+                    c(args.CZMK, list(nodeSizeSurv = nodesize,
+                                      nodeSizeEnd = nodesize,
+                                      minEventSurv = mindeath,
+                                      minEventEnd = mindeath))))
       err.CZMK = class(CZMK.i)[1] == "try-error"
       } else{
         err.CZMK = TRUE
@@ -280,6 +282,7 @@ dat0 = data %>%
 
     ### A2. Cho et al (2022)
     if (skip.CSK != TRUE){
+      library(dtrSurv)
       print(sprintf("Running CSK for %s CV", cv))
       args.CSK <- list(data = train,
                        txName = Tx.nm,
@@ -298,6 +301,9 @@ dat0 = data %>%
                            c(args.CSK, list(nodeSize = nodesize,
                                             minEvent = mindeath))))
       err.CSK = class(CSK.i)[1] == "try-error"
+      if ("package:dtrSurv" %in% search()) {
+        detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+      }
       } else{
         err.CSK = TRUE
         }
@@ -407,6 +413,7 @@ dat0 = data %>%
 
     ### A7. CSKzero-order model
     if (skip.CSKzom != TRUE){
+      library(dtrSurv)
       print(sprintf("Running CSKzom for %s CV", cv))
     CSKzom.i <-
       try(do.call(dtrSurv::dtrSurv, c(args.CSK,
@@ -421,6 +428,9 @@ dat0 = data %>%
       tab[cv, 1] = CSKzom.i@stageResults[[1]]@optimal@optimalTx[1]
       cat("CSKzom freq table\n");
       tab[, 1] %>% table %>% print
+    }
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
     }
     } else{
       err.CSKzom = TRUE
@@ -448,7 +458,8 @@ dat0 = data %>%
         opt.CZMK_phase =
           predict(CZMK.i,
                   newdata = test[elig, ],
-                  Phase = phase)
+                  Phase = phase,
+                  endPoint = "CR")
         if (phase == 1){
           action1 <<- opt.CZMK_phase$optimal@optimalTx
           StopatP1 <<- opt.CZMK_phase$optimal@Ratio_Stopping_Ind
@@ -469,6 +480,7 @@ dat0 = data %>%
     }
     ### B2. Cho et al (2022)
     if (!err.CSK) {
+      library(dtrSurv)
       opt.CSK =
         predict(CSK.i,
                 # newdata = test[elig, ],
@@ -477,6 +489,9 @@ dat0 = data %>%
       opt.rule.CSK[elig, ] = factor(opt.CSK$optimal@optimalTx,
                                     levels = lvls[[1]]) # %>% as.numeric()
       print(table(opt.rule.CSK, useNA = "always"))
+      if ("package:dtrSurv" %in% search()) {
+        detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+      }
     }
 
     ### B3. PMCR - 2021

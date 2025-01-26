@@ -1,3 +1,6 @@
+if ("package:dtrSurv" %in% search()) {
+  detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+}
 library(purrr);
 library(dplyr);
 library(survival)

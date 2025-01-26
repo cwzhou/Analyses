@@ -1,3 +1,6 @@
+if ("package:dtrSurv" %in% search()) {
+  detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+}
 local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
@@ -9,13 +12,13 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 savingrds = FALSE
 date_folder = "2025-01-11"
-n.eval = 1000
-sim = sample(1:n.sim, 1); print(sim)
+n.eval = 100
 n.sim = 1000
+sim = sample(1:n.sim, 1); print(sim)
 sim_data_type = "RE"
 endpoint = sim_data_type
 tau0 = 10
-ntree1 = 300
+ntree1 = 10
 ##### Gap Time Hyperparameters #####
 G = 4 #5 # total gap times
 # now defined in F01.DynamicsRE.R
