@@ -7,7 +7,7 @@
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 local = 0
-parallel = 1
+parallel = 0
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
@@ -35,6 +35,7 @@ if (parallel == 1){
   print(is.data.frame(final_results))
   print(tail(final_results,10))
 } else{
+  message("Not running parallel")
   #not parallel
   source("CR00.Simulation_Body_noparallel.R")
   final_results = result
