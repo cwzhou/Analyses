@@ -1,3 +1,7 @@
+# sbatch -p general -N 1 --mem=50GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript CR01.Simulation_Run.R > /work/users/c/w/cwzhou/Proj1/CRoutput_20250126_test.txt"
+# For local: install.packages('~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
+# For cluster: install.packages('/nas/longleaf/home/cwzhou/Dissertation/itrSurv/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
+
 ## This is the script used to run the simulations ##
 ## Edit parameters in CR00.Simulation_Parameters.R script
 ## Plots in CR02.Simulation_Summary.R script
