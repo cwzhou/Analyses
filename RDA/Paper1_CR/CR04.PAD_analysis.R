@@ -25,8 +25,8 @@ rule2 = "gray_cr" # other option: csh_cr
 # NOTE: CURRENTLY AIPWE TRAIN/TEST DATASETS DON'T USE MULTI-LEVEL FACTORS!!! NEED TO FIX!!!
 rda_methods = c("CZMK", "CSK", "PMCR", "AIPWE",
                 "ZOM", "CSKzom", "observed")
-skip_method <- c(!TRUE,TRUE,TRUE,TRUE,
-                 !TRUE,TRUE,TRUE);
+skip_method <- !c(TRUE,TRUE,TRUE,TRUE,
+                 TRUE,!TRUE,TRUE);
 assign_skip_function(rda_methods, skip_method)
 skipped_methods <- rda_methods[skip_method]
 loop_methods <- rda_methods[!rda_methods %in% c(skipped_methods, "observed")]
