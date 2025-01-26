@@ -1,4 +1,4 @@
-solo.plot = 1
+solo.plot = 0
 local = 1
 if (local == 1){
    setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
@@ -21,7 +21,7 @@ testing_out = 1
 # endpoint = "CR"
 # generate_failure_method = c("simple_exp","fine_gray");
 # generate_failure_method = generate_failure_method[1]
-lab.date = "2025-01-01" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+lab.date = "2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
 dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 
@@ -161,7 +161,7 @@ for (crit.no in 1:crit.tot){
     result.comb <-
       lapply(1:dim(fn)[1], function(i) {
         fn.i = fn$fn[i]
-        print(fn.i)
+        # print(fn.i)
         if (file.exists(fn.i)) {
           print(sprintf("file %s exists", fn.i))
           full <- readRDS(fn.i)
@@ -193,8 +193,13 @@ for (crit.no in 1:crit.tot){
 
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
           # print(head(a))
+          if (parallel == 0){
+            sim_name = "sim"
+          } else{
+            sim_name = "sim.no" # parallel
+          }
           beginning <- as.data.frame(a) %>%
-            dplyr::select(rep = sim.no,
+            dplyr::select(rep = !!sym(sim_name),
                           all_of(var_method),
                           czmk_n_phase2, zom_n_phase2,
                           training_percent.censor, training_cause.1, training_cause.2)
