@@ -44,21 +44,6 @@ Below is the simplified directory structure for relevant scripts.
 To run the code, you need the following:
 1. **Programming Languages**: R 4.1.3.
 2. **Libraries/Packages**: Install dependencies
-
-
-
-
-## Summary
-
-This GitHub repository contains two folders: ~/Simulations and ~/RDA, which store reproducible codes for all computational work in the manuscript. Within each folder, Project1_CR is for the competing risk endpoint, Project2_multiCR is N/A for now, and Project3_RE is for the recurrent event endpoint. Please select accordingly.
-
-1. Competing Risks (CR)
-   1. Simulations
-        * For cluster computing, run the bash script CR_S2value.sh to submit all jobs implementing each simulation setting on Slurm.
-   3. RDA
-2. Recurrent Events (RE)
-
-1. Simulations
 The following R packages should be installed before running:
 install.packages("survival")
 install.packages("itrSurv")
@@ -66,10 +51,21 @@ install.packages("itrSurv")
 ...
 * need to update this list
 
-Use bash script S2value.sh to submit all cluster jobs implementing each simulation setting on Slurm.
+## Summary
 
-2. PAD data analysis
-The cohort data is not publically available but the analysis code is provided here.
+This GitHub repository contains two folders: ~/Simulations and ~/RDA, which store reproducible codes for all computational work in the manuscript. Within each folder, Project1_CR is for the competing risk endpoint, Project2_multiCR is N/A for now, and Project3_RE is for the recurrent event endpoint. Please select accordingly.
+
+1. Competing Risks (CR)
+:folder:Simulations
+For cluster computing, run the bash script CR_S2value.sh to submit all jobs implementing each simulation setting on Slurm.
+
+:folder:RDA
+The PAD observational cohort data is not publically available but the analysis code is provided here.
+
+2. Recurrent Events (RE)
+:folder:Simulations
+
+:folder:RDA
 
 ## File Descriptions
 
