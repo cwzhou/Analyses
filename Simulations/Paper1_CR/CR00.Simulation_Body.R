@@ -375,6 +375,9 @@ message("data.df")
   # estimation
   cat ("2. czmk for simulation", sim, "\n")
   if (!skip.czmk) {
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
     cat ("  2. czmk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # new package itrSurv
     priority_vector <- c(0, priority_cause)
@@ -752,6 +755,9 @@ message("data.df")
   cat("\n******************************\n")
   cat ("6. Estimation - zero-order model for Simulation",sim, ":",generate_failure_method,"\n")
   if (!skip.zom) {
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
     cat ("  6. zero-order model - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     set.seed(train_seed + 5)
     optimal.zom <- do.call(itrSurv::itrSurv, c(arg.czmk2,
