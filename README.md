@@ -104,18 +104,10 @@ We analyze the public bladder recurrence dataset in the R package 'survival'.
 - To ensure full reproducibility, please ensure that all required R packages and dependencies are installed. You can install the required packages by running the following in your R environment:
 
     ```r
-    install.packages(c("parallel", "dplyr", "ggplot2", "data.table"))
+    install.packages(c("parallel", "dplyr", "ggplot2", "itrSurv"))
     ```
 
 - **Version Control**: If you are using a different version of R or any dependencies, please document them in your environment for better reproducibility.
-
-
-   #### Simulations
-In CR00.Simulation_Parameters.R, please modify as appropriate: 1) directory names, 2) local = 1 for local machine, local = 0 for cluster, 3) parallel = 1 for parallel running using R package 'parallel' or parallel = 0 to run just for non-parallel, and 4) any other parameters to adjust, i.e. number of simulations (n.sim).
-
-For cluster computing, run the bash script CR_S2value.sh to submit all jobs implementing each simulation setting on Slurm.
-
-For specific jobs, run CR01.Simulation_Run.R.
 
    #### RDA
 The PAD observational cohort data is not publically available but the analysis code is provided here.
