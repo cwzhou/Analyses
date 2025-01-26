@@ -35,6 +35,7 @@ if (parallel == 1){
   print(is.data.frame(final_results))
   print(tail(final_results,10))
 } else{
+  #not parallel
   source("CR00.Simulation_Body_noparallel.R")
   final_results = result
 }
