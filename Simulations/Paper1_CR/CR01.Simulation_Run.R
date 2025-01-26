@@ -25,10 +25,21 @@ if (parallel == 1){
   print("now going into rbind")
   # Combine the results into a single dataframe
   final_results0 <- do.call(rbind, results_list) # years
-  print(is.data.frame(final_results0))
+  # print(is.data.frame(final_results0))
   final_results0 = as.data.frame(final_results0)
-  print(is.data.frame(final_results0))
-  print(tail(final_results0))
+  # print(is.data.frame(final_results0))
+  # print(tail(final_results0))
+  result_sub0 = final_results0 %>%
+    dplyr::select(obs_survival, czmk_survival,
+                  csk_survival, pmcr_survival,
+                  aipwe_survival, zom_survival,
+                  obs_endpoint, czmk_endpoint,
+                  csk_endpoint, pmcr_endpoint,
+                  aipwe_endpoint, zom_endpoint)
+  means0 = apply(result_sub0, 2, mean, na.rm=TRUE)
+  sds0 = apply(result_sub0, 2, sd, na.rm=TRUE)
+  mean_sd0 = cbind(means0,sds0)
+  
   final_results <- final_results0 %>%
     #   # convert to days
     mutate(across(ends_with("_survival") | ends_with("_endpoint"), ~ . * 365.25))
@@ -59,17 +70,6 @@ long_res = list(statistics = final_results,
                 # true_P2_eval = true3,
                 # p2.df = p2.df,
                 mean_sd = mean_sd)
-
-result_sub0 = final_results0 %>%
-  dplyr::select(obs_survival, czmk_survival,
-                csk_survival, pmcr_survival,
-                aipwe_survival, zom_survival,
-                obs_endpoint, czmk_endpoint,
-                csk_endpoint, pmcr_endpoint,
-                aipwe_endpoint, zom_endpoint)
-means0 = apply(result_sub0, 2, mean, na.rm=TRUE)
-sds0 = apply(result_sub0, 2, sd, na.rm=TRUE)
-mean_sd0 = cbind(means0,sds0)
 
 #not saving result_ext right now (statistics = result not statistics = result_ext)
 if (savingrds == TRUE){
