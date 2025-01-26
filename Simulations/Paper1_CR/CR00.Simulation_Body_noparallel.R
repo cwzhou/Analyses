@@ -375,6 +375,9 @@ for (sim in 1:n.sim) {
   # estimation
   cat ("2. czmk for simulation", sim, "\n")
   if (!skip.czmk) {
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
     cat ("  2. czmk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # new package itrSurv
     priority_vector <- c(0, priority_cause)
@@ -482,6 +485,7 @@ for (sim in 1:n.sim) {
   cat("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
   n.stages = 1
   if (!skip.csk) {
+    library(dtrSurv)
     cat ("  3. csk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # dtrSurv (Cho et al)
     models_dtr <- paste0("Surv(obs_time, D.0) ~ ",
@@ -532,6 +536,9 @@ for (sim in 1:n.sim) {
     result[sim, "time.csk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.csk"]
     arg.csk$policy <- NULL; gc()
     rm(csk.data.rep); gc()
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
   }
   
   
@@ -746,6 +753,9 @@ for (sim in 1:n.sim) {
   cat("\n******************************\n")
   cat ("6. Estimation - zero-order model for Simulation",sim, ":",generate_failure_method,"\n")
   if (!skip.zom) {
+    if ("package:dtrSurv" %in% search()) {
+      detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
+    }
     cat ("  6. zero-order model - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     set.seed(train_seed + 5)
     optimal.zom <- do.call(itrSurv::itrSurv, c(arg.czmk2,

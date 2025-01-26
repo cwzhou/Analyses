@@ -11,7 +11,7 @@ library(dplyr)
 # library(randomForestSRC)
 library(knitr)
 library(itrSurv)
-library(dtrSurv)
+# library(dtrSurv) # we include this within the body scripts directly
 library(MASS)
 library(reshape2)
 library(ggplot2)
