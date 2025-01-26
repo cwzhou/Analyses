@@ -15,6 +15,7 @@ source("CR00.Simulation_Parameters.R")
 
 # call on functions then runs simulations
 if (parallel == 1){
+  message("WE ARE RUNNING PARALLEL JOBS.")
   source("CR00.Simulation_Body.R")
   print("now going into rbind")
   # Combine the results into a single dataframe
