@@ -88,6 +88,9 @@ The `~/RDA/Paper1_CR` folder contains the analysis code for the PAD observationa
 3. **Plotting Results**
    Use the script **`CR05.PAD_summary.R`** to plot the results.
 
+#### Script Descriptions
+Below are descriptions of the scripts used but not directly called upon.
+
 ### 2. multi CR
 Ignore for now.
 
@@ -96,21 +99,26 @@ Ignore for now.
 #### RDA
 We analyze the public bladder recurrence dataset in the R package 'survival'.
 
+#### Script Descriptions
+Below are descriptions of the scripts used but not directly called upon.
+
 ---
 
 ### General Notes on Reproducibility
 
-- All code is designed to be reproducible on both local machines and computing clusters, with support for parallelization.
+- All code is designed to be reproducible on both local machines and computing clusters.
 - To ensure full reproducibility, please ensure that all required R packages and dependencies are installed. You can install the required packages by running the following in your R environment:
 
+For Competing Risks scripts:
     ```r
-    install.packages(c("parallel", "dplyr", "ggplot2", "itrSurv"))
+    install.packages(c("parallel", "dplyr", "ggplot2", "itrSurv")) # need to update this list
     ```
-
+For Recurrent Event scripts:
+    ```r
+    install.packages(c("parallel", "dplyr", "ggplot2", "itrSurv")) # need to update this list
+    ```
+    
 - **Version Control**: If you are using a different version of R or any dependencies, please document them in your environment for better reproducibility.
-
-   #### RDA
-The PAD observational cohort data is not publically available but the analysis code is provided here.
 
 ## References
 1. Zhou, C. W., Freeman, N. L., McGinigle, K. L., & Kosorok, M. R. (2024). Optimal individualized treatment regimes for survival data with competing risks. arXiv preprint arXiv:2411.08315.
