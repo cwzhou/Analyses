@@ -3,7 +3,7 @@
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
  # local = 1 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
 local = 0 # local = 0 for cluster
-parallel = 0
+parallel = 0 # parallel = 0 for NOT parallel code
 #
 # # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
 # # uncomment if running alone (aka for CR02.Simulation_Summary.R
@@ -17,10 +17,10 @@ parallel = 0
 source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
-# date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() # "2024-08-20/24" #"2024-02-27" # this is the most recent date with results; # very old date: "2024-02-18"
-date_folder = "2025-01-01" #"2024-09-13" #Sys.Date()
+# date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
+date_folder = "2025-02-05" #"2024-09-13" 
 n.eval = 10000 #n.eval = 10000
-n.sim = 5
+n.sim = 500
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
@@ -236,10 +236,10 @@ if (endpoint == "CR"){
         beta2.hazard0 = c(0,-1.1,-0.3),#c(0,-0.2,1.2), #c(0,0.2,0.8),
         beta2.hazard1 = c(0,-0.2,1.2)),#c(0,-0.3,-2)),
       beta2 = list(
-        beta1.hazard0 = c(0,0.9,-0.7,0.6,-0.1,0.5),
-        beta1.hazard1 = c(0,-1.2,0.1,-0.5,-0.2,-1.2),
-        beta2.hazard0 = c(0,-0.5,-0.4,-1.1,-0.8,-0.4), #c(0,-0.1,-0.2),
-        beta2.hazard1 = c(0,0.4,-0.3,0.6,0.2,1.1))
+        beta1.hazard0 = c(0,0.9,-0.7,0.6,-0.1,0.5,0.9,-0.7,0.6,-0.1,0.5),
+        beta1.hazard1 = c(0,-1.2,0.1,-0.5,-0.2,-1.2,-1.2,0.1,-0.5,-0.2,-1.2),
+        beta2.hazard0 = c(0,-0.5,-0.5,-0.4,-1.1,-0.8,-0.4,-0.4,-1.1,-0.8,-0.4), #c(0,-0.1,-0.2),
+        beta2.hazard1 = c(0,0.4,-0.3,0.6,0.2,1.1,0.4,-0.3,0.6,0.2,1.1))
     )
   } else{
     stop("generate failure method not specified")
@@ -308,7 +308,7 @@ dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 print(dir_rds)
 print(dir_fig)
 if (local == 0){
-  dir_rds_tmp = sprintf("/users/c/w/cwzhou/Dissertation/Paper_1/output/%s/%s",
+  dir_rds_tmp = sprintf("/work/users/c/w/cwzhou/Proj1/output/%s/%s",
                         generate_failure_method,
                         date_folder)
   if (savingrds == TRUE){

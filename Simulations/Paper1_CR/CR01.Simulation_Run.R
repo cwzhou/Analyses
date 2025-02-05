@@ -82,8 +82,6 @@ if (savingrds == TRUE){
   #              ind_stat = trt_result),
   #         filename.true2)
 }
-# write.csv(final_results, "/nas/longleaf/home/js9gt/survrf/Outputs/1STRATA_28Aug_10stage__500pt_lowcens_V2", row.names=FALSE)
-
 
 # source("plotting value functions.R")
 # plot_values(combined_data, OS_eval)
