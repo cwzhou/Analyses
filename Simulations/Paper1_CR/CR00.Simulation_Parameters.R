@@ -18,7 +18,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
-date_folder = "2025-02-05" #"2024-09-13" 
+date_folder = "2025-02-10" #"2024-09-13" 
 n.eval = 10000 #n.eval = 10000
 n.sim = 500
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
@@ -37,7 +37,7 @@ if (generate_failure_method == "simple_exp"){
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
-skip_method <- !c(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
+skip_method <- !c(TRUE, TRUE, TRUE, !TRUE, TRUE, TRUE);
 # skip_method <- c(!TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
 #### Run this Script FOR CR. Change name later.
@@ -236,10 +236,10 @@ if (endpoint == "CR"){
         beta2.hazard0 = c(0,-1.1,-0.3),#c(0,-0.2,1.2), #c(0,0.2,0.8),
         beta2.hazard1 = c(0,-0.2,1.2)),#c(0,-0.3,-2)),
       beta2 = list(
-        beta1.hazard0 = c(0,0.9,-0.7,0.6,-0.1,0.5,0.9,-0.7,0.6,-0.1,0.5),
-        beta1.hazard1 = c(0,-1.2,0.1,-0.5,-0.2,-1.2,-1.2,0.1,-0.5,-0.2,-1.2),
-        beta2.hazard0 = c(0,-0.5,-0.5,-0.4,-1.1,-0.8,-0.4,-0.4,-1.1,-0.8,-0.4), #c(0,-0.1,-0.2),
-        beta2.hazard1 = c(0,0.4,-0.3,0.6,0.2,1.1,0.4,-0.3,0.6,0.2,1.1))
+        beta1.hazard0 = c(0,1,1.3,-0.2,0.6,0.3,2.1,0.5,-0.3,1.4,3),
+        beta1.hazard1 = c(0,-1.2,-0.1,-0.5,-1.2,-2.2,1.2,-0.1,0.5,-0.2,-1.2),
+        beta2.hazard0 = c(0,-0.5,-0.5,-1.4,-1.1,0.8,1.4,-2.4,-1.1,-0.8,-0.4), #c(0,-0.1,-0.2),
+        beta2.hazard1 = c(0,0.4,1.3,1.6,1.2,1.1,-0.4,-0.3,0.6,0.2,1.1))
     )
   } else{
     stop("generate failure method not specified")
