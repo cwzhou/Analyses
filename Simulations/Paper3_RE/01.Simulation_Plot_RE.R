@@ -81,6 +81,48 @@ mean2 = mean1 %>%
 # View(mean1)
 # View(mean2)
 
+mff_allsims0 %>%
+  group_by(method) %>%
+  summarise(
+    #n = n(),
+    meanSurv = mean(survival),
+    sdSurv = sd(survival),
+    Q1 = quantile(survival, 0.25),
+    Q2 = quantile(survival, 0.5),  # Median (Q2)
+    Q3 = quantile(survival, 0.75)
+  )
+
+mff_allsims0 %>%
+  group_by(method) %>%
+  summarise(
+    #n = n(),
+    meanREyr = mean(RE_lived),
+    sdREyr = sd(RE_lived),
+    Q1 = quantile(RE_lived, 0.25),
+    Q2 = quantile(RE_lived, 0.5),  # Median (Q2)
+    Q3 = quantile(RE_lived, 0.75)
+  )
+
+
+mff_allsims0 %>%
+  group_by(method) %>%
+  summarise(
+    #n = n(),
+    meanTrt1 = mean(Trt),
+    meanSurv = mean(survival),
+    sdTrt = sd(Trt),
+    Q1 = quantile(Trt, 0.25),
+    Q2 = quantile(Trt, 0.5),  # Median (Q2)
+    Q3 = quantile(Trt, 0.75)
+  )
+
+mff_allsims0 %>%
+  group_by(method, Number_RE) %>%
+  summarise(
+    #n = n(),
+    meanTrt = mean(Trt)
+  )
+
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -129,11 +171,11 @@ plot_survival <- ggplot(mff_means, aes(x = method, y = mean_surv, color = method
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   ) +
   scale_x_discrete(
     limits = c("czmk", "zom", "observed"),  # Order changed here
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   ) +
   theme_minimal() +
   theme(
@@ -161,17 +203,17 @@ plot_re <- ggplot(mff_means, aes(x = method, y = mean_re_yrs, color = method)) +
   labs(
     title = "Phase 2 Endpoint Comparison",
     x = "",
-    y = "Mean Number RE per Years Lived"
+    y = "Mean Number RE\nper Year at Risk"
   ) +
   scale_color_manual(
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   ) +
   scale_x_discrete(
     limits = c("czmk", "zom", "observed"),  # Order changed here
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   ) +
   theme_minimal() +
   theme(
@@ -228,18 +270,18 @@ plot_survival1 <-  ggplot(mff_means1,
                color = "black", size = 3, vjust = -1) +
   labs(
     title = "Phase 1 Endpoint Comparison",
-    x = "",
+    x = "Total Number of Recurrent Events",
     y = "Mean Truncated\nSurvival in years"
   ) +
   scale_color_manual(
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   ) +
   # scale_x_discrete(
   #   limits = c("czmk", "zom", "observed"),  # Order changed here
-  #   labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  #   labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   # ) +
   theme_minimal() +
   theme(
@@ -265,18 +307,18 @@ plot_re1 <- ggplot(mff_means1,
                color = "black", size = 3, vjust = -1) +
   labs(
     title = "Phase 2 Endpoint Comparison",
-    # x = "Method",
-    y = "Mean Number RE\nper Years Lived"
+    x = "Total Number of Recurrent Events",
+    y = "Mean Number RE\nper Year at Risk"
   ) +
   scale_color_manual(
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   ) +
   # scale_x_discrete(
   #   limits = c("czmk", "zom", "observed"),  # Order changed here
-  #   labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+  #   labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   # ) +
   theme_minimal() +
   theme(
@@ -291,7 +333,7 @@ combined_plot1 <- plot_survival1 + plot_re1 +
 
 
 
-##############################################################################################
+#############################################################################################
 ##############################################################################################
 ##############################################################################################
 ##############################################################################################
@@ -331,7 +373,7 @@ ps = ggplot(summary, aes(
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   )
 
 pre = ggplot(summary, aes(
@@ -345,7 +387,7 @@ pre = ggplot(summary, aes(
   labs(
     title = "",
     x = "Total Number of RE",
-    y = "Mean Recurrent Events per Years Lived"
+    y = "Mean RE\nper Year at Risk"
   ) +
   theme_minimal(base_size = 14) +  # Larger base font size for readability
   theme(legend.position = "bottom") +
@@ -353,7 +395,7 @@ pre = ggplot(summary, aes(
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   )
 
 # Combine the two plots side-by-side with aligned legends
@@ -382,7 +424,7 @@ ggplot(summary, aes(x = method,
   labs(
     title = "",
     x = "",
-    y = "Mean Recurrent Events per Years Lived"
+    y = "Mean RE\nper Year at Risk"
   ) +
   theme_minimal(base_size = 14) +  # Larger base font size for readability
   theme(legend.position = "bottom") +
@@ -390,7 +432,7 @@ ggplot(summary, aes(x = method,
     values = c("czmk" = "#c39bd8",  # Lighter purple version of #6a0dad
                "zom" = "#80b0e0",  # Lighter blue
                "observed" = "#7bcf7b"),  # Lighter green
-    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "observed policy")
+    labels = c("czmk" = "itrSurv", "zom" = "zero-order", "observed" = "randomized policy")
   )
 
 
