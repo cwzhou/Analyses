@@ -759,6 +759,26 @@ for (cv in 1:K) {
                                     rs = rs,
                                     ntree = Ntree)
   saveRDS(values, paste0(fnm, "values_cv",cv,"_values_", nm, rds))
+  
+  fold_trt_df <- data.frame(
+    obs = testing_dataset_surv$A,
+    czmk = opt.rule.CZMK[[1]],  # Extract the first (or correct) column
+    zom = opt.rule.ZOM[[1]]     # Extract the first (or correct) column
+  )
+  
+  library(dplyr)
+  summary_table_fold <- data.frame(
+    Trt = c("Trt 0", "Trt 1", "Trt 2"),
+    CZMK = c(round(mean(fold_trt_df$czmk == 0) * 100, 2), round(mean(fold_trt_df$czmk == 1) * 100, 2), round(mean(fold_trt_df$czmk == 2) * 100, 2)),
+    ZOM = c(round(mean(fold_trt_df$zom == 0) * 100, 2), round(mean(fold_trt_df$zom == 1) * 100, 2), round(mean(fold_trt_df$zom == 2) * 100, 2)),
+    Observed = c(round(mean(fold_trt_df$obs == 0) * 100, 2), round(mean(fold_trt_df$obs == 1) * 100, 2), round(mean(fold_trt_df$obs == 2) * 100, 2))
+  )
+  
+  # Print the summary table to check
+  print(summary_table_fold)
+  # Save summary_table_fold as a CSV file
+  write.csv(summary_table_fold, paste0(fnm, "trt_table_fold", cv, ".csv"), row.names = FALSE)
+  
 } # end of cv
 saveRDS(values, paste0(fnm,"Values_", K,"CV_", nm, rds))
 saveRDS(tab, paste0(fnm, "tab_ZOM_", nm, rds))
