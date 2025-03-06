@@ -11,6 +11,7 @@
 
 # 3/5/25: small.sample.size edited to reflect size of 5-fold CV training set for bladder1 with n = 118, so 118/5*4 which is 24*4 = 96.
 # Additionally, n.eval was updated to reflect 1 fold testing set so its 24.
+# sbatch -p general -N 1 --mem=6GB -n 2 -t 5-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript 01.Simulation_Run_RE.R > REoutput_G4_rda_001-100.txt"
 
 ### DATA TYPE ###
 local = 0
@@ -26,7 +27,7 @@ source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
 date_folder = "2025-03-05"
-n.sim_start = 1
+n.sim_start = 101
 # "2025-01-12" is 1-100 sims;
 # "2025-01-13" is 101-200 sims;
 # "2025-01-14" is 201-300 sims;
