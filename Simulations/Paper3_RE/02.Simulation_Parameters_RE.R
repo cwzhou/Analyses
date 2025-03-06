@@ -9,6 +9,9 @@
 # Author: Christina Zhou
 # Date: 11.12.2024
 
+# 3/5/25: small.sample.size edited to reflect size of 5-fold CV training set for bladder1 with n = 118, so 118/5*4 which is 24*4 = 96.
+# Additionally, n.eval was updated to reflect 1 fold testing set so its 24.
+
 ### DATA TYPE ###
 local = 0
 if (local == 1){
@@ -22,7 +25,7 @@ source("02.Simulation_Libraries_RE.R")
 source("02.Simulation_Functions_RE.R")
 
 savingrds = TRUE
-date_folder = "2025-03-01"
+date_folder = "2025-03-05"
 n.sim_start = 1
 # "2025-01-12" is 1-100 sims;
 # "2025-01-13" is 101-200 sims;
@@ -38,7 +41,7 @@ n.sim = 100
 n.sim_end = n.sim_start - 1 + n.sim # n.sim
 sim_data_type = "RE"
 endpoint = sim_data_type
-n.eval = 1000
+n.eval = 20 #1000
 tau0 = 10
 ntree1 = 300
 ##### Gap Time Hyperparameters #####
@@ -242,7 +245,7 @@ propensity <-   # (int), covariate (1~5)
        rct  = list(beta.propensity = function(p) c(rep(0, p))))  # RCT
 
 # arg6 size
-size <- list(small.sample.size = list(n = 300),
+size <- list(small.sample.size = list(n = 96), #300),
              large.sample.size = list(n = 1000))
 
 # arg7 and 8 crit
