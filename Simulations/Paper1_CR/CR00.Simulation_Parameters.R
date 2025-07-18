@@ -4,7 +4,8 @@
  # local = 1 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
 local = 0 # local = 0 for cluster
 parallel = 0 # parallel = 0 for NOT parallel code
-#
+revision = 1 #jasa revision round 1
+
 # # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
 # # uncomment if running alone (aka for CR02.Simulation_Summary.R
 # if (local == 1){
