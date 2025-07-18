@@ -3,7 +3,7 @@ library(tidyr)
 library(dplyr)
 library(patchwork)
 
-read_data = 1
+read_data = 0
 local = 1
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE")
@@ -15,13 +15,42 @@ if (local == 1){
 #   # result = readRDS(sprintf("output/%s/simResult_RE_censor1_prop2_n1_betaD.1_gammaD.1_omegaD.1_lambda0D.1_tmp.rds", date_result))
 # }
 
+if (read_rds == 1){
+  home_dir = "~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper3_RE"
+  date_result_list <- "2025-03-05"
+  file_path <- file.path(home_dir, "output", date_result_list, "mff")
+  
+  # Generate file indices, excluding 801-900
+  file_indices <- setdiff(1:1100, 801:900)
+  
+  # Generate full file paths
+  file_names <- file.path(file_path, paste0("stacked.mff_sim", file_indices, ".rds"))
+  
+  # Read all .rds files into a list
+  data_list <- lapply(file_names, readRDS)
+  
+  # Optionally combine if they have the same structure
+  library(dplyr)
+  mff_allsims0 <- bind_rows(data_list)
+  # View(mff_allsims0)
+  mff_allsims = mff_allsims0 %>%
+    # mutate(RE_cat = ifelse(Number_RE <= 1.5, 'Low',
+    #                        ifelse(Number_RE > 2.5 & Number_RE <= 4, 'Med',
+    #                               'High'))) %>%
+    # mutate(RE_cat = factor(RE_cat, levels = c("Low", "Med", "High"))) %>%
+    mutate(RE_cat = ifelse(Number_RE <= 2, '[0,2]','(2,4]')) %>%
+    mutate(RE_cat = factor(RE_cat, levels = c('[0,2]','(2,4]'))) %>%
+    mutate(RE_per_YrsLived = Number_RE/survival)
+  mff_allsims$method <- factor(mff_allsims$method, levels = c("czmk", "zom", "observed"))
+  
+}
 if (read_data == 1){
-  date_result_list <- 
-    c("2025-03-01",
-      "2025-03-02","2025-03-03",
-      "2025-03-04","2025-03-05","2025-03-06",
-      "2025-03-07","2025-03-08","2025-03-09",
-      "2025-03-10","2025-03-11")
+  date_result_list <- "2025-03-05"
+    # c("2025-03-01",
+    #   "2025-03-02","2025-03-03",
+    #   "2025-03-04","2025-03-05","2025-03-06",
+    #   "2025-03-07","2025-03-08","2025-03-09",
+    #   "2025-03-10","2025-03-11")
     # c("2025-03-02.1", "2025-03-02.2", "2025-03-02.3", "2025-03-02.4", "2025-03-02.5", 
     #   "2025-03-02.6", "2025-03-02.7", "2025-03-02.8", "2025-03-02.9"
     #                     )
@@ -61,6 +90,8 @@ if (read_data == 1){
 } else{
   message("not reading data because already done")
 }
+
+
 n.sim = length(unique(mff_allsims0$simulation))
 mff_00 = mff_allsims
 
@@ -155,12 +186,12 @@ plot_survival <- ggplot(mff_means, aes(x = method, y = mean_surv, color = method
   stat_summary(fun = mean, geom = "text",
                aes(label = round(after_stat(y), 2)),
                vjust = -2, size = 5, color = "black") +
-  scale_y_continuous(
-    limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
-    breaks = seq(y_min, y_max, by = 0.5),
-    labels = seq(y_min, y_max, by = 0.5),
-    expand = c(0, 0.05)
-  ) +
+  # scale_y_continuous(
+  #   limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
+  #   breaks = seq(y_min, y_max, by = 0.5),
+  #   labels = seq(y_min, y_max, by = 0.5),
+  #   expand = c(0, 0.05)
+  # ) +
   labs(
     title = "Phase 1 Endpoint Comparison",
     x = "",
@@ -193,13 +224,13 @@ plot_re <- ggplot(mff_means, aes(x = method, y = mean_re_yrs, color = method)) +
                shape = "square", size = 3, color = "black") +
   stat_summary(fun = mean, geom = "text",
                aes(label = round(after_stat(y), 2)),
-               vjust = 2, size = 5, color = "black") +
-  scale_y_continuous(
-    limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
-    breaks = seq(y_min, y_max, by = 0.5),
-    labels = seq(y_min, y_max, by = 0.5),
-    expand = c(0, 0.05)
-  ) +
+               vjust = -2, size = 5, color = "black") +
+  # scale_y_continuous(
+  #   limits = c(y_min, y_max),  # Set the same y-axis limits for both plots
+  #   breaks = seq(y_min, y_max, by = 0.5),
+  #   labels = seq(y_min, y_max, by = 0.5),
+  #   expand = c(0, 0.05)
+  # ) +
   labs(
     title = "Phase 2 Endpoint Comparison",
     x = "",
