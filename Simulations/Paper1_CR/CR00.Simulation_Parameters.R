@@ -28,7 +28,7 @@ mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to 
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
-generate_failure_method = generate_failure_method[2]
+generate_failure_method = generate_failure_method[1]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
@@ -62,6 +62,9 @@ assign_skip_function(all_methods, skip_method)
 arg <- commandArgs(trailingOnly = TRUE)
 if (length(arg) < 9) {
   arg = c(1, 1, 1, 1, 1, 1, 1, 1, 1) # by default
+  if (revision == 1){
+    arg = c(1, 2, 1, 1, 1, 1, 1, 1, 1) # for revision like rda
+  }
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))
 }
@@ -209,13 +212,52 @@ if (endpoint == "CR"){
         # currently using runif covariates
         # we want difference between cause1 and cause2 (csk);
         # also want difference between 0 and 1 within cause1 (zom)
+        
+        sprintf("Adding a simulation study reflecting RDA for %s setting", default$generate_failure_method)
+        # temporary while working on testing dataset
         betas <- list(
           beta1 = list(
-            beta1.hazard0 = c(0,-0.5,-1.2,1.5,0.1,0.6), #c(0, -0.5,-0.5,-0.5,-0.3,0.3), # (int), covariate (1~6)
-            beta1.hazard1 = c(0,0.3,-0.4,-0.2,0.9,1.6), #c(0, -0.1,0.6,-0.9,0.5,-0.3),
-            beta2.hazard0 = c(0,-0.6,1.4,1.5,2,1), #c(0, 0.1,0.3,-0.6,0.3,0.8),
-            beta2.hazard1 = c(0,1.5,-2.1,-0.8,0.1,1)) #c(0, -0.3,-0.3,-0.2,-0.2,0.2))
-    )
+            beta1.hazard0 = c(0,
+                              1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1),
+            beta1.hazard1 = c(0,
+                              1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1),
+            beta2.hazard0 = c(0,
+                              1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1), #c(0,-0.1,-0.2),
+            # higher beta2.hazard1 means more cause 2 because quicker failure_t2 in obs.data
+            beta2.hazard1 = c(0,
+                              1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              # 1, 1, 1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 1)
+            #c(0,
+            # 1, 1, 1, 1, 1, 1,
+            # 1, 1, 1, 1, 1, 1,
+            # 1, 1, 1, 1, 1, 1,
+            # 1, 1, 1, 1, 1, 1,
+            # 1, 1, 1, 1, 1, 1)
+          )
+        )
+        
+    #     betas <- list(
+    #       beta1 = list(
+    #         beta1.hazard0 = c(0,-0.5,-1.2,1.5,0.1,0.6), #c(0, -0.5,-0.5,-0.5,-0.3,0.3), # (int), covariate (1~6)
+    #         beta1.hazard1 = c(0,0.3,-0.4,-0.2,0.9,1.6), #c(0, -0.1,0.6,-0.9,0.5,-0.3),
+    #         beta2.hazard0 = c(0,-0.6,1.4,1.5,2,1), #c(0, 0.1,0.3,-0.6,0.3,0.8),
+    #         beta2.hazard1 = c(0,1.5,-2.1,-0.8,0.1,1)) #c(0, -0.3,-0.3,-0.2,-0.2,0.2))
+    # )
       }else{
         # currently using runif covariates
         
@@ -246,33 +288,48 @@ if (endpoint == "CR"){
       sprintf("Adding a simulation study reflecting RDA for %s setting", default$generate_failure_method)
       # temporary while working on testing dataset
       betas <- list(
-        beta1 = list(
-          beta1.hazard0 = c(0,
-                            1,    1.3, -0.2, 0.6, 0.3, 2.1,
-                            0.6,  0.3,  2.1, 0.6, 0.3, 2.1,
-                            0.5, -0.3,  1.4, 0.6, 0.3, 2.1,
-                            3,    0.6,  0.3, 2.1, 0.6, 0.3,
-                            2.1,  2.1,  2.1, 2.1, 2.1, 2.1),
-          beta1.hazard1 = c(0,
-                            -1.2, -0.1, -0.5, -1.2, -2.2, 1.2,
-                            -1,  0.5, -0.2, -1.2,  3.2, 0.3,
-                            -0.1,  5, -0.2, -1.2,  3.2, 0.3, 
-                            -0.1,  0.5, 2, -1.2,  3.2, 0.3,  
-                            -0.1,  0.5, -0.2, 2,  2, 0.43),
-          beta2.hazard0 = c(0,
-                            -0.5,-0.5,-1.4,-1.1,0.8,1.4,
-                            -2.4,-1.1,-0.8,-0.4, 0.3,0.2,
-                            -0.5,-0.5,-1.4,-1.1,0.8,1.4,
-                            -2.4,-1.1,-0.8,-0.4, 0.3,0.2,
-                            -0.5,-0.5,-1.4,-1.1,0.8,1.4), #c(0,-0.1,-0.2),
-          beta2.hazard1 = c(0,
-                            0.4, 1.3, 1.6, 1.2, 1.1, -0.4,
-                            -0.3, 0.6, 0.2, 1.1, 2, 3,
-                            0.4, 1.3, 1.6, 1.2, 1.1, -0.4,
-                            -0.3, 0.6, 0.2, 1.1, 2, 3,
-                            0.4, 1.3, 1.6, 1.2, 1.1, -0.4)
-          )
+      beta1 = list(
+        beta1.hazard0 = c(0,
+                          1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          1, 1, 1, 1, 1, 1),
+        beta1.hazard1 = c(0,
+                          1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          1, 1, 1, 1, 1, 1),
+        beta2.hazard0 = c(0,
+                          1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          1, 1, 1, 1, 1, 1), #c(0,-0.1,-0.2),
+        beta2.hazard1 = c(0,
+                          1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          1, 1, 1, 1, 1, 1)
+        #c(0,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1,
+                          # 1, 1, 1, 1, 1, 1)
+        )
       )
+      
+      # betas <- list(
+      #   beta1 = list(
+      #     beta1.hazard0 = c(0,-0.5,-1.2,1.5,0.1,0.6), #c(0, -0.5,-0.5,-0.5,-0.3,0.3), # (int), covariate (1~6)
+      #     beta1.hazard1 = c(0,0.3,-0.4,-0.2,0.9,1.6), #c(0, -0.1,0.6,-0.9,0.5,-0.3),
+      #     beta2.hazard0 = c(0,-0.6,1.4,1.5,2,1), #c(0, 0.1,0.3,-0.6,0.3,0.8),
+      #     beta2.hazard1 = c(0,1.5,-2.1,-0.8,0.1,1)) #c(0, -0.3,-0.3,-0.2,-0.2,0.2))
+      # )
+      
     } else{
       # temporary while working on testing dataset
       betas <- list(

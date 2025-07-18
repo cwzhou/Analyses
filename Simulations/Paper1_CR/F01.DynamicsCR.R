@@ -227,9 +227,15 @@ Dynamics <-
     else {
       print("policy is null: generating treatment from rbinom with propensity")
       # print(predPropensityFn)
+      message("covariate")
+      print(covariate)
       propensity = predPropensityFn(covariate = covariate)
-      # print(propensity)
+      message("propensity")
+      print(propensity)
       action = suppressWarnings(rbinom(N, 1, propensity) * 2 - 1) # 1 for aggressive and -1 for gentle
+      # print("TESTING IS THIS RIGHT - JULY 18 2025")
+      message("action")
+      print(action)
       # for NAs in propensity, the action is NA. Thus, the warnings are suppressed.
       action[at.risk == 0] <- NA
       # print(0)
