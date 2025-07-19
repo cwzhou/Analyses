@@ -480,6 +480,7 @@ for (sim in 1:n.sim) {
       
       result[sim, "czmk_survival"] = overall_survival_val.fn(czmk.data.rep) #result["czmk_survival"]
       result[sim, "czmk_endpoint"] = endpoint_val.fn(czmk.data.rep) #result["czmk_endpoint"]
+      result[sim,"czmk_trt1"] = trt1.fn(czmk.data.rep)
       # result[sim, "czmk_percent.censor"] <- mean(czmk.data.rep$status==0, na.rm = TRUE)
       # result[sim, paste0("czmk_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(czmk.data.rep$status == s))
@@ -538,6 +539,7 @@ for (sim in 1:n.sim) {
       rep_csk <<- csk.data.rep
       result[sim, "csk_survival"] = overall_survival_val.fn(csk.data.rep) #result["csk_survival"]
       result[sim, "csk_endpoint"] = endpoint_val.fn(csk.data.rep) # result["csk_endpoint"]
+      result[sim,"csk_trt1"] = trt1.fn(csk.data.rep)
       # result[sim, "csk_percent.censor"] <- mean(csk.data.rep$status==0, na.rm = TRUE)
       # result[sim, paste0("csk_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(csk.data.rep$status == s))
@@ -613,6 +615,7 @@ for (sim in 1:n.sim) {
       rep_pmcr <<- pmcr.data.rep
       result[sim, "pmcr_survival"] = overall_survival_val.fn(pmcr.data.rep) #result["pmcr_survival"]
       result[sim, "pmcr_endpoint"] = endpoint_val.fn(pmcr.data.rep) #result["pmcr_endpoint"]
+      result[sim,"pmcr_trt1"] = trt1.fn(pmcr.data.rep)
       # result[sim, "pmcr_percent.censor"] <- mean(pmcr.data.rep$status==0, na.rm = TRUE)
       # result[sim, paste0("pmcr_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(pmcr.data.rep$status == s))
@@ -684,6 +687,7 @@ for (sim in 1:n.sim) {
       rep_aipwe <<- aipwe.data.rep
       result[sim, "aipwe_survival"] = overall_survival_val.fn(aipwe.data.rep) #result["aipwe_survival"]
       result[sim, "aipwe_endpoint"] = endpoint_val.fn(aipwe.data.rep) #result["aipwe_endpoint"]
+      result[sim,"aipwe_trt1"] = trt1.fn(aipwe.data.rep)
     }
     
     # # within aipwe method, mean survival time from those who have action -1 and mean survival time for those who have action 1
