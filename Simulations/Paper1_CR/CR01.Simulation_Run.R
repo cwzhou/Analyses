@@ -62,16 +62,21 @@ result_sub = final_results %>%
                 aipwe_endpoint, zom_endpoint,
                 obs_trt1, czmk_trt1,
                 csk_trt1, pmcr_trt1,
-                aipwe_trt1, zom_trt1)
+                aipwe_trt1, zom_trt1,
+                czmk_n_phase2,
+                zom_n_phase2,
+                training_percent.censor)
 means = apply(result_sub, 2, mean, na.rm=TRUE)
 sds = apply(result_sub, 2, sd, na.rm=TRUE)
 mean_sd = cbind(means,sds)
+rounded_mean_sd = round(mean_sd,3)
 
 long_res = list(statistics = final_results,
                 settings = setting,
                 # true_P2_eval = true3,
                 # p2.df = p2.df,
-                mean_sd = mean_sd)
+                mean_sd = mean_sd,
+                rounded_mean_sd = rounded_mean_sd)
 
 #not saving result_ext right now (statistics = result not statistics = result_ext)
 if (savingrds == TRUE){
