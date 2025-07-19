@@ -321,6 +321,9 @@ for (sim in 1:n.sim) {
     arrange(obs_time) # MUST SORT ASCENDING ORDER FOR OBS_TIME
   # dplyr::select(-c(Time_Censor, Time_Failure1, Time_Failure2, Time_Tau, obs_time_failureCR,indD))
   
+  View(data.df)
+  # stop("stopping to see data.df")
+  
   # create unique observed failure times for survival phase 1
   timePointsSurvival = data.df %>%
     filter(D.0 == 1) %>%
@@ -641,9 +644,9 @@ for (sim in 1:n.sim) {
   
   cat("\n******************************\n")
   # estimation
-  cat ("4. aipwe for Simulation",sim, ":",generate_failure_method,"\n")
+  cat ("5. aipwe for Simulation",sim, ":",generate_failure_method,"\n")
   if (!skip.aipwe) {
-    cat ("  4. aipwe - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
+    cat ("  5. aipwe - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # models_aipwe <- paste0("Trt ~ ",
     # paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>% as.formula
     arg.aipwe2 = list(data = data.df.aipwe, # b/c trt is 0/1
@@ -665,7 +668,7 @@ for (sim in 1:n.sim) {
     policy_aipwe <<- arg.aipwe$policy
     rm(optimal.aipwe); gc()
     
-    cat ("  \n 4. aipwe - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
+    cat ("  \n 5. aipwe - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
     arg_aipwe <<- arg.aipwe
     if (!aipwe.error) {
       set.seed(train_seed + 10)

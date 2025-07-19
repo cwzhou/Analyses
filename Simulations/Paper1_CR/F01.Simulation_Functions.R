@@ -93,13 +93,13 @@ gdata_CR <- function(N=10,
   # if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
   # 
   
-  message("ztype is:", ztype)
+  # message("ztype is:", ztype)
   if (ztype == 0) {
     # Generate random binary and continuous covariates for each variable
     # Randomly assign each covariate to binary or continuous with 50% chance
     # set.seed(zseed)
     cov_type <- sample(c(0, 1), ncov, replace = TRUE)  # 0 = continuous, 1 = binary
-    message("cov_type is:", cov_type)
+    # message("cov_type is:", cov_type)
     z <- matrix(0, nrow = N, ncol = ncov)   # Initialize covariate matrix 
     for (i in 1:ncov) {
       if (cov_type[i] == 1) {
@@ -132,7 +132,10 @@ gdata_CR <- function(N=10,
   # generating censoring time
   if (ctype == 0){
     message("censoring: exp")
+    # message("cparam:", cparam)
     cc <- rexp(N,cparam)
+    # View(cc)
+    # message("tau:", tau)
     }
   if (ctype == 1){
     message("censoring: unif")
