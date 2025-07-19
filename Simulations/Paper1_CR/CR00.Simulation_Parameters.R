@@ -19,7 +19,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
-date_folder = "2025-07-20"; 
+date_folder = "2025-07-21"; #20 is local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 n.eval = 10000 #10000 #n.eval = 10000
