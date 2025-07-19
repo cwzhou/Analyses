@@ -115,9 +115,16 @@ if (endpoint != "CR" | generate_failure_method != "fine_gray"){
   cause1prob = NULL
 }
 if (endpoint == "CR"){
+  
+  if (revision == 1){
+    ztype1 = 0 #mix of uniform and normal
+  } else{
+    ztype1 = 2 #normal distribution
+  }
+  
   arg_list =   list(
     N = n, tau = tau, # structural parameters
-    ztype = 2, #uniform covariates
+    ztype = ztype1, 
     ctype=ctype,
     cparam=censor_rate,
     censor_min=censor_min,

@@ -68,29 +68,67 @@ gdata_CR <- function(N=10,
   # print("----------------")
   # generating covariates (nxp matrix)
   # print(N)
-  if (ztype == 0){
-    # print(N)
-    # print(ncov)
-    print("ztype=normal")
-    z <- matrix(rnorm(N * ncov), nrow = N, ncol = ncov) # positive for when testing but regular when we want zom to be not as good
-    # standardized_z = scale(z)
-    # print(head(z))
-    # print(head(standardized_z))
-    # z = standardized_z
-    # print("standardized z")
-
-  }
-  # if (ztype == 0) {
-  #   z <- matrix(0, nrow = N, ncol = ncov)
-  #   # First covariate is abs(rnorm) (positive)
-  #   z[, 1] <- abs(rnorm(N))
-  #   # Other covariates are regular rnorm
-  #   z[, -1] <- matrix(rnorm((N * (ncov - 1))), nrow = N, ncol = ncov - 1)
+  
+  # if (ztype == 0){
+  #   # print(N)
+  #   # print(ncov)
+  #   print("ztype=normal")
+  #   z <- matrix(rnorm(N * ncov), nrow = N, ncol = ncov) # positive for when testing but regular when we want zom to be not as good
+  #   # standardized_z = scale(z)
+  #   # print(head(z))
+  #   # print(head(standardized_z))
+  #   # z = standardized_z
+  #   # print("standardized z")
+  # 
   # }
-  if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
-  if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
-  if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
-
+  # # if (ztype == 0) {
+  # #   z <- matrix(0, nrow = N, ncol = ncov)
+  # #   # First covariate is abs(rnorm) (positive)
+  # #   z[, 1] <- abs(rnorm(N))
+  # #   # Other covariates are regular rnorm
+  # #   z[, -1] <- matrix(rnorm((N * (ncov - 1))), nrow = N, ncol = ncov - 1)
+  # # }
+  # if (ztype == 1){z <- matrix(rbinom(N*ncov, 1, zparam),nrow=N,ncol=ncov)}
+  # if (ztype == 2){z <- matrix(runif(N*ncov),nrow=N,ncol=ncov)}
+  # if (is.null(colnames(z))) colnames(z) = paste0("Z", 1:ncov)
+  # 
+  
+  message("ztype is:", ztype)
+  if (ztype == 0) {
+    # Generate random binary and continuous covariates for each variable
+    # Randomly assign each covariate to binary or continuous with 50% chance
+    # set.seed(zseed)
+    cov_type <- sample(c(0, 1), ncov, replace = TRUE)  # 0 = continuous, 1 = binary
+    message("cov_type is:", cov_type)
+    z <- matrix(0, nrow = N, ncol = ncov)   # Initialize covariate matrix 
+    for (i in 1:ncov) {
+      if (cov_type[i] == 1) {
+        # Binary covariate (using binomial distribution)
+        z[, i] <- rbinom(N, 1, 0.5)  # 50% probability for binary values
+      } else {
+        # Continuous covariate (normally distributed)
+        z[, i] <- rnorm(N, mean = 0, sd = zparam)
+      }
+    }
+  }
+  if (ztype == 1) {
+    # Generate binary covariates using binomial distribution
+    z <- matrix(rbinom(N * ncov, 1, 0.5), nrow = N, ncol = ncov)  # 50% probability for binary values
+  }
+  if (ztype == 2) {
+    # Generate continuous covariates using normal distribution
+    z <- matrix(rnorm(N * ncov, mean = 0, sd = zparam), nrow = N, ncol = ncov)
+  }
+  if (ztype == 3) {
+    # Generate continuous covariates using uniform distribution
+    z <- matrix(runif(N * ncov), nrow = N, ncol = ncov)
+  }
+  if (is.null(colnames(z))) {
+    colnames(z) <- paste0("Z", 1:ncov)
+  }
+  zzcov <<- z
+  # View(zzcov)
+  
   # generating censoring time
   if (ctype == 0){
     message("censoring: exp")
