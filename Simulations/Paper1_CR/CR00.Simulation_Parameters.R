@@ -2,7 +2,7 @@
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
  # local = 1 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
-local = 0 # local = 0 for cluster
+local = 1 # local = 0 for cluster
 parallel = 0 # parallel = 0 for NOT parallel code
 revision = 1 #jasa revision round 1
 
@@ -21,11 +21,11 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
-date_folder = "2025-07-21"; #20 is local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
+date_folder = "2025-07-10"; #10 and 20 are local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 n.eval = 10000 #10000 #n.eval = 10000
-n.sim = 1000 #500
+n.sim = 500 #500
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
@@ -192,7 +192,7 @@ if (generate_failure_method == "fine_gray"){
                    high.censoring = list(ctype = 0, # exp censoring
                                          censor_min = 0, # not used for exp
                                          censor_max = 0, # not used for exp
-                                         censor_rate = 10000 #3.3 # higher is more censoring for exp
+                                         censor_rate = 100 #3.3 # higher is more censoring for exp
                                    ))
   } else{
     stop("generate_failure_method is only coded up for simple exponential and fine-gray setting right now.")
@@ -220,31 +220,31 @@ if (endpoint == "CR"){
         betas <- list(
           beta1 = list(
             beta1.hazard0 = c(0,
-                              -1.30, -1.50, 1.3, 1.4, -3.1, 0.1,
-                              0.41, 1.50, 3.1, 0.21, 1.4, 0.1,
-                              4.1, 1.90, 4.1, 4.1, -0.3, 1.4,
-                              1.1, 1.70, -1.60, -1.3, -1.90, 1.50,
-                              2.1, 1.1, 0.51, 0.31, 0.21, -0.21),
+                              -1.30, 1.50, -1.3, 1.4, -2.1, 0.1,
+                              0.41, -1.50, 3.1, 2.21, 1.4, 3.1,
+                              4.1, 1.90, 1.1, -2.1, -0.3, 1.4,
+                              1.1, -1.70, -1.60, -1.3, 1.90, 1.50,
+                              -2.1, -1.1, 0.51, 0.31, 0.21, -0.21),
 
             beta1.hazard1 = c(0,
-                              -0.71, 0.61, -0.1, 3.1, 0.81, 1,
-                              2.1, 2, -1, -3.1, -0.61, 0.71,
-                              3.1, 2, -2.1, -0.91, 3.21, -0.81,
-                              -0.21, 2.1, -1, 4.1, -2.1, -0.21,
-                              -3.1, 0.91, 0.71, -2.1, 2.1, 4.1),
+                              -0.71, -0.61, -0.1, 3.1, -0.81, 1,
+                              2.1, 2, 1.5, -1.1, 0.61, 1.71,
+                              3.1, -0.3, 2.1, -0.91, -3.21, -0.81,
+                              -0.21, 2.1, -1, 1.1, 2.1, -0.21,
+                              3.1, 0.91, -0.71, 2.1, 2.1, 4.1),
             beta2.hazard0 = c(0,
-                              2.1, 1.1, 0.41, 0.41, 0.51, 0.31,
-                              0.31, 1.1, 3.51, 0.71, -0.31, -2.1,
-                              -0.51, -0.81, 3.1, -2.1, 3.1, -1.7,
-                              -0.41, -3.1, 3.1, -0.81, 1.6, -1.4,
-                              0.51, 0.31, -2.1, -1, -0.31, -2.1), #c(0,-0.1,-0.2),
+                              -2.1, 1.1, 0.41, 1.41, 1.51, 1.31,
+                              0.31, 3.1, -0.51, 0.71, -0.31, -2.1,
+                              -0.51, -0.81, 3.1, -0.1, 3.1, -1.7,
+                              -0.41, -0.1, -3.1, -0.81, 1.6, -1.4,
+                              2.51, 0.31, -2.1, -1, -0.31, -2.1), #c(0,-0.1,-0.2),
             # higher beta2.hazard1 means more cause 2 because quicker failure_t2 in obs.data
             beta2.hazard1 = c(0,
-                              -2.1, 1.1, 1.8, 0.61, 3.1, -2.1,
-                              -1.41, -2.1, -4.1, -4.1, -0.41, -0.31,
-                              -1.1, -3.1, -0.41, -0.61, -2.1, -1.1,
-                              1.1, 0.21, 0.61, 3.1, -0.41, -3.1,
-                              0.41, 0.81, 0.91, -0.81, 0.31, 0.41)
+                              -2.1, 1.1, -3.8, 0.61, -3.1, 2.1,
+                              -1.41, -2.1, -1.1, -4.1, -0.41, -0.31,
+                              -1.1, -3.1, 0.41, -1.61, -2.1, -1.1,
+                              1.1, -0.21, -0.61, -3.1, -2.41, -3.1,
+                              0.41, 2.81, -0.91, -0.81, -0.31, 0.41)
             # c(0,
             # 1, 1, 1, 1, 1, 1,
             # 1, 1, 1, 1, 1, 1,

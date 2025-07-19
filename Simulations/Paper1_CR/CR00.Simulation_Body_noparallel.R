@@ -987,6 +987,8 @@ for (sim in 1:n.sim) {
     message('saving rds tmp')
     saveRDS(result, filename.tmp) # saving the temporary results
   }
+  message("The result for up to simulation ", sim)
+  print(result)
   gc()
   cat("--- End of Simulation", sim, "---\n")
 } # for (sim in 1:n.sim) but removed for parallelizing

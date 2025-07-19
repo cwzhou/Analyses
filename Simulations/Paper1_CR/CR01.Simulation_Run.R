@@ -7,7 +7,7 @@
 ## Edit parameters in CR00.Simulation_Parameters.R script
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-local = 0 # change to 0 for cluster
+local = 1 # change to 0 for cluster
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
