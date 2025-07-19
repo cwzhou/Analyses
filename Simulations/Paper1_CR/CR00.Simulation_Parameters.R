@@ -23,7 +23,7 @@ date_folder = "2025-07-19";
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 n.eval = 10000 #10000 #n.eval = 10000
-n.sim = 100 #500
+n.sim = 10 #500
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
@@ -190,7 +190,7 @@ if (generate_failure_method == "fine_gray"){
                    high.censoring = list(ctype = 0, # exp censoring
                                          censor_min = 0, # not used for exp
                                          censor_max = 0, # not used for exp
-                                         censor_rate = 100000 #3.3 # higher is more censoring for exp
+                                         censor_rate = 10000 #3.3 # higher is more censoring for exp
                                    ))
   } else{
     stop("generate_failure_method is only coded up for simple exponential and fine-gray setting right now.")
@@ -226,10 +226,10 @@ if (endpoint == "CR"){
 
             beta1.hazard1 = c(0,
                               -0.71, 0.61, -0.1, 3.1, 0.81, 1,
-                              2.1, 2, -1, 3.1, -0.61, 0.71,
-                              3.1, 2, 2.1, -0.91, 3.21, -0.81,
-                              -0.21, 2.1, -1, 4.1, 2.1, -0.21,
-                              -3.1, 0.91, 0.71, 2.1, 2.1, 4.1),
+                              2.1, 2, -1, -3.1, -0.61, 0.71,
+                              3.1, 2, -2.1, -0.91, 3.21, -0.81,
+                              -0.21, 2.1, -1, 4.1, -2.1, -0.21,
+                              -3.1, 0.91, 0.71, -2.1, 2.1, 4.1),
             beta2.hazard0 = c(0,
                               2.1, 1.1, 0.41, 0.41, 0.51, 0.31,
                               0.31, 1.1, 3.51, 0.71, -0.31, -2.1,
