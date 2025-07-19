@@ -23,7 +23,7 @@ date_folder = "2025-07-18";
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 n.eval = 100#10000 #n.eval = 10000
-n.sim = 1#500
+n.sim = 5#500
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
@@ -40,7 +40,7 @@ if (generate_failure_method == "simple_exp"){
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
-skip_method <- c(!TRUE, TRUE, TRUE, TRUE, !TRUE, !TRUE);
+skip_method <- c(!TRUE, !TRUE, TRUE, TRUE, !TRUE, !TRUE);
 # skip_method <- c(!TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
 #### Run this Script FOR CR. Change name later.
@@ -218,30 +218,33 @@ if (endpoint == "CR"){
         betas <- list(
           beta1 = list(
             beta1.hazard0 = c(0,
-                              1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1),
+                              1.1, 2.1, 2.1, 1, 1, 1,
+                              1, 1, 1, 1, 1, 4.1,
+                              1, 3.1, 1, 1, 1, 1,
+                              1, 1, 11, 5.1, 1, 1,
+                              1, 3.1, 1, 1, 1, 1
+                              ),
             beta1.hazard1 = c(0,
-                              1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1),
+                              1, 1, 1, 1, -1, 1,
+                              -1, 1, 1, 1, 1, 1,
+                              1, 1, 1, -1, -1, 1,
+                              1, 1, -1, 1, 1, 1,
+                              1, -1, 1, 1, 1, 1
+                              ),
             beta2.hazard0 = c(0,
-                              1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1), #c(0,-0.1,-0.2),
+                              1.1, 2.1, 2.1, 1.21, 3.1, 2.1,
+                              -2.1, 5.1, -1, -0.1, 4.41, 4.1,
+                              -1, 3.1, 0.31, 1, -1, 1,
+                              1, 1, -0.4, 2.1, -3.1, 1,
+                              1, 3.1, 0.1, -1, 1, 1
+                              ), #c(0,-0.1,-0.2),
             # higher beta2.hazard1 means more cause 2 because quicker failure_t2 in obs.data
             beta2.hazard1 = c(0,
-                              1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              # 1, 1, 1, 1, 1, 1,
-                              1, 1, 1, 1, 1, 1)
+                              -1, 1, 1, 1.1, 1, 1,
+                              1, 1, -1, 2.1, -1.1, 1,
+                              1, -1, 1, 0.21, 1, 0.1,
+                              1, -1, 1, 0.7, 0.21, 1,
+                              1, -1, 0.41, 1, -0.21, -3.1)
             #c(0,
             # 1, 1, 1, 1, 1, 1,
             # 1, 1, 1, 1, 1, 1,
