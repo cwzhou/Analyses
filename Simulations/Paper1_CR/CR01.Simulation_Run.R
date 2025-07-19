@@ -59,7 +59,10 @@ result_sub = final_results %>%
                 aipwe_survival, zom_survival,
                 obs_endpoint, czmk_endpoint,
                 csk_endpoint, pmcr_endpoint,
-                aipwe_endpoint, zom_endpoint)
+                aipwe_endpoint, zom_endpoint,
+                obs_trt1, czmk_trt1,
+                csk_trt1, pmcr_trt1,
+                aipwe_trt1, zom_trt1)
 means = apply(result_sub, 2, mean, na.rm=TRUE)
 sds = apply(result_sub, 2, sd, na.rm=TRUE)
 mean_sd = cbind(means,sds)

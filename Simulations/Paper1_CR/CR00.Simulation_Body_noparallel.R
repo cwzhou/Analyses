@@ -25,6 +25,11 @@ endpoint_val.fn <- function(data) {
   # mean CIF probability at t0 = crit.eval.cif
   mean(data$CIF_eval, na.rm = TRUE)
 }
+trt1.fn <- function(data) {
+  # mean truncated years lost due to cause 1 (priorty cause) or
+  # mean CIF probability at t0 = crit.eval.cif
+  mean(data$action==1, na.rm = TRUE)
+}
 
 if (criterion_phase1 %in% c("mean", "area", "surv.area")) {
   crit.eval.os = "mean"
@@ -68,12 +73,14 @@ column_names <- lapply(all_methods, function(method) {
     c(
       paste(method, "survival", sep = "_"),
       paste(method, "endpoint", sep = "_"),
+      paste(method, "trt1", sep = "_"),
       paste("time", method, sep = ".")
     )
   } else {
     c(
       paste(method, "survival", sep = "_"),
       paste(method, "endpoint", sep = "_"),
+      paste(method, "trt1", sep = "_"),
       paste(method, "n_phase2", sep = "_"),
       paste("time", method, sep = ".")
     )
@@ -321,7 +328,7 @@ for (sim in 1:n.sim) {
     arrange(obs_time) # MUST SORT ASCENDING ORDER FOR OBS_TIME
   # dplyr::select(-c(Time_Censor, Time_Failure1, Time_Failure2, Time_Tau, obs_time_failureCR,indD))
   
-  View(data.df)
+  # View(data.df)
   # stop("stopping to see data.df")
   
   # create unique observed failure times for survival phase 1
@@ -355,6 +362,7 @@ for (sim in 1:n.sim) {
   # result["obs_endpoint"]
   result[sim, "obs_survival"] <- overall_survival_val.fn(obs.data.rep)#val.fn_phase1(obs.data.rep$event.time)
   result[sim, "obs_endpoint"] <- endpoint_val.fn(obs.data.rep)
+  result[sim, "obs_trt1"] <- trt1.fn(obs.data.rep)
   
   # # A = -1; B = 1
   # # within method, mean survival time from those who have action -1 and mean survival time for those who have action 1
@@ -805,6 +813,7 @@ for (sim in 1:n.sim) {
       rep_zom <<- zom.data.rep
       result[sim,"zom_survival"] = overall_survival_val.fn(zom.data.rep) #result["zom_survival"]
       result[sim,"zom_endpoint"] = endpoint_val.fn(zom.data.rep) #result["zom_endpoint"]
+      result[sim,"zom_trt1"] = trt1.fn(zom.data.rep)
       # result[sim, "zom_percent.censor"] <- mean(zom.data.rep$status==0, na.rm = TRUE)
       # result[sim, paste0("zom_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(zom.data.rep$status == s))
