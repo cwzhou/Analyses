@@ -2,7 +2,7 @@
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
  # local = 1 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
-local = 1 # local = 0 for cluster
+local = 0 # local = 0 for cluster
 parallel = 0 # parallel = 0 for NOT parallel code
 revision = 1 #jasa revision round 1
 
@@ -19,11 +19,11 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
-date_folder = "2025-07-19"; 
+date_folder = "2025-07-20"; 
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 n.eval = 10000 #10000 #n.eval = 10000
-n.sim = 100 #500
+n.sim = 1000 #500
 mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
