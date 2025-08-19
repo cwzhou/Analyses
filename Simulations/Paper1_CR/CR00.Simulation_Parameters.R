@@ -21,16 +21,16 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
-date_folder = "2025-07-10"; #10 and 20 are local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
+date_folder = "2025-08-02"; #10 and 20 are local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 n.eval = 10000 #10000 #n.eval = 10000
-n.sim = 500 #500
-mean_tol1 = c(0.07,0) # this is for differences in years so we don't want it to be too big
+n.sim = 100 #500
+mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
@@ -180,7 +180,7 @@ if (generate_failure_method == "fine_gray"){
     # we want about 50% censoring
     ctype = 1, # uniform censoring
     censor_min = 0,
-    censor_max = 0.7*tau.1, # lower is more censoring for unif
+    censor_max = 0.1*tau.1, #0.7*tau.1, # lower is more censoring for unif
     censor_rate = 0 # not used for unif
     ))
   } else if (generate_failure_method == "simple_exp"){
@@ -192,7 +192,7 @@ if (generate_failure_method == "fine_gray"){
                    high.censoring = list(ctype = 0, # exp censoring
                                          censor_min = 0, # not used for exp
                                          censor_max = 0, # not used for exp
-                                         censor_rate = 100 #3.3 # higher is more censoring for exp
+                                         censor_rate = 1000 #3.3 # higher is more censoring for exp
                                    ))
   } else{
     stop("generate_failure_method is only coded up for simple exponential and fine-gray setting right now.")
@@ -219,32 +219,66 @@ if (endpoint == "CR"){
         # temporary while working on testing dataset
         betas <- list(
           beta1 = list(
-            beta1.hazard0 = c(0,
-                              -1.30, 1.50, -1.3, 1.4, -2.1, 0.1,
-                              0.41, -1.50, 3.1, 2.21, 1.4, 3.1,
-                              4.1, 1.90, 1.1, -2.1, -0.3, 1.4,
-                              1.1, -1.70, -1.60, -1.3, 1.90, 1.50,
-                              -2.1, -1.1, 0.51, 0.31, 0.21, -0.21),
+            beta1.hazard0 = 
+              c(0,
+                2.1, 3.8, 1.3, 1.3, 2.1, 0.2,
+                2.1, 2.1, 1, 1.3, 1.9, 2.1,
+                1.2, 3.1, 2.1, 1, 2.3, 0.4,
+                2.3, 0.1, 1.3, 2.4, 1.1, 2.7,
+                0.1, 2.3, 3.4, 3.1, 0.1, 0.3),
+              # c(0,
+              #                 -1.30, -3.50, -2.3, -1.4, -2.1, -1.41,
+              #                 -0.41, 2.50, -3.1, -2.21, -1.4, -3.1,
+              #                 0.1, -1.90, 1.1, -2.1, -1.3, -1.4,
+              #                 -1.1, -0.70, -1.60, -1.3, -1.90, -1.50,
+              #                 -2.1, -1.1, -0.51, -0.31, -0.21, -0.21),
 
-            beta1.hazard1 = c(0,
-                              -0.71, -0.61, -0.1, 3.1, -0.81, 1,
-                              2.1, 2, 1.5, -1.1, 0.61, 1.71,
-                              3.1, -0.3, 2.1, -0.91, -3.21, -0.81,
-                              -0.21, 2.1, -1, 1.1, 2.1, -0.21,
-                              3.1, 0.91, -0.71, 2.1, 2.1, 4.1),
-            beta2.hazard0 = c(0,
-                              -2.1, 1.1, 0.41, 1.41, 1.51, 1.31,
-                              0.31, 3.1, -0.51, 0.71, -0.31, -2.1,
-                              -0.51, -0.81, 3.1, -0.1, 3.1, -1.7,
-                              -0.41, -0.1, -3.1, -0.81, 1.6, -1.4,
-                              2.51, 0.31, -2.1, -1, -0.31, -2.1), #c(0,-0.1,-0.2),
+            beta1.hazard1 = 
+              c(0,
+                2.5, 3.8, 1.3, 1.3, 2.1, 0.2,
+                2.3, 2.1, 1.3, 1.3, 1.9, 2.3,
+                1.5, 3.1, 2.1, 1.1, 2.3, 0.4,
+                2.7, 0.1, 1.3, 2.4, 1.1, 3.2,
+                0.1, 2.3, 3.4, 3.1, 0.4, 0.3),
+                                # 3.3, 3.8, 3.3, 5.31, 1.1, 2.21,
+                # 4.2, 2.1, 4.3, 2, 3.1, 4.3,
+                # 2, 5.1, 2.1, 3.1, 3.2, 4.2,
+                # 2, 4.8, 2, 5.1, 4.1, 2.2,
+                # 1.51, 1.3, 6.4, 7.3, 1.41, 3.1),
+              
+              # c(0,
+              #                 2.71, 0.61, 1.1, -2.61, 0.81, 1,
+              #                 -0.81, 2, 1.5, -1.1, 3.21, 1.71,
+              #                 3.1, 3.3, 2.1, -0.91, -2.21, 1.81,
+              #                 2.21, -1.1, 0.5, 1.1, 2.1, -0.21,
+              #                 3.1, 0.91, 0.71, 2.1, 1.1, 0.41),
+            beta2.hazard0 = 
+              c(0,
+                2.3, 1.1, 0.31, 2.1, 0.31, 1,
+                0.1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1),
+              # c(0,
+              #                 -1.1, 1.1, 0.41, 1.41, 0.51, -1.31,
+              #                 0.31, 1.1, -0.51, 0.71, 0.31, -2.1,
+              #                 -0.51, -0.81, 0.1, 0.1, -3.1, -1.7,
+              #                 -0.41, 0.1, -3.1, -0.81, 1.6, 1.4,
+                              # 1.51, -0.31, -2.1, 1.1, -0.31, -2.1), #c(0,-0.1,-0.2),
             # higher beta2.hazard1 means more cause 2 because quicker failure_t2 in obs.data
-            beta2.hazard1 = c(0,
-                              -2.1, 1.1, -3.8, 0.61, -3.1, 2.1,
-                              -1.41, -2.1, -1.1, -4.1, -0.41, -0.31,
-                              -1.1, -3.1, 0.41, -1.61, -2.1, -1.1,
-                              1.1, -0.21, -0.61, -3.1, -2.41, -3.1,
-                              0.41, 2.81, -0.91, -0.81, -0.31, 0.41)
+            beta2.hazard1 = 
+              c(0,
+                1.8, 1.4, 1.1, 1.1, 2.1, 3.1,
+                1.2, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1)
+              # c(0,
+              #                 -2.1, 0.1, -3.8, -0.61, -3.1, -2.1,
+              #                 -1.41, -2.1, -1.1, -4.1, -0.41, -0.31,
+              #                 -1.1, -3.1, 0.41, -1.61, -2.1, -1.1,
+              #                 1.1, -0.21, 0.61, -3.1, -2.41, -3.1,
+              #                 0.41, 2.81, 0.91, 0.81, -0.31, 0.41)
             # c(0,
             # 1, 1, 1, 1, 1, 1,
             # 1, 1, 1, 1, 1, 1,
@@ -289,33 +323,46 @@ if (endpoint == "CR"){
     # currently using runif covariates
     if (revision == 1){
       sprintf("Adding a simulation study reflecting RDA for %s setting", default$generate_failure_method)
-      # temporary while working on testing dataset
+      
+      # betas <- list(
+      #   beta1 = list(
+      #     beta1.hazard0 = c(0,0.1,0.3),#c(0,-1,-1.4),
+      #     beta1.hazard1 = c(0,-1.8,-1.5),#c(0,0.8,0.7),
+      #     beta2.hazard0 = c(0,-1.1,-0.3),#c(0,-0.2,1.2), #c(0,0.2,0.8),
+      #     beta2.hazard1 = c(0,-0.2,1.2)),#c(0,-0.3,-2)),
+      #   beta2 = list(
+      #     beta1.hazard0 = c(0,1,1.3,-0.2,0.6,0.3,2.1,0.5,-0.3,1.4,3),
+      #     beta1.hazard1 = c(0,-1.2,-0.1,-0.5,-1.2,-2.2,1.2,-0.1,0.5,-0.2,-1.2),
+      #     beta2.hazard0 = c(0,-0.5,-0.5,-1.4,-1.1,0.8,1.4,-2.4,-1.1,-0.8,-0.4), #c(0,-0.1,-0.2),
+      #     beta2.hazard1 = c(0,0.4,1.3,1.6,1.2,1.1,-0.4,-0.3,0.6,0.2,1.1))
+      # )
+      
       betas <- list(
       beta1 = list(
         beta1.hazard0 = c(0,
-                          1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          1, 1, 1, 1, 1, 1),
+                          0.1, 0.3, 0.01, -0.15, -0.13, -0.17,
+                          0.16, -1.15, -3.27, 1.16, 0.01, 0.01,
+                          0.14, -2.13, 0.3, 1.18, 0.01, 0.01,
+                          0.18, 0.01, -2.2, 0.54, 0, 0,
+                          0.01, 0.01, 0.01, 0.38, 0.15, 0.12),
         beta1.hazard1 = c(0,
-                          1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          1, 1, 1, 1, 1, 1),
+                          -1.8, -1.5, 1.31, -0.13, 0.01, -0.17,
+                          0.1, 0.13, 1.71, -0.3, 0, 2.1,
+                          0, -0.16, -0.4, 0.1, 0.1, 0.11,
+                          0.19, 0, 0.1, 1.33, 0.4, 0.2,
+                          0.18, 0.12, 0.01, 0, 0, -0.1),
         beta2.hazard0 = c(0,
-                          1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          1, 1, 1, 1, 1, 1), #c(0,-0.1,-0.2),
+                          0.15, 0.32, 2.19, 0.13, 0.14, 0.18,
+                          -1.18, -0.13, 0.16, 0.01, 0.25, 0.19,
+                          -0.36, 0.34, 0.32, -1.73, 0.04, 0.15,
+                          -0.27, -0.14, -0.13, 1.21, 0.02, 0.84,
+                          -0.14, 1.33, 0.12, 0.25, 0.01, 0.71), #c(0,-0.1,-0.2),
         beta2.hazard1 = c(0,
-                          1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          1, 1, 1, 1, 1, 1)
+                          -0.23,  0.35, 0.77, -1.38, 0.36, -1.98,
+                          -0.14, -0.81, -0.52, 0.13, 0.17, 0.15,
+                           0.31,  0.37, -0.17, 0.18, 0.12, -0.14,
+                          -0.22,  0.83, 0.54, -1.41, 0.16, 0.01,
+                          -0.33, -0.55, 0.62, 0.1, -0.32, 0.01)
         #c(0,
                           # 1, 1, 1, 1, 1, 1,
                           # 1, 1, 1, 1, 1, 1,

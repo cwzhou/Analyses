@@ -256,7 +256,7 @@ for (sim in 1:n.sim) {
   #   prev_count = prev_count + 1
   # }
   
-  train_seed = sim*10000 + 123
+  train_seed = sim*10000 + 2025
   # if (setting_seed == 1){
   #   arg.obs$seed1 <- train_seed
   #   arg.czmk$seed1 <- arg.obs.no.censor$seed1 <-
@@ -405,6 +405,7 @@ for (sim in 1:n.sim) {
              paste(paste0("Z", 1:ncov, ""), collapse = " + ")) %>% as.formula
     })
     # print(crit.value_phase1)
+    
     arg.czmk2 = list(data = data.df,
                      endPoint = "CR",
                      yName = "obs_time",
@@ -430,8 +431,12 @@ for (sim in 1:n.sim) {
     set.seed(train_seed + 1)
     optimal.czmk <- do.call(itrSurv::itrSurv, c(arg.czmk2,
                                                 list(mTry = sqrt(ncov),
-                                                     nodeSize = nodesize,
-                                                     minEvent = mindeath)))
+                                                     minEventEnd = mindeath, # minimum number of subjects with events
+                                                     minEventSurv = mindeath, # minimum number of subjects with events
+                                                     nodeSizeEnd = nodesize,
+                                                     nodeSizeSurv = nodesize # this is needed only for endpoint=RE.
+                                                     )))
+    print(table(optimal.czmk@phaseResults[["FinalOptimalTx_Recc"]]))
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk$policy <- if (!czmk.error) optimal.czmk
     # View(arg.czmk$policy)
@@ -504,6 +509,9 @@ for (sim in 1:n.sim) {
   cat("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
   n.stages = 1
   if (!skip.csk) {
+    if ("package:itrSurv" %in% search()) {
+      detach("package:itrSurv", unload = TRUE, character.only = TRUE)
+    }
     library(dtrSurv)
     cat ("  3. csk - Policy estimation for Simulation",sim, ":",generate_failure_method,"\n")
     # dtrSurv (Cho et al)
@@ -559,6 +567,7 @@ for (sim in 1:n.sim) {
     if ("package:dtrSurv" %in% search()) {
       detach("package:dtrSurv", unload = TRUE, character.only = TRUE)
     }
+    library(itrSurv)
   }
   
   
@@ -782,26 +791,46 @@ for (sim in 1:n.sim) {
     set.seed(train_seed + 5)
     optimal.zom <- do.call(itrSurv::itrSurv, c(arg.czmk2,
                                                list(mTry = 1,
-                                                    nodeSize = 1e+9,
-                                                    minEvent = 1)))
+                                                    minEventEnd = 1, # minimum number of subjects with events
+                                                    minEventSurv = 1, # minimum number of subjects with events
+                                                    nodeSizeEnd = 1e9,
+                                                    nodeSizeSurv = 1e9 # this is needed only for endpoint=RE.
+                                               )))
+    print(table(optimal.zom@phaseResults[["FinalOptimalTx_Recc"]]))
+    # set.seed(10128)
+    # opt_test <- do.call(itrSurv::itrSurv, c(arg.czmk2, list(minEventEnd = 1, # minimum number of subjects with events
+    #                                                         minEventSurv = 1, # minimum number of subjects with events
+    #                                                         nodeSizeEnd = 1e9,
+    #                                                         nodeSizeSurv = 1e9, # this is needed only for endpoint=RE.
+    #                                                         mTry = 1)))
+    # print(table(opt_test@phaseResults[["FinalOptimalTx_Recc"]]))
+ 
     # optimal.zom <- try(itrSurv:::itrSurv(data = data.df,
-    #                                      txName = "Trt",
+    #                                      endPoint = "CR",
+    #                                      yName = "obs_time",
+    #                                      txName = paste("Trt"),
+    #                                      epName = "status", # status indicator (0 = censored, 1 = failure from cause 1 (PC), 2 = failure from cause 2)
     #                                      models = models_itr,
-    #                                      usePrevTime = TRUE,
+    #                                      timePointsSurvival = timePointsSurvival,
+    #                                      timePointsEndpoint = timePointsEndpoint,
     #                                      tau = tau,
-    #                                      timePoints = "uni",
-    #                                      nTimes = 100,
     #                                      criticalValue1 = criterion_phase1,
     #                                      criticalValue2 = criterion_phase2,
     #                                      evalTime = crit.value_phase1,
-    #                                      splitRule = NULL,#ifelse(criterion == "mean", "mean", "logrank"),
+    #                                      splitRule1 = splitRule,
+    #                                      splitRule2 = "gray_cr",
     #                                      ERT = TRUE, uniformSplit = TRUE, replace = FALSE,
     #                                      randomSplit = 0.2,
-    #                                      minEvent = 1, nodeSize = 1e+4, # zero-order model !!!!
-    #                                      nTree = 300, mTry = 1,
+    #                                      minEventEnd = 1, # minimum number of subjects with events
+    #                                      minEventSurv = 1, # minimum number of subjects with events
+    #                                      nodeSizeEnd = 1e9,
+    #                                      nodeSizeSurv = 1e9, # this is needed only for endpoint=RE.
+    #                                      nTree = 300,
+    #                                      mTry = 1,
     #                                      pooled = FALSE,
-    #                                      tol1 = tol1,#c(0.1,0),
+    #                                      tol1 = tol1, #c(0.1,0),
     #                                      stratifiedSplit = 0))
+    # print(table(optimal.zom@phaseResults[["FinalOptimalTx_Recc"]]))
     zom.error <- class(optimal.zom)[1] == "try-error"
     arg.zom$policy <- if (!zom.error) optimal.zom
     policy_zom <- arg.zom$policy

@@ -1,10 +1,10 @@
 solo.plot = 0
 local = 1
 if (local == 1){
-   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
- } else{
-   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
- }
+  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+} else{
+  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+}
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
 saving_eps = TRUE#TRUE
@@ -60,7 +60,7 @@ design.levels = c(1,2)
 design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
 beta.levels = c(1,2)
 beta.labels = c(sprintf("ncov=%s",ncov.list$beta1),
-             sprintf("ncov=%s",ncov.list$beta2))
+                sprintf("ncov=%s",ncov.list$beta2))
 # beta.levels = c(1,2)
 # beta.labels = c("setting1",
 #                 "setting2")
@@ -109,7 +109,7 @@ if (endpoint == "CR"){
                          "_n", n, "_critS", critS.no,
                          "_critE", critE.no, ".rds"))
   }
-
+  
 } else{
   fn <-
     expand.grid(ncauses = 1, censor = 1:2, beta = 1:6, prop = 1:2,
@@ -190,7 +190,7 @@ for (crit.no in 1:crit.tot){
           NULL
         } else {
           print("a is not null")
-
+          
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
           # print(head(a))
           if (parallel == 0){
@@ -203,7 +203,7 @@ for (crit.no in 1:crit.tot){
                           all_of(var_method),
                           czmk_n_phase2, zom_n_phase2,
                           training_percent.censor, training_cause.1, training_cause.2)
-
+          
           if (generate_failure_method == "fine_gray"){
             middle = beginning %>%
               mutate(ncauses = fn$ncauses[i],
@@ -224,8 +224,8 @@ for (crit.no in 1:crit.tot){
                      crit = fn$critS.no[i])
           }
           middle %>% pivot_longer(cols = all_of(var_method),
-                       names_to = "method",
-                       values_to = "value")
+                                  names_to = "method",
+                                  values_to = "value")
         }
       }) %>%
       do.call(rbind, .) %>%
@@ -245,8 +245,8 @@ for (crit.no in 1:crit.tot){
                          levels = beta.levels,
                          labels = beta.labels),
         n = factor(n,
-                    levels = n.levels,
-                    labels = n.labels),
+                   levels = n.levels,
+                   labels = n.labels),
         design = factor(prop,
                         levels = design.levels,
                         labels = design.labels),
@@ -254,10 +254,10 @@ for (crit.no in 1:crit.tot){
                             levels = 1:2,
                             labels = c("1" = sprintf("Mean Truncated %s", crit_lab),
                                        "2" = sprintf("%s probability at t=%s, Curve(%s)", crit_lab, t0, t0)
-                                       )))
+                            )))
     #end of result.comb
     print("end of result.comb")
-
+    
     if (generate_failure_method == "fine_gray"){
       result.comb1 = result.comb %>%
         mutate(cause1prob = factor(cause1prob,
@@ -276,21 +276,21 @@ for (crit.no in 1:crit.tot){
                     crit + crit.label , data = .,
                   FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
         rename(sd = value)
-      } else{
-        result.comb1 <- result.comb
-        result.stat <-
-          result.comb1 %>%
-          aggregate(cbind(value, czmk_n_phase2, zom_n_phase2, training_percent.censor, training_cause.1, training_cause.2) ~ method +
-                      ncauses + censor +
-                      setting + n + design + crit + crit.label , data = .,
-                    FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
-          mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
-        result.stat.sd <-
-          result.comb1 %>%
-          aggregate(value ~ method + ncauses + censor + setting + n + design +
-                      crit + crit.label , data = .,
-                    FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
-          rename(sd = value)
+    } else{
+      result.comb1 <- result.comb
+      result.stat <-
+        result.comb1 %>%
+        aggregate(cbind(value, czmk_n_phase2, zom_n_phase2, training_percent.censor, training_cause.1, training_cause.2) ~ method +
+                    ncauses + censor +
+                    setting + n + design + crit + crit.label , data = .,
+                  FUN = function(x) round(mean(x, na.rm = TRUE), 2)) %>%
+        mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
+      result.stat.sd <-
+        result.comb1 %>%
+        aggregate(value ~ method + ncauses + censor + setting + n + design +
+                    crit + crit.label , data = .,
+                  FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
+        rename(sd = value)
     }
     result.stat <- left_join(result.stat, result.stat.sd)
     rm(result.stat.sd)
@@ -326,14 +326,78 @@ for (crit.no in 1:crit.tot){
       scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
       ylab(ylabs) +
       theme_bw() #+
-      # theme(legend.position = "bottom")
+    # theme(legend.position = "bottom")
     rng = suppressWarnings(layer_scales(p)$y$range$range)
     rng[3] = rng[2] - rng[1]
     rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
     rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
-
-      p.list[[Phase.no]] <-
-        p +
+    
+    p.list[[Phase.no]] <-
+      p +
+      stat_summary(aes(x = as.numeric(method),
+                       y = value),
+                   fun = mean,
+                   geom = 'point',
+                   col = "black",
+                   shape = "square",
+                   size = 1) +
+      stat_summary(aes(x = as.numeric(method),
+                       y = value,
+                       label = round(..y.., 2),
+                       #below is code for alternating. if you use this, comment out vjust=-1.1 below
+                       # vjust = ifelse(as.numeric(method) %% 2 == 0,
+                       #                2,
+                       #                -1)
+      ),
+      fun = mean,
+      geom = 'text',
+      col = "black",
+      vjust = -1.1,
+      size = 2.5) +
+      # Expand y-axis limits to prevent labels from being cut off
+      scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
+    
+    if (saving_eps == TRUE){
+      ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
+      ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
+             p.list[[Phase.no]],
+             width = 12, height = 10)
+    }
+    
+    
+    if (solo.plot == 1){
+      solo.result.comb1 = result.comb1 %>%
+        filter(design %in% design.filter[1]) %>%
+        filter(setting %in% "ncov=5",
+               n %in% "N=700",
+               censor %in% "Low Censoring (20%)")
+      
+      if (generate_failure_method == "fine_gray"){
+        solo.result.comb1 = solo.result.comb1 %>%
+          filter(cause1prob %in% "mass_p = 0.8")
+        p0.solo <-
+          solo.result.comb1 %>%
+          ggplot(aes(x = method, y = value, group = method, color = method)) +
+          facet_grid(cause1prob + setting ~ censor + n + design)# , scales = "free_y")
+      } else{
+        p0.solo <-
+          solo.result.comb1 %>%
+          ggplot(aes(x = method, y = value, group = method, color = method)) +
+          facet_grid(setting ~ censor + n + design, scales = "free_y")
+      }
+      p.solo = p0.solo +
+        geom_boxplot() +
+        geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
+        scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
+        ylab(ylabs) +
+        theme_bw() #+
+      # theme(legend.position = "bottom")
+      rng = suppressWarnings(layer_scales(p.solo)$y$range$range)
+      rng[3] = rng[2] - rng[1]
+      rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
+      rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
+      p.list.solo[[Phase.no]] <-
+        p.solo +
         stat_summary(aes(x = as.numeric(method),
                          y = value),
                      fun = mean,
@@ -344,106 +408,42 @@ for (crit.no in 1:crit.tot){
         stat_summary(aes(x = as.numeric(method),
                          y = value,
                          label = round(..y.., 2),
-                         #below is code for alternating. if you use this, comment out vjust=-1.1 below
-                         # vjust = ifelse(as.numeric(method) %% 2 == 0,
-                         #                2,
-                         #                -1)
-                         ),
-                     fun = mean,
-                     geom = 'text',
-                     col = "black",
-                     vjust = -1.1,
-                     size = 2.5) +
-      # Expand y-axis limits to prevent labels from being cut off
-      scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
-
+        ),
+        fun = mean,
+        geom = 'text',
+        col = "black",
+        vjust = -1.1,
+        size = 2.5) +
+        scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
+                           # Expand y-axis limits to prevent labels from being cut off
+                           expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
+      
       if (saving_eps == TRUE){
-        ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
-        ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
-               p.list[[Phase.no]],
+        ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
+        ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
+               p.list.solo[[Phase.no]],
                width = 12, height = 10)
       }
-
-
-      if (solo.plot == 1){
-        solo.result.comb1 = result.comb1 %>%
-          filter(design %in% design.filter[1]) %>%
-          filter(setting %in% "ncov=5",
-                 n %in% "N=700",
-                 censor %in% "Low Censoring (20%)")
-
-        if (generate_failure_method == "fine_gray"){
-          solo.result.comb1 = solo.result.comb1 %>%
-            filter(cause1prob %in% "mass_p = 0.8")
-          p0.solo <-
-            solo.result.comb1 %>%
-            ggplot(aes(x = method, y = value, group = method, color = method)) +
-            facet_grid(cause1prob + setting ~ censor + n + design)# , scales = "free_y")
-        } else{
-          p0.solo <-
-            solo.result.comb1 %>%
-            ggplot(aes(x = method, y = value, group = method, color = method)) +
-            facet_grid(setting ~ censor + n + design, scales = "free_y")
-        }
-        p.solo = p0.solo +
-          geom_boxplot() +
-          geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
-          scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
-          ylab(ylabs) +
-          theme_bw() #+
-        # theme(legend.position = "bottom")
-        rng = suppressWarnings(layer_scales(p.solo)$y$range$range)
-        rng[3] = rng[2] - rng[1]
-        rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
-        rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
-        p.list.solo[[Phase.no]] <-
-          p.solo +
-          stat_summary(aes(x = as.numeric(method),
-                           y = value),
-                       fun = mean,
-                       geom = 'point',
-                       col = "black",
-                       shape = "square",
-                       size = 1) +
-          stat_summary(aes(x = as.numeric(method),
-                           y = value,
-                           label = round(..y.., 2),
-          ),
-          fun = mean,
-          geom = 'text',
-          col = "black",
-          vjust = -1.1,
-          size = 2.5) +
-          scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
-                             # Expand y-axis limits to prevent labels from being cut off
-                             expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
-
-        if (saving_eps == TRUE){
-          ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
-          ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
-                 p.list.solo[[Phase.no]],
-                 width = 12, height = 10)
-        }
-      }
-
-    } # end of Phase.no for-loop
-
-
+    }
+    
+  } # end of Phase.no for-loop
+  
+  
   p.1 = p.list[[1]] +
     theme(legend.position = "none",
           axis.title.x=element_blank()) #+
-    # ylim(y_limits)
+  # ylim(y_limits)
   p.2 = p.list[[2]] +
     theme(legend.position = "none",
           axis.title.x=element_blank()) #+
-    # ylim(y_limits)
-
+  # ylim(y_limits)
+  
   p.grid <- plot_grid(p.1,
                       p.2,
                       align = "vh",
                       axis = "tblr",
                       nrow = 1, ncol = 2)#,
-                      # common.legend = FALSE)
+  # common.legend = FALSE)
   p.grid1 <- plot_grid(p.grid,
                        get_legend(p.list[[2]] +
                                     theme(legend.direction = "horizontal",
@@ -451,13 +451,13 @@ for (crit.no in 1:crit.tot){
                                           legend.text = element_text(size = 20), # Adjust the size of the legend text
                                           legend.spacing.x = unit(0.1, "cm")) +
                                     guides(color = guide_legend(nrow = 1, title = "Methods"))),
-                      align = "vh",
-                      axis = "tblr",
-                      ncol = 1,
-                      nrow = 2,
-                      rel_heights = c(1, 0.1))
+                       align = "vh",
+                       axis = "tblr",
+                       ncol = 1,
+                       nrow = 2,
+                       rel_heights = c(1, 0.1))
   #we can ignore the warning message about return_all
-
+  
   # # Extract the legend from one plot
   # legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
   #
@@ -472,25 +472,25 @@ for (crit.no in 1:crit.tot){
   #
   # # Display the plot
   # print(final_plot)
-
+  
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
   }
   ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
          p.grid1,
          width = 20, height = 10)
-
+  
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
     y_limits = c(200,800)
     p.1.solo = p.list.solo[[1]] +
       theme(legend.position = "none",
             axis.title.x=element_blank()) +
-    ylim(y_limits)
+      ylim(y_limits)
     p.2.solo = p.list.solo[[2]] +
       theme(legend.position = "none",
             axis.title.x=element_blank()) +
-    ylim(y_limits)
+      ylim(y_limits)
     p.grid.solo <- plot_grid(p.1.solo,
                              p.2.solo,
                              align = "vh",
@@ -514,8 +514,8 @@ for (crit.no in 1:crit.tot){
            p.grid1.solo,
            width = 20, height = 10)
   }
-
-  } # end of crit.tot for-loop
+  
+} # end of crit.tot for-loop
 
 # EXPLORING PROPOPRTION OF PEOPLE DYING FROM CAUSE 1 (crit = 1: truncated mean)
 # source("CR03.Simulation_Summary_Supplementary.R")

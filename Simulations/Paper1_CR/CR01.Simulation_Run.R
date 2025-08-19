@@ -1,3 +1,6 @@
+# Record start time
+start_time <- Sys.time()
+
 # sbatch -p general -N 1 --mem=50GB -n 2 -t 10-07:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript CR01.Simulation_Run.R > /work/users/c/w/cwzhou/Proj1/CRoutput_20250126_test.txt"
 # For local: install.packages('~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
 # For cluster: install.packages('/nas/longleaf/home/cwzhou/Dissertation/itrSurv/itrSurv_0.1.0.tar.gz', repos = NULL, type = 'source')
@@ -120,4 +123,17 @@ if (local == 1){
   # }
 }
 
+# Record end time
+end_time <- Sys.time()
+# Calculate total duration
+total_secs <- as.numeric(difftime(end_time, start_time, units = "secs"))
+hours <- floor(total_secs / 3600)
+minutes <- floor((total_secs %% 3600) / 60)
+seconds <- round(total_secs %% 60)
+# Print results in readable format
+cat("Start time:", format(start_time, "%Y-%m-%d %H:%M:%S"), "\n")
+cat("End time:", format(end_time, "%Y-%m-%d %H:%M:%S"), "\n")
+cat("Total time:", hours, "hours", minutes, "minutes", seconds, "seconds\n")
+
 message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
+
