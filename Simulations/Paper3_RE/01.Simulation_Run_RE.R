@@ -197,10 +197,10 @@ all_sims_data.mff <- list()
     message("using train_seed (", train_seed, ") to generate training data")
     set.seed(train_seed)
     sim.train = do.call(gdata_RE, arg.obs.train)
-    obs.times_train <<- times_act
-    ph1_obs_train <<-pred.hazard1
-    gap1_obs_train <<- gaptime1
-    tt_obs_train <<- tt_fail
+    # obs.times_train <<- times_act
+    # ph1_obs_train <<-pred.hazard1
+    # gap1_obs_train <<- gaptime1
+    # tt_obs_train <<- tt_fail
     df_recurr = sim.train$dataset_recurrent; ##View(df_recurr)
     df_surv = sim.train$dataset_survival; head(df_surv)
     name = sprintf("%s_%s",sim.train$name, sim_data_type); #print(name)

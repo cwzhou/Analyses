@@ -218,7 +218,7 @@ r00 = data.frame(sim = n.sim) # this is for parallelizaitn: data.frame(sim.no = 
 r00[column_names1] <- NA
 
 # Create the data frame with the 'sim' column
-result <- data.frame(sim = 1:n.sim) # this is for parallelizaitn: data.frame(sim.no = sim) #this is for sim for loop: data.frame(sim = 1:n.sim)
+result <- data.frame(sim = n.sim_start:n.sim_end) # this is for parallelizaitn: data.frame(sim.no = sim) #this is for sim for loop: data.frame(sim = 1:n.sim)
 # Add columns to the result data frame
 result[sorted_column_names] <- NA
 attr(result, "criterion_phase1") <- list(criterion = criterion_phase1, crit.value = crit.value_phase1)
@@ -238,7 +238,9 @@ trt_result <- data.frame(rep(1:n.sim, each = n.methods), # this is for paralleli
 # flow: obs (1) -> optimal (n.mc), obs.no.censor (n.mc)
 true2 = true3 = list()
 print(Sys.time())
-for (sim in 1:n.sim) {
+for (sim in n.sim_start:n.sim_end){
+  #8/20 revision, making this runnable in batches based on 01.Simulation_Run_RE.R
+# for (sim in 1:n.sim) {
   
   cat("\n\n#################################")
   cat("\n######### Simulation ",sim, "#########")
@@ -256,7 +258,9 @@ for (sim in 1:n.sim) {
   #   prev_count = prev_count + 1
   # }
   
-  train_seed = sim*10000 + 2025
+  train_seed = sim*10000 + init_seed*3
+  test_seed = train_seed + 30306
+  
   # if (setting_seed == 1){
   #   arg.obs$seed1 <- train_seed
   #   arg.czmk$seed1 <- arg.obs.no.censor$seed1 <-
@@ -267,7 +271,7 @@ for (sim in 1:n.sim) {
   tt(1)
   
   # obs.data
-  set.seed(train_seed + 0)
+  set.seed(init_seed*sim + 505)
   u1_train = runif(n)
   u1_test = runif(n.eval)
   u2_train = runif(n)
@@ -353,8 +357,8 @@ for (sim in 1:n.sim) {
     sapply(1:n.causes, function(s) mean(data.df$status == s))
   
   # # # obs policy value
-  message("using train_seed+10 to generate obs testing data")
-  set.seed(train_seed + 10)
+  message("using test_seed to generate obs testing data")
+  set.seed(test_seed)
   obs.data.rep <- do.call(gdata_CR, arg.obs.no.censor) # no censoring for eval sets
   rep_obs <<- obs.data.rep
   
@@ -380,14 +384,14 @@ for (sim in 1:n.sim) {
   # # data.df = output2observable(obs.data)
   rm(obs.data.rep); gc()
   
-  set.seed(train_seed + 10)
-  test0.data.rep <<- do.call(gdata_CR, arg.test0)
-  set.seed(train_seed + 10)
-  test1.data.rep <<- do.call(gdata_CR, arg.test1)
-  set.seed(train_seed)
-  train0.data <<- do.call(gdata_CR, arg.train0)
-  set.seed(train_seed)
-  train1.data <<- do.call(gdata_CR, arg.train1)
+  # set.seed(train_seed + 10)
+  # test0.data.rep <<- do.call(gdata_CR, arg.test0)
+  # set.seed(train_seed + 10)
+  # test1.data.rep <<- do.call(gdata_CR, arg.test1)
+  # set.seed(train_seed)
+  # train0.data <<- do.call(gdata_CR, arg.train0)
+  # set.seed(train_seed)
+  # train1.data <<- do.call(gdata_CR, arg.train1)
   
   cat("\n******************************\n")
   # estimation
@@ -451,7 +455,7 @@ for (sim in 1:n.sim) {
     cat ("  \n 2. czmk - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
     arg_czmk <<- arg.czmk
     if (!czmk.error) {
-      set.seed(train_seed + 10)
+      set.seed(train_seed + 2)
       czmk.data.rep <- do.call(gdata_CR, arg.czmk)
       predd_surv_czmk_eval <<- predd_surv
       predd_ep_czmk_eval <<- predd_ep
@@ -529,7 +533,7 @@ for (sim in 1:n.sim) {
                     mTry = rep(sqrt(ncov), n.stages),
                     pooled = FALSE,
                     stratifiedSplit = 0.1)
-    set.seed(train_seed + 2)
+    set.seed(train_seed + 3)
     optimal.csk <- do.call(dtrSurv::dtrSurv, c(arg.csk2, list(nodeSize = nodesize, minEvent = mindeath )))
     csk.error <- class(optimal.csk)[1] == "try-error"
     arg.csk$policy <- if (!csk.error) optimal.csk
@@ -542,7 +546,7 @@ for (sim in 1:n.sim) {
     # if (!csk.error) result[sim, "csk"] <- val.fn(csk.data.rep$summary$cumulative.event.time)
     
     if (!csk.error) {
-      set.seed(train_seed + 10)
+      set.seed(test_seed)
       csk.data.rep <- do.call(gdata_CR, arg.csk)
       rep_csk <<- csk.data.rep
       result[sim, "csk_survival"] = overall_survival_val.fn(csk.data.rep) #result["csk_survival"]
@@ -588,7 +592,7 @@ for (sim in 1:n.sim) {
                      t0=t0_pmcr) # t0 need to be tuned
     # Unrestricted regime
     message("unrestricted regime")
-    set.seed(train_seed + 3)
+    set.seed(train_seed + 4)
     temp.unrestr.fit1 <- do.call(PMCR, arg.pmcr2)
     #range of alpha # alpha needs to be tuned
     alps<-c(temp.unrestr.fit1$Fbeta2[2],
@@ -603,7 +607,7 @@ for (sim in 1:n.sim) {
     M_PMCR<-1e+5; arg.pmcr3$M = M_PMCR # pick a large M
     #Restricted regime
     message("restricted regime")
-    set.seed(train_seed + 3)
+    set.seed(train_seed + 4)
     temp.restr.fit1 <- do.call(PMCR, arg.pmcr3)
     optimal.pmcr <- temp.restr.fit1$beta3 #optbetas for the linear decision rule
     
@@ -619,7 +623,7 @@ for (sim in 1:n.sim) {
     cat ("  \n 4. pmcr - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
     arg_pmcr <<- arg.pmcr
     if (!pmcr.error) {
-      set.seed(train_seed + 10)
+      set.seed(test_seed)
       pmcr.data.rep <- do.call(gdata_CR, arg.pmcr)
       rep_pmcr <<- pmcr.data.rep
       result[sim, "pmcr_survival"] = overall_survival_val.fn(pmcr.data.rep) #result["pmcr_survival"]
@@ -676,7 +680,7 @@ for (sim in 1:n.sim) {
                                seq(0.1,400,
                                    length.out=16))
     )
-    set.seed(train_seed + 4)
+    set.seed(train_seed + 5)
     aipwe.fit1 <- do.call(aipwe.fit, arg.aipwe2)
     optimal.aipwe <- aipwe.fit1 #eta0-eta_{ncov}
     aipwe.error <- class(optimal.aipwe)[1] == "try-error"
@@ -691,7 +695,7 @@ for (sim in 1:n.sim) {
     cat ("  \n 5. aipwe - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
     arg_aipwe <<- arg.aipwe
     if (!aipwe.error) {
-      set.seed(train_seed + 10)
+      set.seed(test_seed)
       aipwe.data.rep <- do.call(gdata_CR, arg.aipwe)
       rep_aipwe <<- aipwe.data.rep
       result[sim, "aipwe_survival"] = overall_survival_val.fn(aipwe.data.rep) #result["aipwe_survival"]
@@ -841,7 +845,7 @@ for (sim in 1:n.sim) {
     cat ("  6. zero-order model - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
     if (!zom.error){
       arg_zom <<-arg.zom
-      set.seed(train_seed + 10)
+      set.seed(test_seed)
       zom.data.rep <- do.call(gdata_CR, arg.zom)
       rep_zom <<- zom.data.rep
       result[sim,"zom_survival"] = overall_survival_val.fn(zom.data.rep) #result["zom_survival"]

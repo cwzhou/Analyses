@@ -6,6 +6,8 @@ local = 1 # local = 0 for cluster
 parallel = 0 # parallel = 0 for NOT parallel code
 revision = 1 #jasa revision round 1
 
+init_seed = 353
+
 # # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
 # # uncomment if running alone (aka for CR02.Simulation_Summary.R
 # if (local == 1){
@@ -21,11 +23,27 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
-date_folder = "2025-08-02"; #10 and 20 are local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
+#10 and 20 are local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
+
 n.eval = 10000 #10000 #n.eval = 10000
-n.sim = 100 #500
+date_folder = "2025-08-05"; 
+# n.sim = 100 #500
+n.sim_start = 301
+# "2025-08-02" is 1-100 sims;
+# "2025-08-03" is 101-200 sims;
+# "2025-08-04" is 201-300 sims;
+# "2025-08-05" is 301-400 sims;
+# "2025-08-06" is 401-500 sims;
+# "2025-08-07" is 501-600 sims;
+# "2025-08-08" is 601-700 sims;
+# "2025-08-09" is 701-800 sims;
+# "2025-08-10" is 801-900 sims;
+# "2025-08-11" is 901-1000 sims;
+n.sim = 100
+n.sim_end = n.sim_start - 1 + n.sim # n.sim
+
 mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])

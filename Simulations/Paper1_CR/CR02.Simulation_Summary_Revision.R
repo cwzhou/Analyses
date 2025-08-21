@@ -31,21 +31,24 @@ files <- list.files(path = sprintf("output/%s/%s", generate_failure_method, lab.
 #   files = files[grepl("_tmp", files) == FALSE]
 #   print(files)
 # }
-method.levels = c(1,2,3,4,5,6)
+method.levels = c(1,2,#3,4,
+                  5,6)
 method.nm.abc =
-  c("A", "B", "C", "D", "E", "F")
+  c("A", "B", #"C", "D", 
+    "C", "D")
 method.nm.simple =
-  c("czmk", "csk", "pmcr", "aipwe", "zom", "obs") # this is important for selecting variables below.
+  c("czmk", "csk", #"pmcr", "aipwe", 
+    "zom", "obs") # this is important for selecting variables below.
 method.nm.formal =
   c("itrSurv", "dtrSurv (2023)",
-    "PMCR (2021)", "AIPWE (2021)",
+    # "PMCR (2021)", "AIPWE (2021)",
     "zero-order model", "observed policy")
 # "Goldberg & Kosorok (2012), RF", "Goldberg & Kosorok (2012), linear", "Simoneau et al. (2019)",
 
 if (generate_failure_method == "fine_gray"){
   cause1prob.levels = c(1,2)
-  cause1prob.labels = c(sprintf("mass_p = %s",cause1_prob$small.cause1prob$cause1prob),
-                        sprintf("mass_p = %s", cause1_prob$large.cause1prob$cause1prob))
+  cause1prob.labels = c(sprintf("Fine-Gray probability mass: %s",cause1_prob$small.cause1prob$cause1prob),
+                        sprintf("Fine-Gray probability mass: %s", cause1_prob$large.cause1prob$cause1prob))
 } else{
   cause1prob.levels = cause1_prob$cause1.prob$cause1prob
   cause1prob.labels = " "
@@ -58,9 +61,9 @@ n.labels = c(sprintf("N=%s",size$small.sample.size$n),
              sprintf("N=%s",size$large.sample.size$n))
 design.levels = c(1,2)
 design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
-beta.levels = c(1,2)
-beta.labels = c(sprintf("ncov=%s",ncov.list$beta1),
-                sprintf("ncov=%s",ncov.list$beta2))
+beta.levels = c(1)#,2)
+beta.labels = c(sprintf("%s Covariates",ncov.list$beta1))#,
+                # sprintf("%s Covariates",ncov.list$beta2))
 # beta.levels = c(1,2)
 # beta.labels = c("setting1",
 #                 "setting2")
@@ -142,7 +145,7 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "Overall S(t)"
+      Phase_lab_1 = "Overall Event-Free S(t)"
     } else{
       Phase_lab = "endpoint"
       Phase_lab_1 = "Cause 1 CIF"
@@ -340,7 +343,7 @@ for (crit.no in 1:crit.tot){
                    geom = 'point',
                    col = "black",
                    shape = "square",
-                   size = 1) +
+                   size = 3) +
       stat_summary(aes(x = as.numeric(method),
                        y = value,
                        label = round(..y.., 2),
@@ -353,7 +356,7 @@ for (crit.no in 1:crit.tot){
       geom = 'text',
       col = "black",
       vjust = -1.1,
-      size = 2.5) +
+      size = 5) +
       # Expand y-axis limits to prevent labels from being cut off
       scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
     
@@ -374,7 +377,7 @@ for (crit.no in 1:crit.tot){
       
       if (generate_failure_method == "fine_gray"){
         solo.result.comb1 = solo.result.comb1 %>%
-          filter(cause1prob %in% "mass_p = 0.8")
+          filter(cause1prob %in% "Fine-Gray probability mass: 0.8")
         p0.solo <-
           solo.result.comb1 %>%
           ggplot(aes(x = method, y = value, group = method, color = method)) +
@@ -414,7 +417,7 @@ for (crit.no in 1:crit.tot){
         col = "black",
         vjust = -1.1,
         size = 2.5) +
-        scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
+        scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 100),
                            # Expand y-axis limits to prevent labels from being cut off
                            expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
       
@@ -448,7 +451,7 @@ for (crit.no in 1:crit.tot){
                        get_legend(p.list[[2]] +
                                     theme(legend.direction = "horizontal",
                                           legend.key.size = unit(2, "cm"),    # Adjust the size of the legend keys
-                                          legend.text = element_text(size = 20), # Adjust the size of the legend text
+                                          legend.text = element_text(size = 12), # Adjust the size of the legend text
                                           legend.spacing.x = unit(0.1, "cm")) +
                                     guides(color = guide_legend(nrow = 1, title = "Methods"))),
                        align = "vh",
@@ -482,7 +485,7 @@ for (crit.no in 1:crit.tot){
   
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
-    y_limits = c(200,800)
+    y_limits = c(200,700)
     p.1.solo = p.list.solo[[1]] +
       theme(legend.position = "none",
             axis.title.x=element_blank()) +
