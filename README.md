@@ -17,6 +17,8 @@ This repository aims to ensure transparency and reproducibility for the analyses
 - Scripts for generating and analyzing simulation data.
 - Application of statistical methods to real-world data.
 
+Note: due to IRB restrictions, the real-world data is not available for public use. However, we include the code here for transparancy, and this can be adapted for your datasets.
+
 ## Directory Structure
 
 Below is the simplified directory structure for relevant scripts.
@@ -51,12 +53,18 @@ library(itrSurv)
 
 ## Usage Instructions and Reproducibility
 
-This repository contains two main folders: `~/Simulations` and `~/RDA`. These folders include the necessary code and scripts for reproducing all computational work presented in the manuscript. Below are the instructions for using the repository and ensuring reproducibility of the analyses. Within each folder, Project1_CR is for the competing risk endpoint, Project2_multiCR is N/A for now, and Project3_RE is for the recurrent event endpoint. Please select accordingly.
+This repository contains two main folders: `~/Simulations` and `~/RDA`. These folders include the necessary code and scripts for reproducing all computational work presented in the manuscript. Below are the instructions for using the repository and ensuring reproducibility of the analyses. Within each folder, Project1_CR is for the competing risk endpoint and Project3_RE is for the recurrent event endpoint. Please select accordingly.
 
 ### 1. Competing Risks (CR)
 #### Simulations
 
-The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to generate the results from the manuscript. There are two simulation settings: 1) generating independent failure tiems from an exponential distribution, and 2) simulating dependent failures times based on the simulation settings from Fine-Gray [2]. The simulation setting is specified by the parameter `generate_failure_method` (see below). To run the simulations:
+The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to generate the results from the manuscript. There are two simulation settings: 1) generating independent failure tiems from an exponential distribution, and 2) simulating dependent failures times based on the simulation settings from Fine-Gray [2]. The simulation setting is specified by the parameter `generate_failure_method` (see below). R packages such as survival, itrSruv, tidyverse, dplyr, tidyr, MASS, and ggplot2, reshape2, cowplot (for figures) should be installed before running. 
+
+The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He et al, 2021), PMCR (Zhou et al, 2021), the zero-order model, and observed policy. Refer to the manuscript for references and details on these methods. See `F02.ComparatorMethod_Functions.R` script with helper functions to implement these methods. Note that these methods do not always run or converge, and removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv. 
+
+For dtrSurv, R package dtrSurv must be installed before running. For PMCR, Rpackages rgenoud and rpart must be installed before running. For AIPWE, R packages purrr and cmprsk must be installed before running.
+
+To run the simulations:
 
 1. **Edit Simulation Parameters**  
    Open the script `CR00.Simulation_Parameters.R` and modify the following parameters as necessary:
@@ -64,6 +72,7 @@ The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to
    - `local`: Set to `1` for running on a local machine or `0` for running on a cluster.
    - `parallel`: Set to `1` to enable parallel processing using the `parallel` package in R, or set to `0` for non-parallel execution.
    - Other parameters (e.g., `n.sim` for the number of simulations): Modify according to the simulation needs for various simulation scenarios for the for the specified `generate_failure_method` setting.
+   - For the sensitivity analysis in the manuscript, set parameter `revision = 1` to get the simulation that mimicks features of the real-data analysis; also set `n.sim = 1000` and `n.eval = 10,000`. Use `generate_failure_method = fine_gray`.
 
 2. **Cluster Computing**  
    If running on a cluster, submit the jobs using the provided bash script:
@@ -73,7 +82,7 @@ The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to
    To run specific simulations manually, use the script **`CR01.Simulation_Run.R`**, which runs individual simulation settings that can be customized as needed for the specified `generate_failure_method` setting.
    
 4. **Plotting Results**
-   To plot the results from the simulation studies, use the script **`CR02.Simulation_Summary.R`**, which plots the results read from the sepcified date folder, using parametesr from `CR00.Simulation_Parameters.R` for the specified `generate_failure_method` setting. NOTE: this script works as is only if results from more than 2 simulation scenarios exists (since we use `facet_grid` in R). 
+   To plot the results from the simulation studies, use the script **`CR02.Simulation_Summary.R`**, which plots the results read from the sepcified date folder, using parametesr from `CR00.Simulation_Parameters.R` for the specified `generate_failure_method` setting. NOTE: this script works as is only if results from more than 2 simulation scenarios exists (since we use `facet_grid` in R). For the sensitivity analysis in the manuscript, use `CR02.Simulation_Summary_Revision.R`.
 
 #### RDA (Analysis Code)
 
@@ -98,9 +107,6 @@ Ignore for now.
 #### Simulations
 #### RDA
 We analyze the public bladder recurrence dataset in the R package 'survival'.
-
-#### Script Descriptions
-Below are descriptions of the scripts used but not directly called upon.
 
 ---
 
