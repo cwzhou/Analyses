@@ -188,6 +188,7 @@ Dynamics <-
             action[at.risk != 0] <- do.call(dtrSurv::predict, args)$optimal@optimalTx
             tmp_act_csk <<- action
           }
+          
           action[at.risk == 0] <- NA
         } else{# policy has attr class
           if (is.list(policy)){
@@ -226,19 +227,30 @@ Dynamics <-
       } # null policy
     else {
       print("policy is null: generating treatment from rbinom with propensity")
-      # print(predPropensityFn)
-      # message("covariate")
-      # print(covariate)
       propensity = predPropensityFn(covariate = covariate)
-      # message("propensity")
-      # print(propensity)
+      
+      if (revision == 1){
+        message("CSK in revision setting can't handle when only 1 patient a group")
+        repeat{
+          action <- suppressWarnings(rbinom(N, 1, propensity) * 2 - 1)
+          action[at.risk == 0] <- NA
+          
+          # check counts, excluding NAs
+          if (sum(action == 1, na.rm = TRUE) >= 2 &&
+              sum(action == -1, na.rm = TRUE) >= 2) {
+            break  # accept and exit loop
+          }
+        }
+        
+        print(sum(action == -1, na.rm = TRUE))
+        print(sum(action == 1, na.rm = TRUE))
+        stop
+      } else{
       action = suppressWarnings(rbinom(N, 1, propensity) * 2 - 1) # 1 for aggressive and -1 for gentle
-      # print("TESTING IS THIS RIGHT - JULY 18 2025")
-      # message("action")
-      # print(action)
       # for NAs in propensity, the action is NA. Thus, the warnings are suppressed.
       action[at.risk == 0] <- NA
       # print(0)
+      }
     }
 
     # we HAVE OUR ACTION!

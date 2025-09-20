@@ -1,5 +1,9 @@
-solo.plot = 0
+solo.plot = 1
 local = 1
+saving_eps = TRUE#TRUE
+crit.tot = 1 # total number of critical values (for now - just mean!!)
+testing_out = 1
+
 if (local == 1){
   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 } else{
@@ -7,30 +11,51 @@ if (local == 1){
 }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
-saving_eps = TRUE#TRUE
-crit.tot = 1 # total number of critical values (for now - just mean!!)
-testing_out = 1
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+library(patchwork)
+library(purrr)
 
-# crit.no = 1
-# critS.no = 1
-# critE.no = 1
-# # below needs to edited based on what the values are - or needs to be automated
-# y_limits_prob <- c(min(0.12, 0.13), max(0.17, 0.20))
-# y_limits_mean <- c(0,1.1)#c(min(0.45, 0.50), max(0.70, 0.80))
+lab.date = "2025-09-29" #"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+dir_fig = sprintf("./figure/%s/%s", generate_failure_method, lab.date)
 
-# endpoint = "CR"
-# generate_failure_method = c("simple_exp","fine_gray");
-# generate_failure_method = generate_failure_method[1]
-lab.date = "2025-08-01" #"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
-dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
-dir_fig = dir_rds %>% gsub("output/", "figure/", .)
+# Sequence of dates to include
+date_seq <- seq(as.Date("2025-09-01"), as.Date("2025-09-22"), by = "day")
+date_seq <- date_seq[!date_seq %in% as.Date(c("2025-09-07", "2025-09-12"))]
+date_seq
 
-files <- list.files(path = sprintf("output/%s/%s", generate_failure_method, lab.date),
-                    pattern = paste0(lab.date, ".*\\.rds"), full.names = TRUE)
-# if (testing_out == 1){
-#   files = files[grepl("_tmp", files) == FALSE]
-#   print(files)
-# }
+# date_seq = date_folder
+file_name <- "simResult_fine_gray_censor2_nCauses1_cause1prob1_beta1_prop1_n1_critS1_critE1.rds"
+# Read and combine all files
+final_tbl <- map_dfr(date_seq, function(d) {
+  if (length(date_seq) == 1){
+    date_str = date_folder
+  } else{
+    date_str <- format(d, "%Y-%m-%d")
+  }
+  file_path <- file.path("./output", "fine_gray", date_str, file_name)
+  
+  dat_list <- readRDS(file_path)
+  dat = dat_list$statistics
+  
+  # If it's a list, combine into one data frame
+  dat1 <- bind_rows(dat)
+  
+  dat1 %>% mutate(date = date_str)
+  final_tbl = dat1
+}); dim(final_tbl)
+View(final_tbl)
+
+(n.sim = nrow(final_tbl))
+
+# # crit.no = 1
+# # critS.no = 1
+# # critE.no = 1
+# # # below needs to edited based on what the values are - or needs to be automated
+# # y_limits_prob <- c(min(0.12, 0.13), max(0.17, 0.20))
+# # y_limits_mean <- c(0,1.1)#c(min(0.45, 0.50), max(0.70, 0.80))
+
 method.levels = c(1,2,#3,4,
                   5,6)
 method.nm.abc =
@@ -55,7 +80,7 @@ if (generate_failure_method == "fine_gray"){
 }
 
 censor.levels = c(1,2)
-censor.labels = c("Low Censoring (20%)","High Censoring (50%)")
+censor.labels = c("Average 56% Censoring","High Censoring (50%)")
 n.levels = c(1,2)
 n.labels = c(sprintf("N=%s",size$small.sample.size$n),
              sprintf("N=%s",size$large.sample.size$n))
@@ -161,54 +186,17 @@ for (crit.no in 1:crit.tot){
     }
     print(crit_lab); print(Phase_lab)
     method.nm.simple1 = paste0(method.nm.simple, "_", Phase_lab)
-    result.comb <-
-      lapply(1:dim(fn)[1], function(i) {
-        fn.i = fn$fn[i]
-        # print(fn.i)
-        if (file.exists(fn.i)) {
-          print(sprintf("file %s exists", fn.i))
-          full <- readRDS(fn.i)
-          a <- full$statistics
-          true2_sum <- full$true_P2_eval
-          # n.sim = full$settings$n.sim
-          # tol1 = full$settings$tol1[1]
-          # if (crit.no == 1){
-          # source("SM02.Plots_For_P2Subset_byTrt.R")
-          # }
-        } else if (file.exists(gsub("\\.rds", "_tmp.rds", fn.i))) {
-          # print(sprintf("_TMP.RDS exists: %s", fn.i))
-          full <- NULL
-          a <- readRDS(gsub("\\.rds", "_tmp.rds", fn.i))
-        } else {
-          full <- NULL
-          a <- NULL
-        }
-        # if (is.null(full)){
-        #   NULL
-        # } else{
-        #   list2env(full, envir = globalenv())
-        #   source("Testing/Latex_Tables_Means.R")
-        # }
-        if (is.null(a)) {
-          NULL
-        } else {
-          print("a is not null")
-          
-          var_method = select_method_endpoints(method.nm.simple, Phase_lab)
-          # print(head(a))
-          if (parallel == 0){
-            sim_name = "sim"
-          } else{
-            sim_name = "sim.no" # parallel
-          }
-          beginning <- as.data.frame(a) %>%
-            dplyr::select(rep = !!sym(sim_name),
-                          all_of(var_method),
-                          czmk_n_phase2, zom_n_phase2,
-                          training_percent.censor, training_cause.1, training_cause.2)
-          
-          if (generate_failure_method == "fine_gray"){
-            middle = beginning %>%
+    var_method = select_method_endpoints(method.nm.simple, Phase_lab)
+    sim_name = "sim"
+    beginning <- final_tbl %>%
+      as.data.frame() %>%
+      dplyr::select(rep = !!sym(sim_name),
+                    all_of(var_method),
+                    czmk_n_phase2, zom_n_phase2,
+                    training_percent.censor, training_cause.1, training_cause.2)
+    i = 1
+    if (generate_failure_method == "fine_gray"){
+      middle = beginning %>%
               mutate(ncauses = fn$ncauses[i],
                      censor = fn$censor[i],
                      cause1prob = fn$cause1prob[i], # this only exists if endpoint = CR
@@ -226,14 +214,11 @@ for (crit.no in 1:crit.tot){
                      n    = fn$n[i],
                      crit = fn$critS.no[i])
           }
-          middle %>% pivot_longer(cols = all_of(var_method),
+    result.comb = middle %>% pivot_longer(cols = all_of(var_method),
                                   names_to = "method",
-                                  values_to = "value")
-        }
-      }) %>%
-      do.call(rbind, .) %>%
+                                  values_to = "value") %>%
       # below is ONLY for days,not years
-      mutate(value = ifelse(value<2, value*365.25,value)) %>%
+      mutate(value = ifelse(value<5, value*365.25,value)) %>%
       mutate(
         method = factor(method,
                         levels = method.nm.simple1,
@@ -371,17 +356,23 @@ for (crit.no in 1:crit.tot){
     if (solo.plot == 1){
       solo.result.comb1 = result.comb1 %>%
         filter(design %in% design.filter[1]) %>%
-        filter(setting %in% "ncov=5",
-               n %in% "N=700",
-               censor %in% "Low Censoring (20%)")
+        filter(setting %in% "30 Covariates",
+               n %in% "N=300",
+               censor %in% "Average 56% Censoring")
       
       if (generate_failure_method == "fine_gray"){
         solo.result.comb1 = solo.result.comb1 %>%
-          filter(cause1prob %in% "Fine-Gray probability mass: 0.8")
-        p0.solo <-
-          solo.result.comb1 %>%
-          ggplot(aes(x = method, y = value, group = method, color = method)) +
-          facet_grid(cause1prob + setting ~ censor + n + design)# , scales = "free_y")
+          filter(cause1prob %in% "Fine-Gray probability mass: 0.2")
+        if (revision == 1){
+          p0.solo <-
+            solo.result.comb1 %>%
+            ggplot(aes(x = method, y = value, group = method, color = method))
+        } else{
+          p0.solo <-
+            solo.result.comb1 %>%
+            ggplot(aes(x = method, y = value, group = method, color = method)) +
+            facet_grid(cause1prob + setting ~ censor + n + design)# , scales = "free_y")
+        }
       } else{
         p0.solo <-
           solo.result.comb1 %>%
@@ -407,16 +398,16 @@ for (crit.no in 1:crit.tot){
                      geom = 'point',
                      col = "black",
                      shape = "square",
-                     size = 1) +
+                     size = 2) +
         stat_summary(aes(x = as.numeric(method),
                          y = value,
-                         label = round(..y.., 2),
+                         label = round(..y.., 3),
         ),
         fun = mean,
         geom = 'text',
         col = "black",
         vjust = -1.1,
-        size = 2.5) +
+        size = 4) +
         scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 100),
                            # Expand y-axis limits to prevent labels from being cut off
                            expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
@@ -485,7 +476,7 @@ for (crit.no in 1:crit.tot){
   
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
-    y_limits = c(200,700)
+    y_limits = c(0,1000)
     p.1.solo = p.list.solo[[1]] +
       theme(legend.position = "none",
             axis.title.x=element_blank()) +
@@ -503,10 +494,10 @@ for (crit.no in 1:crit.tot){
     p.grid1.solo <- plot_grid(p.grid.solo,
                               get_legend(p.list.solo[[2]] +
                                            theme(legend.direction = "horizontal",
-                                                 legend.key.size = unit(2, "cm"),    # Adjust the size of the legend keys
+                                                 legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
                                                  legend.text = element_text(size = 20), # Adjust the size of the legend text
                                                  legend.spacing.x = unit(0.1, "cm")) +
-                                           guides(color = guide_legend(nrow = 1, title = "Methods"))),
+                                           guides(color = guide_legend(nrow = 1, title = "Methods", size=1))),
                               align = "vh",
                               axis = "tblr",
                               ncol = 1,
@@ -530,3 +521,56 @@ if (local == 1){
 
 message("End of CR02.Simulation_Summary.R")
 
+
+#############
+# Columns that need conversion from days -> years
+cols_years <- c(
+  "czmk_survival", "csk_survival", "zom_survival", "obs_survival",
+  "czmk_endpoint", "csk_endpoint", "zom_endpoint", "obs_endpoint"
+)
+
+final_tbl_means <- final_tbl %>%
+  dplyr::select(-sim) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%   # mean across sims
+  mutate(across(all_of(cols_years), ~ .x * 365.25)) %>%          # convert years -> days
+  mutate(across(where(is.numeric), ~ round(.x, 2))) %>%          # round all numeric columns
+  as_tibble()                                                     # make a nice tibble table
+
+# View the table
+View(final_tbl_means)
+
+library(knitr)
+
+# Create a LaTeX table
+latex_table <- kable(final_tbl_means, format = "latex", booktabs = TRUE, 
+                     caption = "Means Across Sims (Selected Columns in Days)")
+
+# Print the LaTeX code
+cat(latex_table)
+
+
+
+
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+# Columns to convert from years -> days
+cols_years <- c(
+  "czmk_survival", "csk_survival", "zom_survival", "obs_survival",
+  "czmk_endpoint", "csk_endpoint", "zom_endpoint", "obs_endpoint"
+)
+
+# Compute means across sims, convert, round
+final_tbl_means <- final_tbl %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
+  mutate(across(all_of(cols_years), ~ .x * 365.25)) %>%
+  mutate(across(where(is.numeric), ~ round(.x, 2))) %>%
+  as_tibble()
+
+# Create LaTeX table with grouped headers
+final_tbl_means %>%
+  kable(format = "latex", booktabs = TRUE, longtable = FALSE, 
+        caption = "Means Across Sims (Days Conversion)") %>%
+  kable_styling(latex_options = c("hold_position", "scale_down")) %>%  # scale_down fits page width
+  add_header_above(c(" " = 0, "Survival" = 4, "Endpoint" = 4))

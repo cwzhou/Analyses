@@ -239,6 +239,8 @@ trt_result <- data.frame(rep(1:n.sim, each = n.methods), # this is for paralleli
 true2 = true3 = list()
 print(Sys.time())
 for (sim in n.sim_start:n.sim_end){
+  
+  row_index = sim - n.sim_start + 1
   #8/20 revision, making this runnable in batches based on 01.Simulation_Run_RE.R
 # for (sim in 1:n.sim) {
   
@@ -351,9 +353,9 @@ for (sim in n.sim_start:n.sim_end){
   
   data.df.aipwe <<- aipwe_data_format(data.df)
   
-  result[sim, "training_percent.censor"] <- mean(data.df$status==0, na.rm = TRUE) #result["training_percent.censor"]
+  result[row_index, "training_percent.censor"] <- mean(data.df$status==0, na.rm = TRUE) #result["training_percent.censor"]
   # result[paste0("training_cause.", 1:n.causes)]
-  result[sim, paste0("training_cause.", 1:n.causes)] <-
+  result[row_index, paste0("training_cause.", 1:n.causes)] <-
     sapply(1:n.causes, function(s) mean(data.df$status == s))
   
   # # # obs policy value
@@ -364,9 +366,9 @@ for (sim in n.sim_start:n.sim_end){
   
   # result["obs_survival"]
   # result["obs_endpoint"]
-  result[sim, "obs_survival"] <- overall_survival_val.fn(obs.data.rep)#val.fn_phase1(obs.data.rep$event.time)
-  result[sim, "obs_endpoint"] <- endpoint_val.fn(obs.data.rep)
-  result[sim, "obs_trt1"] <- trt1.fn(obs.data.rep)
+  result[row_index, "obs_survival"] <- overall_survival_val.fn(obs.data.rep)#val.fn_phase1(obs.data.rep$event.time)
+  result[row_index, "obs_endpoint"] <- endpoint_val.fn(obs.data.rep)
+  result[row_index, "obs_trt1"] <- trt1.fn(obs.data.rep)
   
   # # A = -1; B = 1
   # # within method, mean survival time from those who have action -1 and mean survival time for those who have action 1
@@ -378,7 +380,7 @@ for (sim in n.sim_start:n.sim_end){
   # trt_result[sim_count, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("obs", A_mean, B_mean, A_mean_cr, B_mean_cr)
   # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
   
-  result[sim, "time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"] #result["time.obs"]
+  result[row_index, "time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"] #result["time.obs"]
   # # print(flowchart(obs.data$output)) # if i fix this in 02_Simulation_Functions.R for CR then I can use, otherwise delete.
   # # transforming data from an array format to a data.frame format
   # # data.df = output2observable(obs.data)
@@ -449,7 +451,7 @@ for (sim in n.sim_start:n.sim_end){
     predd_surv_czmk <<- predd_surv
     predd_ep_czmk <<- predd_ep
     # print(arg.czmk$policy@phaseResults[["EndPointPhase2Results"]]@optimal@optimalTx)
-    if (!czmk.error) result[sim, "czmk_n_phase2"] <- mean(arg.czmk$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) #result["czmk_n_phase2"]
+    if (!czmk.error) result[row_index, "czmk_n_phase2"] <- mean(arg.czmk$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) #result["czmk_n_phase2"]
     rm(optimal.czmk); gc()
     
     cat ("  \n 2. czmk - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
@@ -487,11 +489,11 @@ for (sim in n.sim_start:n.sim_end){
       
       
       
-      result[sim, "czmk_survival"] = overall_survival_val.fn(czmk.data.rep) #result["czmk_survival"]
-      result[sim, "czmk_endpoint"] = endpoint_val.fn(czmk.data.rep) #result["czmk_endpoint"]
-      result[sim,"czmk_trt1"] = trt1.fn(czmk.data.rep)
-      # result[sim, "czmk_percent.censor"] <- mean(czmk.data.rep$status==0, na.rm = TRUE)
-      # result[sim, paste0("czmk_cause.", 1:n.causes)] <-
+      result[row_index, "czmk_survival"] = overall_survival_val.fn(czmk.data.rep) #result["czmk_survival"]
+      result[row_index, "czmk_endpoint"] = endpoint_val.fn(czmk.data.rep) #result["czmk_endpoint"]
+      result[row_index,"czmk_trt1"] = trt1.fn(czmk.data.rep)
+      # result[row_index, "czmk_percent.censor"] <- mean(czmk.data.rep$status==0, na.rm = TRUE)
+      # result[row_index, paste0("czmk_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(czmk.data.rep$status == s))
     }
     
@@ -503,7 +505,7 @@ for (sim in n.sim_start:n.sim_end){
     # trt_result[sim_count+1, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("czmk", A_mean, B_mean, A_mean_cr, B_mean_cr)
     # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     
-    result[sim, "time.czmk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.czmk"]
+    result[row_index, "time.czmk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.czmk"]
     arg.czmk$policy <- NULL; gc()
     rm(czmk.data.rep); gc()
   }
@@ -543,17 +545,17 @@ for (sim in n.sim_start:n.sim_end){
     cat ("  \n 3. csk - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
     arg_csk <<- arg.csk
     # if (!csk.error) {csk.data.rep <- do.call(multiStageDynamics, arg.csk)}
-    # if (!csk.error) result[sim, "csk"] <- val.fn(csk.data.rep$summary$cumulative.event.time)
+    # if (!csk.error) result[row_index, "csk"] <- val.fn(csk.data.rep$summary$cumulative.event.time)
     
     if (!csk.error) {
       set.seed(test_seed)
       csk.data.rep <- do.call(gdata_CR, arg.csk)
       rep_csk <<- csk.data.rep
-      result[sim, "csk_survival"] = overall_survival_val.fn(csk.data.rep) #result["csk_survival"]
-      result[sim, "csk_endpoint"] = endpoint_val.fn(csk.data.rep) # result["csk_endpoint"]
-      result[sim,"csk_trt1"] = trt1.fn(csk.data.rep)
-      # result[sim, "csk_percent.censor"] <- mean(csk.data.rep$status==0, na.rm = TRUE)
-      # result[sim, paste0("csk_cause.", 1:n.causes)] <-
+      result[row_index, "csk_survival"] = overall_survival_val.fn(csk.data.rep) #result["csk_survival"]
+      result[row_index, "csk_endpoint"] = endpoint_val.fn(csk.data.rep) # result["csk_endpoint"]
+      result[row_index,"csk_trt1"] = trt1.fn(csk.data.rep)
+      # result[row_index, "csk_percent.censor"] <- mean(csk.data.rep$status==0, na.rm = TRUE)
+      # result[row_index, paste0("csk_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(csk.data.rep$status == s))
     }
     # # within csk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
@@ -565,7 +567,7 @@ for (sim in n.sim_start:n.sim_end){
     # trt_result[sim_count+2, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("csk", A_mean, B_mean, A_mean_cr, B_mean_cr)
     # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     
-    result[sim, "time.csk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.csk"]
+    result[row_index, "time.csk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.csk"]
     arg.csk$policy <- NULL; gc()
     rm(csk.data.rep); gc()
     if ("package:dtrSurv" %in% search()) {
@@ -626,11 +628,11 @@ for (sim in n.sim_start:n.sim_end){
       set.seed(test_seed)
       pmcr.data.rep <- do.call(gdata_CR, arg.pmcr)
       rep_pmcr <<- pmcr.data.rep
-      result[sim, "pmcr_survival"] = overall_survival_val.fn(pmcr.data.rep) #result["pmcr_survival"]
-      result[sim, "pmcr_endpoint"] = endpoint_val.fn(pmcr.data.rep) #result["pmcr_endpoint"]
-      result[sim,"pmcr_trt1"] = trt1.fn(pmcr.data.rep)
-      # result[sim, "pmcr_percent.censor"] <- mean(pmcr.data.rep$status==0, na.rm = TRUE)
-      # result[sim, paste0("pmcr_cause.", 1:n.causes)] <-
+      result[row_index, "pmcr_survival"] = overall_survival_val.fn(pmcr.data.rep) #result["pmcr_survival"]
+      result[row_index, "pmcr_endpoint"] = endpoint_val.fn(pmcr.data.rep) #result["pmcr_endpoint"]
+      result[row_index,"pmcr_trt1"] = trt1.fn(pmcr.data.rep)
+      # result[row_index, "pmcr_percent.censor"] <- mean(pmcr.data.rep$status==0, na.rm = TRUE)
+      # result[row_index, paste0("pmcr_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(pmcr.data.rep$status == s))
     }
     # # within pmcr method, mean survival time from those who have action -1 and mean survival time for those who have action 1
@@ -641,7 +643,7 @@ for (sim in n.sim_start:n.sim_end){
     # trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("pmcr", A_mean, B_mean, A_mean_cr, B_mean_cr)
     # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     
-    result[sim, "time.pmcr"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.pmcr"]
+    result[row_index, "time.pmcr"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.pmcr"]
     arg.pmcr$policy <- NULL; gc()
     rm(pmcr.data.rep); gc()
     
@@ -698,9 +700,9 @@ for (sim in n.sim_start:n.sim_end){
       set.seed(test_seed)
       aipwe.data.rep <- do.call(gdata_CR, arg.aipwe)
       rep_aipwe <<- aipwe.data.rep
-      result[sim, "aipwe_survival"] = overall_survival_val.fn(aipwe.data.rep) #result["aipwe_survival"]
-      result[sim, "aipwe_endpoint"] = endpoint_val.fn(aipwe.data.rep) #result["aipwe_endpoint"]
-      result[sim,"aipwe_trt1"] = trt1.fn(aipwe.data.rep)
+      result[row_index, "aipwe_survival"] = overall_survival_val.fn(aipwe.data.rep) #result["aipwe_survival"]
+      result[row_index, "aipwe_endpoint"] = endpoint_val.fn(aipwe.data.rep) #result["aipwe_endpoint"]
+      result[row_index,"aipwe_trt1"] = trt1.fn(aipwe.data.rep)
     }
     
     # # within aipwe method, mean survival time from those who have action -1 and mean survival time for those who have action 1
@@ -711,7 +713,7 @@ for (sim in n.sim_start:n.sim_end){
     # trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("aipwe", A_mean, B_mean, A_mean_cr, B_mean_cr)
     # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     
-    result[sim, "time.aipwe"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.aipwe"]
+    result[row_index, "time.aipwe"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.aipwe"]
     arg.aipwe$policy <- NULL; gc()
     rm(aipwe.data.rep); gc()
     # aipwe.fit(data_list = data.df.aipwe,
@@ -738,8 +740,8 @@ for (sim in n.sim_start:n.sim_end){
   #     cat ("  3. Goldberg & Kosorok - lm - Evaluation \n")
   #     set.seed(train_seed + 10)
   #     if (!gklm.error) gklm.data.rep <- do.call(multiStageDynamics, arg.gk.lm)
-  #     if (!gklm.error) result[sim, "gkLM"]    <- val.fn(gklm.data.rep$summary$cumulative.event.time)
-  #     result[sim, "time.gkLM"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
+  #     if (!gklm.error) result[row_index, "gkLM"]    <- val.fn(gklm.data.rep$summary$cumulative.event.time)
+  #     result[row_index, "time.gkLM"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
   #     arg.gk.lm$policy <- NULL; gc()
   #     rm(gklm.data.rep); gc()
   #
@@ -761,8 +763,8 @@ for (sim in n.sim_start:n.sim_end){
   #     cat ("  4. Estimation - Goldberg & Kosorok  - rf - Evaluation \n")
   #     set.seed(train_seed + 10)
   #     if (!gkrf.error) gkrf.data.rep <- do.call(multiStageDynamics, arg.gk.rf)
-  #     if (!gkrf.error) result[sim, "gkRF"]    <- val.fn(gkrf.data.rep$summary$cumulative.event.time)
-  #     result[sim, "time.gkRF"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
+  #     if (!gkrf.error) result[row_index, "gkRF"]    <- val.fn(gkrf.data.rep$summary$cumulative.event.time)
+  #     result[row_index, "time.gkRF"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
   #     arg.gk.rf$policy <- NULL; gc()
   #     rm(gkrf.data.rep); gc()
   #   }
@@ -779,8 +781,8 @@ for (sim in n.sim_start:n.sim_end){
   #     cat ("  5. Estimation - Simoneau et al. - Evaluation \n")
   #     set.seed(train_seed + 10)
   #     if (!dw.error) dw.data.rep <- do.call(multiStageDynamics, arg.dw)
-  #     if (!dw.error) result[sim, "dw"]  <- val.fn(dw.data.rep$summary$cumulative.event.time)
-  #     result[sim, "time.dw"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
+  #     if (!dw.error) result[row_index, "dw"]  <- val.fn(dw.data.rep$summary$cumulative.event.time)
+  #     result[row_index, "time.dw"] <- tt(2, reset = TRUE, units = "mins")["elapsed"]
   #     arg.dw$policy <- NULL; gc()
   #     rm(dw.data.rep); gc()
   #   }
@@ -839,7 +841,7 @@ for (sim in n.sim_start:n.sim_end){
     arg.zom$policy <- if (!zom.error) optimal.zom
     policy_zom <- arg.zom$policy
     # print(arg.zom$policy@phaseResults[["EndPointPhase2Results"]]@optimal@optimalTx)
-    if (!zom.error) result[sim, "zom_n_phase2"] <- mean(arg.zom$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) # result["zom_n_phase2"]
+    if (!zom.error) result[row_index, "zom_n_phase2"] <- mean(arg.zom$policy@phaseResults[["SurvivalPhase1Results"]]@optimal@Ratio_Stopping_Ind == 0) # result["zom_n_phase2"]
     rm(optimal.zom); gc()
     
     cat ("  6. zero-order model - Evaluation for Simulation",sim, ":",generate_failure_method,"\n")
@@ -848,11 +850,11 @@ for (sim in n.sim_start:n.sim_end){
       set.seed(test_seed)
       zom.data.rep <- do.call(gdata_CR, arg.zom)
       rep_zom <<- zom.data.rep
-      result[sim,"zom_survival"] = overall_survival_val.fn(zom.data.rep) #result["zom_survival"]
-      result[sim,"zom_endpoint"] = endpoint_val.fn(zom.data.rep) #result["zom_endpoint"]
-      result[sim,"zom_trt1"] = trt1.fn(zom.data.rep)
-      # result[sim, "zom_percent.censor"] <- mean(zom.data.rep$status==0, na.rm = TRUE)
-      # result[sim, paste0("zom_cause.", 1:n.causes)] <-
+      result[row_index,"zom_survival"] = overall_survival_val.fn(zom.data.rep) #result["zom_survival"]
+      result[row_index,"zom_endpoint"] = endpoint_val.fn(zom.data.rep) #result["zom_endpoint"]
+      result[row_index,"zom_trt1"] = trt1.fn(zom.data.rep)
+      # result[row_index, "zom_percent.censor"] <- mean(zom.data.rep$status==0, na.rm = TRUE)
+      # result[row_index, paste0("zom_cause.", 1:n.causes)] <-
       #   sapply(1:n.causes, function(s) mean(zom.data.rep$status == s))
       
       # # within zom method, mean survival time from those who have action -1 and mean survival time for those who have action 1
@@ -863,9 +865,9 @@ for (sim in n.sim_start:n.sim_end){
       # trt_result[sim_count+4, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("zom", A_mean, B_mean, A_mean_cr, B_mean_cr)
       # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     }
-    # if (!zom.error) result[sim, "zom_phase1"] <- val.fn_phase1(zom.data.rep$event.time)
-    # if (!zom.error) result[sim, "zom_phase2"] <- val.fn_phase2(zom.data.rep$event.time)
-    result[sim,"time.zom"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[sim, "time.zom"]
+    # if (!zom.error) result[row_index, "zom_phase1"] <- val.fn_phase1(zom.data.rep$event.time)
+    # if (!zom.error) result[row_index, "zom_phase2"] <- val.fn_phase2(zom.data.rep$event.time)
+    result[row_index,"time.zom"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[row_index, "time.zom"]
     arg.zom$policy <- NULL; gc()
     rm(zom.data.rep); gc()
   }

@@ -1,3 +1,5 @@
+setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+
 # things to note:
 # - censoring for training; no censoring for testing; truncated at tau for both (differs by sim generate failure setting)
 # right now, in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
@@ -27,22 +29,62 @@ savingrds = TRUE
 #"2025-02-10" this is the original submission 
 #"2024-09-13" this is an old one
 
-n.eval = 10000 #10000 #n.eval = 10000
-date_folder = "2025-08-05"; 
-# n.sim = 100 #500
-n.sim_start = 301
-# "2025-08-02" is 1-100 sims;
-# "2025-08-03" is 101-200 sims;
-# "2025-08-04" is 201-300 sims;
-# "2025-08-05" is 301-400 sims;
-# "2025-08-06" is 401-500 sims;
-# "2025-08-07" is 501-600 sims;
-# "2025-08-08" is 601-700 sims;
-# "2025-08-09" is 701-800 sims;
-# "2025-08-10" is 801-900 sims;
-# "2025-08-11" is 901-1000 sims;
-n.sim = 100
-n.sim_end = n.sim_start - 1 + n.sim # n.sim
+
+# only thing you change
+multiplier <- 25  # e.g. 1 → first 50 sims, 2 → next 50 sims, etc.
+
+# fixed settings
+n.eval <- 10000
+n.sim  <- 50     # number of sims per block
+step   <- 50     # step size for n.sim_start calculation
+
+# auto-calculated
+start_date <- as.Date("2025-09-01")  # baseline date for multiplier = 1
+date_folder <- as.character(start_date + (multiplier - 1)) 
+
+n.sim_start <- (multiplier - 1) * step + 1
+n.sim_end   <- n.sim_start + n.sim - 1
+
+# check
+sim_deets = list(
+  multiplier   = multiplier,
+  date_folder  = date_folder,
+  n.sim_start  = n.sim_start,
+  n.sim_end    = n.sim_end
+); sim_deets
+
+# 
+
+# calculate number of multipliers needed to reach 1000 sims
+max_multiplier <- ceiling(1000 / n.sim)
+
+# create table
+sim_schedule <- data.frame(
+  multiplier   = 1:max_multiplier
+) %>%
+  mutate(
+    date_folder = as.character(start_date + (multiplier - 1)),
+    n.sim_start = (multiplier - 1) * step + 1,
+    n.sim_end   = n.sim_start + n.sim - 1
+  )
+sim_schedule
+
+# n.eval = 10000 #10000 #n.eval = 10000
+# date_folder = "2025-08-09"; 
+# # n.sim = 100 #500
+# n.sim_start = 701
+# # "2025-08-02" is 1-100 sims;
+# # "2025-08-03" is 101-200 sims;
+# # "2025-08-04" is 201-300 sims;
+# # "2025-08-05" is 301-400 sims;
+# # "2025-08-06" is 401-500 sims;
+# # "2025-08-07" is 501-600 sims;
+# # "2025-08-08" is 601-700 sims;
+# # "2025-08-09" is 701-800 sims;
+# # "2025-08-10" is 801-900 sims;
+# # "2025-08-11" is 901-1000 sims;
+# n.sim = 100
+# n.sim_end = n.sim_start - 1 + n.sim # n.sim
 
 mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't want it to be too big
 prob_tol1 = c(0.15, 0.01)
@@ -357,36 +399,49 @@ if (endpoint == "CR"){
       
       betas <- list(
       beta1 = list(
-        beta1.hazard0 = c(0,
-                          0.1, 0.3, 0.01, -0.15, -0.13, -0.17,
-                          0.16, -1.15, -3.27, 1.16, 0.01, 0.01,
-                          0.14, -2.13, 0.3, 1.18, 0.01, 0.01,
-                          0.18, 0.01, -2.2, 0.54, 0, 0,
-                          0.01, 0.01, 0.01, 0.38, 0.15, 0.12),
-        beta1.hazard1 = c(0,
-                          -1.8, -1.5, 1.31, -0.13, 0.01, -0.17,
-                          0.1, 0.13, 1.71, -0.3, 0, 2.1,
-                          0, -0.16, -0.4, 0.1, 0.1, 0.11,
-                          0.19, 0, 0.1, 1.33, 0.4, 0.2,
-                          0.18, 0.12, 0.01, 0, 0, -0.1),
-        beta2.hazard0 = c(0,
-                          0.15, 0.32, 2.19, 0.13, 0.14, 0.18,
-                          -1.18, -0.13, 0.16, 0.01, 0.25, 0.19,
-                          -0.36, 0.34, 0.32, -1.73, 0.04, 0.15,
-                          -0.27, -0.14, -0.13, 1.21, 0.02, 0.84,
-                          -0.14, 1.33, 0.12, 0.25, 0.01, 0.71), #c(0,-0.1,-0.2),
-        beta2.hazard1 = c(0,
-                          -0.23,  0.35, 0.77, -1.38, 0.36, -1.98,
-                          -0.14, -0.81, -0.52, 0.13, 0.17, 0.15,
-                           0.31,  0.37, -0.17, 0.18, 0.12, -0.14,
-                          -0.22,  0.83, 0.54, -1.41, 0.16, 0.01,
-                          -0.33, -0.55, 0.62, 0.1, -0.32, 0.01)
-        #c(0,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1,
-                          # 1, 1, 1, 1, 1, 1)
+        beta1.hazard0 = c(0,1,1.3,-0.2,0.6,0.3,
+                          0.1,0.5,-0.3,1.4,3, 
+                          rep(0, 31-11)),
+        beta1.hazard1 = c(0,1.2,-0.1,-0.5,1.2,-2.2,
+                          1.2,1.1,0.5,-0.2,-1.2, 
+                          rep(0, 31-11)),
+        beta2.hazard0 = c(0,-0.5,-0.5,-1.4,-1.1,0.8,
+                          1.4,-2.4,-1.1,-0.8,-0.4, 
+                          rep(0, 31-11)),
+        beta2.hazard1 = c(0,0.4,1.3,1.6,1.2,1.1,
+                          -0.4,-0.3,0.6,0.2,1.1, 
+                          rep(0, 31-11))
+        
+        # beta1.hazard0 = c(0,
+        #                   0.1, 0.3, 0.01, -0.15, -0.13, -0.17,
+        #                   0.16, -1.15, -3.27, 1.16, 0.01, 0.01,
+        #                   0.14, -2.13, 0.3, 1.18, 0.01, 0.01,
+        #                   0.18, 0.01, -2.2, 0.54, 0, 0,
+        #                   0.01, 0.01, 0.01, 0.38, 0.15, 0.12),
+        # beta1.hazard1 = c(0,
+        #                   -1.8, -1.5, 1.31, -0.13, 0.01, -0.17,
+        #                   0.1, 0.13, 1.71, -0.3, 0, 2.1,
+        #                   0, -0.16, -0.4, 0.1, 0.1, 0.11,
+        #                   0.19, 0, 0.1, 1.33, 0.4, 0.2,
+        #                   0.18, 0.12, 0.01, 0, 0, -0.1),
+        # beta2.hazard0 = c(0,
+        #                   0.15, 0.32, 2.19, 0.13, 0.14, 0.18,
+        #                   -1.18, -0.13, 0.16, 0.01, 0.25, 0.19,
+        #                   -0.36, 0.34, 0.32, -1.73, 0.04, 0.15,
+        #                   -0.27, -0.14, -0.13, 1.21, 0.02, 0.84,
+        #                   -0.14, 1.33, 0.12, 0.25, 0.01, 0.71), #c(0,-0.1,-0.2),
+        # beta2.hazard1 = c(0,
+        #                   -0.23,  0.35, 0.77, -1.38, 0.36, -1.98,
+        #                   -0.14, -0.81, -0.52, 0.13, 0.17, 0.15,
+        #                    0.31,  0.37, -0.17, 0.18, 0.12, -0.14,
+        #                   -0.22,  0.83, 0.54, -1.41, 0.16, 0.01,
+        #                   -0.33, -0.55, 0.62, 0.1, -0.32, 0.01)
+        # #c(0,
+        #                   # 1, 1, 1, 1, 1, 1,
+        #                   # 1, 1, 1, 1, 1, 1,
+        #                   # 1, 1, 1, 1, 1, 1,
+        #                   # 1, 1, 1, 1, 1, 1,
+        #                   # 1, 1, 1, 1, 1, 1)
         )
       )
       
@@ -583,3 +638,10 @@ if (skip.zom == "FALSE"){
 
 message("End of CR00.Simulation_Parameters.R")
 
+# check
+list(
+  multiplier   = multiplier,
+  date_folder  = date_folder,
+  n.sim_start  = n.sim_start,
+  n.sim_end    = n.sim_end
+)
