@@ -60,9 +60,9 @@ This repository contains two main folders: `~/Simulations` and `~/RDA`. These fo
 
 The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to generate the results from the manuscript. There are two simulation settings: 1) generating independent failure tiems from an exponential distribution, and 2) simulating dependent failures times based on the simulation settings from Fine-Gray [2]. The simulation setting is specified by the parameter `generate_failure_method` (see below). R packages such as survival, itrSruv, tidyverse, dplyr, tidyr, MASS, and ggplot2, reshape2, cowplot (for figures) should be installed before running. 
 
-The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He et al, 2021), PMCR (Zhou et al, 2021), the zero-order model, and observed policy. Refer to the manuscript for references and details on these methods. See `F02.ComparatorMethod_Functions.R` script with helper functions to implement these methods. Note that these methods do not always run or converge, and removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv. 
+The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He et al, 2021), PMCR (Zhou et al, 2021), the zero-order model, and observed policy. Refer to the manuscript for references and details on these methods. See `F02.ComparatorMethod_Functions.R` script with helper functions to implement these methods. Note that these methods do not always run or converge, and *removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv.* For dtrSurv, R package dtrSurv must be installed before running. For PMCR, Rpackages rgenoud and rpart must be installed before running. For AIPWE, R packages purrr and cmprsk must be installed before running.
 
-For dtrSurv, R package dtrSurv must be installed before running. For PMCR, Rpackages rgenoud and rpart must be installed before running. For AIPWE, R packages purrr and cmprsk must be installed before running.
+Some parts of the code may use `beep()` function from `beepr` package when `local = 1`. Comment out if you don't want to use this.
 
 To run the simulations:
 
