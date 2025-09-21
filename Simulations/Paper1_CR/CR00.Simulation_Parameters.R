@@ -110,7 +110,7 @@ if (generate_failure_method == "simple_exp"){
 
 # Specify the methods and skip.methods
 all_methods <- c("czmk", "csk", "pmcr", "aipwe", "zom", "obs");
-skip_method <- c(!TRUE, !TRUE, TRUE, TRUE, !TRUE, !TRUE);
+skip_method <- c(!TRUE, !TRUE, !TRUE, !TRUE, !TRUE, !TRUE);
 # skip_method <- c(!TRUE, TRUE, TRUE, TRUE, TRUE, TRUE);
 
 #### Run this Script FOR CR. Change name later.
