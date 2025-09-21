@@ -121,6 +121,9 @@ The `~/RDA/Paper1_CR` folder contains the analysis code for the PAD observationa
 ---
 
 ### 3. Recurrent Events (RE)
+
+The simulation and rda analyses are complete. The readme is not updated yet (as of Sept 2025).
+
 #### Simulations
 #### RDA
 We analyze the public bladder recurrence dataset in the R package 'survival'.
