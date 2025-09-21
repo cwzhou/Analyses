@@ -27,15 +27,12 @@ Below is the simplified directory structure for relevant scripts.
 │   ├── Paper1_CR/           # Implementation Scripts for Competing Risk Endpoint  
 │   │   ├── 3_output/        # RDS Output  
 │   │   └── 3_figure/        # Figure Output  
-│   ├── Paper2_multiCR/      # N/A for now 
 │   └── Paper3_RE/           # Implementation Scripts for Recurrent Event Endpoint 
 │   │   ├── output/          # RDS Output  
 │   │   └── figure/          # Figure Output 
 ├── Simulations /            # Scripts for simulating CR/RE survival data and analyses  
 │   ├── Paper1_CR/           # Implementation Scripts for Competing Risk Datasets
-│   ├── Paper2_multiCR/      # N/A for now
 │   └── Paper3_RE/           # Implementation Scripts for Recurrent Event
-├── requirements.txt         # List of R package dependencies  
 └── README.md                # This file  
 ```
 
@@ -120,7 +117,7 @@ The `~/RDA/Paper1_CR` folder contains the analysis code for the PAD observationa
 
 ---
 
-### 3. Recurrent Events (RE)
+### 2. Recurrent Events (RE)
 
 The simulation and rda analyses are complete. The readme is not updated yet (as of Sept 2025).
 
