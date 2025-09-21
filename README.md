@@ -77,10 +77,8 @@ To run the simulations, the following scripts must be downloaded from Github:
 	8. `CR02.Simulation_Summary.R`, and 
 	9. (if interested) `CR02.Simulation_Summary_Revision.R`.
 
-First, go to the working directory the scripts are saved and set this as the working directory.
-Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Simulation_Summary.R` or `CR02.Simulation_Summary_Revision.R`. Make sure date_folder matches the date folder in the output saved.
-
----
+**First, go to the working directory the scripts are saved and set this as the working directory.
+Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Simulation_Summary.R` or `CR02.Simulation_Summary_Revision.R`. Make sure date_folder matches the date folder in the output saved.**
 
 Follow the steps below before running:
 1. **Edit Simulation Parameters**  
