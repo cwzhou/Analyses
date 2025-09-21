@@ -50,7 +50,8 @@ if (revision == 1){
     multiplier   = multiplier,
     date_folder  = date_folder,
     n.sim_start  = n.sim_start,
-    n.sim_end    = n.sim_end
+    n.sim_end    = n.sim_end,
+    n.eval = n.eval
   ); sim_deets
   
   # 
@@ -92,6 +93,15 @@ if (revision == 1){
   date_folder = "2025-02-10"
   n.sim_start = 1
   n.sim_end = n.sim_start - 1 + n.sim
+  
+  # check
+  sim_deets = list(
+    date_folder  = date_folder,
+    n.sim_start  = n.sim_start,
+    n.sim_end    = n.sim_end,
+    n.eval = n.eval
+  ); sim_deets
+  
 }
 
 mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't want it to be too big

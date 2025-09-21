@@ -22,9 +22,7 @@ local = 1 # change to 0 for cluster
 
 # call on parameters which calls on library
 source("CR00.Simulation_Parameters.R")
-if (revision == 1){
-  print(sim_deets)
-}
+print(sim_deets)
 
 # call on functions then runs simulations
 if (parallel == 1){
@@ -140,7 +138,8 @@ seconds <- round(total_secs %% 60)
 cat("Start time:", format(start_time, "%Y-%m-%d %H:%M:%S"), "\n")
 cat("End time:", format(end_time, "%Y-%m-%d %H:%M:%S"), "\n")
 
-sim_deets
+print(sim_deets)
+
 cat("Total time:", hours, "hours", minutes, "minutes", seconds, "seconds\n")
 message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")
 
