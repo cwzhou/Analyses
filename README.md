@@ -45,8 +45,8 @@ To run the code, you need the following:
 ## Usage Instructions and Reproducibility
 This repository contains two main folders: `~/Simulations` and `~/RDA`. These folders include the necessary code and scripts for reproducing all computational work presented in the manuscript. Below are the instructions for using the repository and ensuring reproducibility of the analyses. Within each folder, Project1_CR is for the competing risk endpoint and Project3_RE is for the recurrent event endpoint. Please select accordingly.
 
-### 1. Competing Risks (CR)
-#### Simulations
+## 1. Competing Risks (CR)
+### Simulations
 
 The `~/Simulations/Paper1_CR` folder contains the simulation scripts required to generate the results from the manuscript. There are two simulation settings: 1) generating independent failure tiems from an exponential distribution, and 2) simulating dependent failures times based on the simulation settings from Fine-Gray [2]. The simulation setting is specified by the parameter `generate_failure_method` (see below). 
 
@@ -64,7 +64,7 @@ The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He e
 Note that these methods do not always run or converge, and **removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv.**
 
 ---
-##### Running Simulations
+### Running Simulations
 
 To run the simulations, the following scripts must be downloaded from Github: 
 	1. `F00.Libraries.R`, 
