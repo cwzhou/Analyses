@@ -298,7 +298,7 @@ aipwe_data_format = function(data.df){
   A <- data.df %>%
     dplyr::select("Trt") %>%
     mutate(Trt = ifelse(Trt == 1, 1, 0)) %>% # Trt has to be 0/1 # LIMITATION TO AIPWE: can only consider binary treatments
-    as.vector()
+    dplyr::pull(Trt)
   colnames(A) = NULL
   xs <- data.df %>%
     dplyr::select(-c(obs_time, Trt, status, D.0, D.1, D.2)) %>%
@@ -308,9 +308,10 @@ aipwe_data_format = function(data.df){
   # View(xs)
   # View(ncol(xs))
   for (c in 1:ncol(xs)){
-    # print(c)
+    print(c)
     cc = as.numeric(xs[,c])
     cc1 = cbind(cc,A) %>%
+      as.data.frame() %>%
       mutate(ix = ifelse(A == 1, cc, 0)) %>%
       dplyr::select(ix)
     ixn[,c] = cc1$ix
