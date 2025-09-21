@@ -242,7 +242,7 @@ for (sim in n.sim_start:n.sim_end){
   
   row_index = sim - n.sim_start + 1
   #8/20 revision, making this runnable in batches based on 01.Simulation_Run_RE.R
-# for (sim in 1:n.sim) {
+  # for (sim in 1:n.sim) {
   
   cat("\n\n#################################")
   cat("\n######### Simulation ",sim, "#########")
@@ -347,11 +347,19 @@ for (sim in n.sim_start:n.sim_end){
   timePointsEndpoint = timePointsSurvival # we can do this bc CR is subset of OS failure times
   # create unique observed endpoint times for endpoint phase 2
   
-  data.df.pmcr <<- data.df %>%
-    dplyr::select(obs_time, Trt, status, starts_with("Z")) %>%
-    mutate(Trt = ifelse(Trt == -1, 0, Trt)) # Trt has to be 0/1
+  if (!skip.pmcr){
+    data.df.pmcr <<- data.df %>%
+      dplyr::select(obs_time, Trt, status, starts_with("Z")) %>%
+      mutate(Trt = ifelse(Trt == -1, 0, Trt)) # Trt has to be 0/1
+  } else{
+    message("skipping pmcr data manipulation because skip.pmcr = TRUE")
+  }
   
-  data.df.aipwe <<- aipwe_data_format(data.df)
+  if (!skip.aipwe){
+    data.df.aipwe <<- aipwe_data_format(data.df)
+  } else{
+    message("skipping aipwe data manipulation because skip.aipwe = TRUE")
+  }
   
   result[row_index, "training_percent.censor"] <- mean(data.df$status==0, na.rm = TRUE) #result["training_percent.censor"]
   # result[paste0("training_cause.", 1:n.causes)]
@@ -441,7 +449,7 @@ for (sim in n.sim_start:n.sim_end){
                                                      minEventSurv = mindeath, # minimum number of subjects with events
                                                      nodeSizeEnd = nodesize,
                                                      nodeSizeSurv = nodesize # this is needed only for endpoint=RE.
-                                                     )))
+                                                )))
     print(table(optimal.czmk@phaseResults[["FinalOptimalTx_Recc"]]))
     czmk.error <- class(optimal.czmk)[1] == "try-error"
     arg.czmk$policy <- if (!czmk.error) optimal.czmk
@@ -810,7 +818,7 @@ for (sim in n.sim_start:n.sim_end){
     #                                                         nodeSizeSurv = 1e9, # this is needed only for endpoint=RE.
     #                                                         mTry = 1)))
     # print(table(opt_test@phaseResults[["FinalOptimalTx_Recc"]]))
- 
+    
     # optimal.zom <- try(itrSurv:::itrSurv(data = data.df,
     #                                      endPoint = "CR",
     #                                      yName = "obs_time",

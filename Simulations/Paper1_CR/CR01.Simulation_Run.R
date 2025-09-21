@@ -11,15 +11,20 @@ start_time <- Sys.time()
 ## Plots in CR02.Simulation_Summary.R script
 # setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
 local = 1 # change to 0 for cluster
-if (local == 1){
-  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-} else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
-}
+
+# FIRST SET WORKING DIRECTORY TO THE FOLDER THE SCRIPTS ARE IN
+
+# if (local == 1){
+#   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
+# } else{
+#   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
+# }
 
 # call on parameters which calls on library
 source("CR00.Simulation_Parameters.R")
-print(sim_deets)
+if (revision == 1){
+  print(sim_deets)
+}
 
 # call on functions then runs simulations
 if (parallel == 1){

@@ -64,6 +64,7 @@ The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He e
 Note that these methods do not always run or converge, and **removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv.**
 
 ---
+##### Running Simulations
 
 To run the simulations, the following scripts must be downloaded from Github: 
 	1. `F00.Libraries.R`, 
@@ -76,6 +77,7 @@ To run the simulations, the following scripts must be downloaded from Github:
 	8. `CR02.Simulation_Summary.R`, and 
 	9. (if interested) `CR02.Simulation_Summary_Revision.R`.
 
+First, go to the working directory the scripts are saved and set this as the working directory.
 Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Simulation_Summary.R` or `CR02.Simulation_Summary_Revision.R`. Make sure date_folder matches the date folder in the output saved.
 
 ---
