@@ -63,6 +63,25 @@ The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He e
 
 Note that these methods do not always run or converge, and **removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv.**
 
+```r
+install_comparator_packages <- function() {
+  pkgs <- c("dtrSurv", "rgenoud", "rpart", "purrr", "cmprsk")
+  
+  # Check which are not installed
+  missing_pkgs <- pkgs[!(pkgs %in% installed.packages()[, "Package"])]
+  
+  if (length(missing_pkgs) > 0) {
+    message("Installing missing packages: ", paste(missing_pkgs, collapse = ", "))
+    install.packages(missing_pkgs, dependencies = TRUE)
+  } else {
+    message("All comparator packages are already installed.")
+  }
+}
+
+install_comparator_packages()
+```
+
+
 ---
 ### Running Simulations
 
