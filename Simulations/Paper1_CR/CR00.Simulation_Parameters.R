@@ -8,7 +8,7 @@ local = 0 # local = 0 for cluster
 parallel = 0 # parallel = 0 for NOT parallel code
 revision = 0 #jasa revision round 1
 
-init_seed = 353
+init_seed = 2025 #init_seed = 353 was used for revision
 
 # # below is only needed if running this script directly. comment out if running CR01.Simulation_Run.R script.
 # # uncomment if running alone (aka for CR02.Simulation_Summary.R
