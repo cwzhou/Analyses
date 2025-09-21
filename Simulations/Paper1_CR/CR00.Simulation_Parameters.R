@@ -548,7 +548,7 @@ list2env(setting, envir = globalenv())
 beta.propensity <- beta.propensity(ncov)
 
 
-dir_rds <- file.path("output", generate_failure_method, date_folder)
+dir_rds <- file.path("./output", generate_failure_method, date_folder)
 dir_fig <- sub("^output", "figure", dir_rds)
 print(dir_rds)
 print(dir_fig)
