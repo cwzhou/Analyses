@@ -139,7 +139,6 @@ cat("Start time:", format(start_time, "%Y-%m-%d %H:%M:%S"), "\n")
 cat("End time:", format(end_time, "%Y-%m-%d %H:%M:%S"), "\n")
 
 print(sim_deets)
-print(generate_failure_time)
 
 cat("Total time:", hours, "hours", minutes, "minutes", seconds, "seconds\n")
 message("End of CR01.Simulation_Run.R -- proceed to CR02.Simulation_Summary.R for creating plots.")

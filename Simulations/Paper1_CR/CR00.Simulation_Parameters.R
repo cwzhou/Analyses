@@ -90,7 +90,7 @@ if (revision == 1){
 } else{
   n.eval = 1000
   n.sim = 100
-  date_folder = "2025-09-01"
+  date_folder = "2025-09-22"
   n.sim_start = 1
   n.sim_end = n.sim_start - 1 + n.sim
   
