@@ -23,7 +23,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 # sbatch -p general -N 1 --mem 15G -n 1 -t 6-11:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript CR01.Simulation_Run.R"
 
-savingrds = FALSE
+savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
 #10 and 20 are local for revision = 1 and 100 sims; 2025-07-21 is cluster for revision = 1 1000 sims, 10000 neval 
 #"2025-02-10" this is the original submission 
