@@ -1,3 +1,6 @@
+# EXPLORING PROPOPRTION OF PEOPLE DYING FROM CAUSE 1 (crit = 1: truncated mean)
+# source("CR03.Simulation_Summary_Supplementary.R")
+
 # supplementary table for table 2
 s2a_dataset <-
   lapply(1:dim(fn)[1], function(i) {

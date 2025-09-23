@@ -49,13 +49,6 @@ View(final_tbl)
 
 (n.sim = nrow(final_tbl))
 
-# # crit.no = 1
-# # critS.no = 1
-# # critE.no = 1
-# # # below needs to edited based on what the values are - or needs to be automated
-# # y_limits_prob <- c(min(0.12, 0.13), max(0.17, 0.20))
-# # y_limits_mean <- c(0,1.1)#c(min(0.45, 0.50), max(0.70, 0.80))
-
 method.levels = c(1,2,#3,4,
                   5,6)
 method.nm.abc =
@@ -68,7 +61,6 @@ method.nm.formal =
   c("itrSurv", "dtrSurv (2023)",
     # "PMCR (2021)", "AIPWE (2021)",
     "zero-order model", "observed policy")
-# "Goldberg & Kosorok (2012), RF", "Goldberg & Kosorok (2012), linear", "Simoneau et al. (2019)",
 
 if (generate_failure_method == "fine_gray"){
   cause1prob.levels = c(1,2)
@@ -87,13 +79,7 @@ n.labels = c(sprintf("N=%s",size$small.sample.size$n),
 design.levels = c(1,2)
 design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
 beta.levels = c(1)#,2)
-beta.labels = c(sprintf("%s Covariates",ncov.list$beta1))#,
-                # sprintf("%s Covariates",ncov.list$beta2))
-# beta.levels = c(1,2)
-# beta.labels = c("setting1",
-#                 "setting2")
-# beta.levels = c(1)
-# beta.labels = c("setting1")
+beta.labels = c(sprintf("%s Covariates",ncov.list$beta1))
 
 file_naming = function(lab.date, file_lab, crit.no){
   paste0(dir_fig,"/CR02.",file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
@@ -452,21 +438,6 @@ for (crit.no in 1:crit.tot){
                        rel_heights = c(1, 0.1))
   #we can ignore the warning message about return_all
   
-  # # Extract the legend from one plot
-  # legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
-  #
-  # # Combine plots side by side
-  # combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
-  #
-  # # Add the legend underneath
-  # final_plot <- plot_grid(combined,
-  #                         legend,
-  #                         ncol = 1,
-  #                         rel_heights = c(1, 0.1))
-  #
-  # # Display the plot
-  # print(final_plot)
-  
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
   }
@@ -511,13 +482,6 @@ for (crit.no in 1:crit.tot){
   
 } # end of crit.tot for-loop
 
-# EXPLORING PROPOPRTION OF PEOPLE DYING FROM CAUSE 1 (crit = 1: truncated mean)
-# source("CR03.Simulation_Summary_Supplementary.R")
-
-
-if (local == 1){
-  # beep()
-}
 
 message("End of CR02.Simulation_Summary.R")
 
@@ -547,8 +511,6 @@ latex_table <- kable(final_tbl_means, format = "latex", booktabs = TRUE,
 
 # Print the LaTeX code
 cat(latex_table)
-
-
 
 
 library(dplyr)

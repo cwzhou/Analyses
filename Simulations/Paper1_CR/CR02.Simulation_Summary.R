@@ -1,36 +1,31 @@
-solo.plot = 1
+# RUN THIS SCRIPT AFTER CR02.SIMULATION_RUN.R SUCCESSFULLY FINISHES
+# EDIT CR00.SIMULATION_PARAMEERS.R to make sure generate_failure_method is what you want
+
+# BE SURE TO CHANGE LOCAL = 1 BOT HERE AND IN CR00.SIMULATION_PARAMETERS.R BEFORE RUNNING PLOTS
+
+solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
 if (local == 1){
+  # set to your location where the R scripts are located
    setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
  } else{
    setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
  }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
-saving_eps = TRUE#TRUE
+saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
-# crit.no = 1
-# critS.no = 1
-# critE.no = 1
-# # below needs to edited based on what the values are - or needs to be automated
-# y_limits_prob <- c(min(0.12, 0.13), max(0.17, 0.20))
-# y_limits_mean <- c(0,1.1)#c(min(0.45, 0.50), max(0.70, 0.80))
+lab.date = "2025-09-22" # use the date that saved your results for CR01.Simulation_Run.R
 
-# endpoint = "CR"
-# generate_failure_method = c("simple_exp","fine_gray");
-# generate_failure_method = generate_failure_method[1]
-lab.date = "2025-09-22" #"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+#"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
 dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 
 files <- list.files(path = sprintf("output/%s/%s", generate_failure_method, lab.date),
                     pattern = paste0(lab.date, ".*\\.rds"), full.names = TRUE)
-# if (testing_out == 1){
-#   files = files[grepl("_tmp", files) == FALSE]
-#   print(files)
-# }
+
 method.levels = c(1,2,3,4,5,6)
 method.nm.abc =
   c("A", "B", "C", "D", "E", "F")
@@ -40,12 +35,11 @@ method.nm.formal =
   c("itrSurv", "dtrSurv (2023)",
     "PMCR (2021)", "AIPWE (2021)",
     "zero-order model", "observed policy")
-# "Goldberg & Kosorok (2012), RF", "Goldberg & Kosorok (2012), linear", "Simoneau et al. (2019)",
 
 if (generate_failure_method == "fine_gray"){
   cause1prob.levels = c(1,2)
-  cause1prob.labels = c(sprintf("mass_p = %s",cause1_prob$small.cause1prob$cause1prob),
-                        sprintf("mass_p = %s", cause1_prob$large.cause1prob$cause1prob))
+  cause1prob.labels = c(sprintf("Fine-Gray mass: %s",cause1_prob$small.cause1prob$cause1prob),
+                        sprintf("Fine-Gray mass: %s", cause1_prob$large.cause1prob$cause1prob))
 } else{
   cause1prob.levels = cause1_prob$cause1.prob$cause1prob
   cause1prob.labels = " "
@@ -59,13 +53,8 @@ n.labels = c(sprintf("N=%s",size$small.sample.size$n),
 design.levels = c(1,2)
 design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
 beta.levels = c(1,2)
-beta.labels = c(sprintf("ncov=%s",ncov.list$beta1),
-             sprintf("ncov=%s",ncov.list$beta2))
-# beta.levels = c(1,2)
-# beta.labels = c("setting1",
-#                 "setting2")
-# beta.levels = c(1)
-# beta.labels = c("setting1")
+beta.labels = c(sprintf("%s Covariates",ncov.list$beta1),
+             sprintf("%s Covariates",ncov.list$beta2))
 
 file_naming = function(lab.date, file_lab, crit.no){
   paste0(dir_fig,"/CR02.",file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
@@ -130,11 +119,10 @@ for (crit.no in 1:crit.tot){
   if (crit.no == 1){
     crit_lab = "Area Under"
     crit_lab_1 = "a"
-    # y_limits = y_limits_mean
   } else{
+    stop("not done in this paper")
     crit_lab = "Probability"
     crit_lab_1 = "b"
-    # y_limits = y_limits_prob
   }
   file.name.saved = file_naming(lab.date, "SimulationResults", crit.no)
   file.name.saved.solo = file_naming(lab.date, "solo.SimulationResults", crit.no)
@@ -180,19 +168,12 @@ for (crit.no in 1:crit.tot){
           full <- NULL
           a <- NULL
         }
-        # if (is.null(full)){
-        #   NULL
-        # } else{
-        #   list2env(full, envir = globalenv())
-        #   source("Testing/Latex_Tables_Means.R")
-        # }
         if (is.null(a)) {
           NULL
         } else {
           print("a is not null")
 
           var_method = select_method_endpoints(method.nm.simple, Phase_lab)
-          # print(head(a))
           if (parallel == 0){
             sim_name = "sim"
           } else{
@@ -370,20 +351,20 @@ for (crit.no in 1:crit.tot){
         if (generate_failure_method == "fine_gray"){
           solo.result.comb1 = result.comb1 %>%
             filter(design %in% design.filter[1]) %>%
-            filter(setting %in% "ncov=10",
+            filter(setting %in% "10 Covariates",
                    n %in% "N=1000",
                    censor %in% "Low Censoring (20%)")
         } else{
           solo.result.comb1 = result.comb1 %>%
             filter(design %in% design.filter[1]) %>%
-            filter(setting %in% "ncov=5",
+            filter(setting %in% "5 Covariates",
                    n %in% "N=1000",
                    censor %in% "Low Censoring (20%)")
         }
 
         if (generate_failure_method == "fine_gray"){
           solo.result.comb1 = solo.result.comb1 %>%
-            filter(cause1prob %in% "mass_p = 0.8")
+            filter(cause1prob %in% "Fine-Gray mass: 0.8")
           p0.solo <-
             solo.result.comb1 %>%
             ggplot(aes(x = method, y = value, group = method, color = method)) +
@@ -467,21 +448,6 @@ for (crit.no in 1:crit.tot){
                       rel_heights = c(1, 0.1))
   #we can ignore the warning message about return_all
 
-  # # Extract the legend from one plot
-  # legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
-  #
-  # # Combine plots side by side
-  # combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
-  #
-  # # Add the legend underneath
-  # final_plot <- plot_grid(combined,
-  #                         legend,
-  #                         ncol = 1,
-  #                         rel_heights = c(1, 0.1))
-  #
-  # # Display the plot
-  # print(final_plot)
-
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
   }
@@ -491,7 +457,11 @@ for (crit.no in 1:crit.tot){
 
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
-    y_limits = c(200,800)
+    if (generate_failure_method == "fine_gray"){
+      y_limits = c(220,700)
+    } else{
+      y_limits = c(200,800)
+    }
     p.1.solo = p.list.solo[[1]] +
       theme(legend.position = "none",
             axis.title.x=element_blank()) +
@@ -504,8 +474,7 @@ for (crit.no in 1:crit.tot){
                              p.2.solo,
                              align = "vh",
                              axis = "tblr",
-                             nrow = 1, ncol = 2)#,
-    # common.legend = FALSE)
+                             nrow = 1, ncol = 2)
     p.grid1.solo <- plot_grid(p.grid.solo,
                               get_legend(p.list.solo[[2]] +
                                            theme(legend.direction = "horizontal",
@@ -524,15 +493,21 @@ for (crit.no in 1:crit.tot){
            width = 20, height = 10)
   }
 
-  } # end of crit.tot for-loop
-
-# EXPLORING PROPOPRTION OF PEOPLE DYING FROM CAUSE 1 (crit = 1: truncated mean)
-# source("CR03.Simulation_Summary_Supplementary.R")
-
-
-if (local == 1){
-  # beep()
-}
+   } # end of crit.tot for-loop
 
 message("End of CR02.Simulation_Summary.R")
 
+# # Extract the legend from one plot
+# legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
+#
+# # Combine plots side by side
+# combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
+#
+# # Add the legend underneath
+# final_plot <- plot_grid(combined,
+#                         legend,
+#                         ncol = 1,
+#                         rel_heights = c(1, 0.1))
+#
+# # Display the plot
+# print(final_plot)
