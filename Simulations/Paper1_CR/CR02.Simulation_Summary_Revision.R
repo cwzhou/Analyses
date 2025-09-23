@@ -17,7 +17,7 @@ library(dplyr)
 library(patchwork)
 library(purrr)
 
-lab.date = "2025-09-29" #"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+lab.date = "2026-01-26" #"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
 dir_fig = sprintf("./figure/%s/%s", generate_failure_method, lab.date)
 
 # Sequence of dates to include
@@ -156,10 +156,10 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "Overall Event-Free S(t)"
+      Phase_lab_1 = "AUC(OEFS)"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "Cause 1 CIF"
+      Phase_lab_1 = "AUC(PC CIF)"
     }
     if (Phase.no == 1){
       crit = crit_surv
@@ -272,9 +272,9 @@ for (crit.no in 1:crit.tot){
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
     design.filter = c("Trt: Covariate Dependent","Trt: Covariate Independent")
     if (crit.no == 1){
-      ylabs = sprintf("Mean Truncated %s", Phase_lab_1)
+      ylabs = Phase_lab_1
     } else {
-      ylabs = paste0(Phase_lab_1, " ",crit_lab, " at t = ", t0)
+      stop("crit.no not defined")
     }
     print(sprintf("ylabs: %s", ylabs))
     result.stat.i =

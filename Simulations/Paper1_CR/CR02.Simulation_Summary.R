@@ -3,7 +3,7 @@
 
 # BE SURE TO CHANGE LOCAL = 1 BOT HERE AND IN CR00.SIMULATION_PARAMETERS.R BEFORE RUNNING PLOTS
 
-solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
+solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
 if (local == 1){
   # set to your location where the R scripts are located
