@@ -21,7 +21,7 @@ testing_out = 1
 # endpoint = "CR"
 # generate_failure_method = c("simple_exp","fine_gray");
 # generate_failure_method = generate_failure_method[1]
-lab.date = "2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
+lab.date = "2025-09-22" #"2025-01-02" #"2024-09-13" #"2024-09-07" #"2024-08-31" #Sys.Date()#"2024-08-20"#"2024-02-27" #"2024-02-18" #Sys.Date()  # change this for the date of RDS data you want
 dir_rds = sprintf("./output/%s/%s", generate_failure_method, lab.date)
 dir_fig = dir_rds %>% gsub("output/", "figure/", .)
 
@@ -128,7 +128,7 @@ p.list <- p.list.solo <- list()
 for (crit.no in 1:crit.tot){
   message("%%%%%%%%%%%% crit.no", crit.no, " %%%%%%%%%%%%%%%%%")
   if (crit.no == 1){
-    crit_lab = "Truncated mean"
+    crit_lab = "Area Under"
     crit_lab_1 = "a"
     # y_limits = y_limits_mean
   } else{
@@ -142,10 +142,10 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "Overall S(t)"
+      Phase_lab_1 = "Overall Event-Free Survival Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "Cause 1 CIF"
+      Phase_lab_1 = "Priority Cause Cumulative Incidence Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv
@@ -230,7 +230,7 @@ for (crit.no in 1:crit.tot){
       }) %>%
       do.call(rbind, .) %>%
       # below is ONLY for days,not years
-      mutate(value = ifelse(value<2, value*365.25,value)) %>%
+      mutate(value = ifelse(value<3, value*365.25,value)) %>%
       mutate(
         method = factor(method,
                         levels = method.nm.simple1,
@@ -252,7 +252,7 @@ for (crit.no in 1:crit.tot){
                         labels = design.labels),
         crit.label = factor(crit,
                             levels = 1:2,
-                            labels = c("1" = sprintf("Mean Truncated %s", crit_lab),
+                            labels = c("1" = sprintf("Truncated Area Under %s", crit_lab),
                                        "2" = sprintf("%s probability at t=%s, Curve(%s)", crit_lab, t0, t0)
                                        )))
     #end of result.comb
@@ -298,9 +298,10 @@ for (crit.no in 1:crit.tot){
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
     design.filter = c("Trt: Covariate Dependent","Trt: Covariate Independent")
     if (crit.no == 1){
-      ylabs = sprintf("Mean Truncated %s", Phase_lab_1)
+      ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
     } else {
-      ylabs = paste0(Phase_lab_1, " ",crit_lab, " at t = ", t0)
+      # ylabs = paste0(crit_lab, " ",Phase_lab_1, " at t = ", t0)
+      stop(sprintf("crit.no == %s is not defined yet.", crit.no))
     }
     print(sprintf("ylabs: %s", ylabs))
     result.stat.i =
@@ -369,7 +370,7 @@ for (crit.no in 1:crit.tot){
         solo.result.comb1 = result.comb1 %>%
           filter(design %in% design.filter[1]) %>%
           filter(setting %in% "ncov=5",
-                 n %in% "N=700",
+                 n %in% "N=1000",
                  censor %in% "Low Censoring (20%)")
 
         if (generate_failure_method == "fine_gray"){

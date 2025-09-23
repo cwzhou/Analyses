@@ -34,7 +34,7 @@ final_tbl <- map_dfr(date_seq, function(d) {
   } else{
     date_str <- format(d, "%Y-%m-%d")
   }
-  file_path <- file.path("./output", "fine_gray", date_str, file_name)
+  file_path <- file.path("./output", "fine_gray/revision", date_str, file_name)
   
   dat_list <- readRDS(file_path)
   dat = dat_list$statistics
