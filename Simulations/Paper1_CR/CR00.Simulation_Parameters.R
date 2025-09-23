@@ -105,9 +105,9 @@ if (revision == 1){
 }
 
 mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't want it to be too big
-prob_tol1 = c(0.15, 0.01)
+prob_tol1 = c(0.15, 0.01) # IGNORE THIS, WE DONT USE, but keep in code since fortran isn't updated to ignore
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
-generate_failure_method = c("simple_exp","fine_gray") #"simple_exp" # "fine_gray"
+generate_failure_method = c("simple_exp","fine_gray") 
 generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){

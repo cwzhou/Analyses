@@ -3,7 +3,11 @@
 
 # BE SURE TO CHANGE LOCAL = 1 BOT HERE AND IN CR00.SIMULATION_PARAMETERS.R BEFORE RUNNING PLOTS
 
-solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
+library(knitr)
+library(kableExtra)
+library(stringr)
+
+solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
 if (local == 1){
   # set to your location where the R scripts are located
@@ -13,7 +17,7 @@ if (local == 1){
  }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
-saving_eps = TRUE
+saving_eps = !TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -34,7 +38,7 @@ method.nm.simple =
 method.nm.formal =
   c("itrSurv", "dtrSurv (2023)",
     "PMCR (2021)", "AIPWE (2021)",
-    "zero-order model", "observed policy")
+    "zero-order", "observed policy")
 
 if (generate_failure_method == "fine_gray"){
   cause1prob.levels = c(1,2)
@@ -46,12 +50,12 @@ if (generate_failure_method == "fine_gray"){
 }
 
 censor.levels = c(1,2)
-censor.labels = c("Low Censoring (20%)","High Censoring (50%)")
+censor.labels = c("Low (20%)","High (50%)")
 n.levels = c(1,2)
 n.labels = c(sprintf("N=%s",size$small.sample.size$n),
              sprintf("N=%s",size$large.sample.size$n))
 design.levels = c(1,2)
-design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
+design.labels = c("Trt: Dependent","Trt: Independent")
 beta.levels = c(1,2)
 beta.labels = c(sprintf("%s Covariates",ncov.list$beta1),
              sprintf("%s Covariates",ncov.list$beta2))
@@ -146,10 +150,10 @@ for (crit.no in 1:crit.tot){
     }
     print(crit_lab); print(Phase_lab)
     method.nm.simple1 = paste0(method.nm.simple, "_", Phase_lab)
+    colMeans_list <- list()
     result.comb <-
       lapply(1:dim(fn)[1], function(i) {
         fn.i = fn$fn[i]
-        # print(fn.i)
         if (file.exists(fn.i)) {
           print(sprintf("file %s exists", fn.i))
           full <- readRDS(fn.i)
@@ -179,7 +183,22 @@ for (crit.no in 1:crit.tot){
           } else{
             sim_name = "sim.no" # parallel
           }
-          beginning <- as.data.frame(a) %>%
+          
+          df.a = as.data.frame(a)
+          
+          # --- compute colMeans side table for this iteration ---
+          colMeans_list[[i]] <<- as.data.frame(t(colMeans(df.a))) %>%
+            cbind(
+              ncauses    = fn$ncauses[i],
+              censor     = fn$censor[i],
+              cause1prob = if ("cause1prob" %in% names(fn)) fn$cause1prob[i] else NA,
+              beta       = fn$beta[i],
+              prop       = fn$prop[i],
+              n          = fn$n[i],
+              crit       = fn$critS.no[i]
+            )
+          
+          beginning <- df.a %>%
             dplyr::select(rep = !!sym(sim_name),
                           all_of(var_method),
                           czmk_n_phase2, zom_n_phase2,
@@ -277,7 +296,7 @@ for (crit.no in 1:crit.tot){
     rm(result.stat.sd)
     file.name.phase = file_naming(lab.date, Phase_lab, crit.no)
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
-    design.filter = c("Trt: Covariate Dependent","Trt: Covariate Independent")
+    design.filter = c("Trt: Dependent","Trt: Independent")
     if (crit.no == 1){
       ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
     } else {
@@ -353,13 +372,13 @@ for (crit.no in 1:crit.tot){
             filter(design %in% design.filter[1]) %>%
             filter(setting %in% "10 Covariates",
                    n %in% "N=1000",
-                   censor %in% "Low Censoring (20%)")
+                   censor %in% "Low (20%)")
         } else{
           solo.result.comb1 = result.comb1 %>%
             filter(design %in% design.filter[1]) %>%
             filter(setting %in% "5 Covariates",
                    n %in% "N=1000",
-                   censor %in% "Low Censoring (20%)")
+                   censor %in% "Low (20%)")
         }
 
         if (generate_failure_method == "fine_gray"){
@@ -450,10 +469,10 @@ for (crit.no in 1:crit.tot){
 
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
+    ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
+           p.grid1,
+           width = 20, height = 10)
   }
-  ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
-         p.grid1,
-         width = 20, height = 10)
 
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
@@ -492,22 +511,231 @@ for (crit.no in 1:crit.tot){
            p.grid1.solo,
            width = 20, height = 10)
   }
+  
+  colMeans_df0 <- do.call(rbind, colMeans_list)
+  colMeans_df <- colMeans_df0 %>%
+    mutate(
+      cause1prob = factor(cause1prob, levels = cause1prob.levels, labels = cause1prob.labels),
+      censor     = factor(censor, levels = censor.levels, labels = censor.labels),
+      n          = factor(n, levels = n.levels, labels = n.labels),
+      prop     = factor(prop, levels = c(1,2), labels = design.filter),
+      beta       = factor(beta, levels = beta.levels, labels = beta.labels)
+    )
+  metadata_cols <- c(
+    # "ncauses",
+    "n",
+    "prop",
+    "beta",
+    "censor",
+    "cause1prob"
+    # "crit"
+  )
+  metadata_map <- c(
+    # ncauses     = "# Causes",
+    censor      = "Censoring",
+    cause1prob  = "Fine-Gray mass",
+    beta        = "Covariates",
+    prop        = "Treatment Assignment",
+    n           = "Sample Size"
+    # crit        = "Criterion"
+  )
 
+  if (generate_failure_method == "simple_exp") {
+    metadata_cols <- setdiff(metadata_cols, "cause1prob")
+    
+    # Keep only those entries whose names are still in metadata_cols
+    metadata_map <- metadata_map[names(metadata_map) %in% metadata_cols]
+  }
+  
+  survival_cols   <- c("czmk_survival","csk_survival","pmcr_survival","aipwe_survival","zom_survival","obs_survival")
+  endpoint_cols   <- c("czmk_endpoint","csk_endpoint","pmcr_endpoint","aipwe_endpoint","zom_endpoint","obs_endpoint")
+  phase2_cols     <- c("czmk_n_phase2","zom_n_phase2")
+  trt_cols        <- c("czmk_trt1","csk_trt1","pmcr_trt1","aipwe_trt1","zom_trt1","obs_trt1")
+  time_cols       <- c("time.aipwe","time.csk","time.czmk","time.obs","time.pmcr","time.zom")
+  training_cols   <- c("training_percent.censor","training_cause.1","training_cause.2")
+  
+  summarize_metrics <- function(df, metric_cols) {
+    df %>%
+      group_by(across(all_of(metadata_cols))) %>%
+      summarise(across(all_of(metric_cols), mean, .names = "{.col}"), .groups = "drop")
+  }
+
+  survival_table  <- summarize_metrics(colMeans_df, survival_cols)
+  endpoint_table  <- summarize_metrics(colMeans_df, endpoint_cols)
+  phase2_table    <- summarize_metrics(colMeans_df, phase2_cols)
+  trt_table       <- summarize_metrics(colMeans_df, trt_cols)
+  time_table      <- summarize_metrics(colMeans_df, time_cols)
+  training_table  <- summarize_metrics(colMeans_df, training_cols)
+
+  # df: summarized data from summarize_metrics
+  # metadata_cols: columns to keep as metadata
+  # metric_cols: original columns passed to summarize_metrics
+  # preferred_order: vector of method short names, e.g., c("czmk","csk","pmcr","aipwe","zom","obs")
+  
+  preferred_order <- method.nm.simple
+  method_map <- setNames(method.nm.formal, method.nm.simple)
+  reorder_metrics_table <- function(df, metadata_cols, metric_cols, preferred_order) {
+    
+    # Get the name of the object as a string
+    df_name <- deparse(substitute(df))
+    
+    if (grepl("training", df_name, ignore.case = TRUE)) {
+      message("Skipping first half because 'training' is in the name")
+      df_final1 = df %>%
+        rename(
+          `Censored` = training_percent.censor,
+          `Priority Cause Events` = training_cause.1,
+          `Cause 2 Events` = training_cause.2,
+        ) 
+    } else {
+      metric_cols <- metric_cols[metric_cols %in% colnames(df)]
+      
+      # Map original names to method short names (for reordering)
+      # Extract method short names from metric_cols, e.g., time.aipwe -> aipwe
+      metric_short_names <- sapply(metric_cols, function(x) {
+        if(grepl("_", x)) {
+          # For czmk_survival, czmk_endpoint, czmk_n_phase2, czmk_trt1, etc.
+          sub("_.*$", "", x)
+        } else if(grepl("\\.", x)) {
+          # For time.aipwe, time.czmk, etc. → take last part after dot
+          sub(".*\\.", "", x)
+        } else {
+          x
+        }
+      })    
+      # Reorder according to preferred_order
+      ordered_metrics <- metric_short_names[metric_short_names %in% preferred_order]
+      ordered_cols <- metric_cols[metric_short_names %in% ordered_metrics]
+      
+      # Subset df: metadata + ordered metrics
+      df_final <- df[, c(metadata_cols, ordered_cols)] 
+      
+      # Optionally rename metric columns to method short names for cleaner table
+      colnames(df_final)[-(1:length(metadata_cols))] <- ordered_metrics
+      
+      existing_cols <- intersect(method.nm.simple, colnames(df_final))
+      existing_cols <- method.nm.simple[method.nm.simple %in% existing_cols]
+      df_final1 <- df_final[, c(metadata_cols, existing_cols)]
+      colnames(df_final1)[(length(metadata_cols)+1):ncol(df_final1)] <- method_map[existing_cols]
+    }
+    
+    library(stringr)
+    df_final2 = df_final1 %>%
+      rename(
+        `Censoring` = censor,
+        `Covariates` = beta,
+        `Treatment Assignment` = prop,
+        `Sample Size` = n,
+      ) 
+    # Columns you want to clean
+    cols_to_clean <- c("Treatment Assignment", "Covariates", "Sample Size")
+    
+    df_final3 <- df_final2 %>%
+      mutate(
+        across(
+          .cols = any_of(cols_to_clean),  # only these columns
+          .fns = ~ {
+            x <- .
+            if (is.factor(x) | is.character(x)) {
+              # Remove "Trt: " or any text before colon
+              x <- str_replace(x, "^Trt:\\s*", "")
+            }
+            # If numeric values with extra text, extract first number
+            if (all(grepl("\\d", x))) {
+              x <- as.numeric(str_extract(x, "\\d+"))
+            }
+            x
+          }
+        )
+      )
+    # df_final3 = df_final2 %>%
+    #   mutate(
+    #     across(
+    #       .cols = -c("Censoring", any_of(method.nm.formal)),
+    #       .fns = ~ {
+    #         x <- .
+    #         if (is.factor(x) | is.character(x)) {
+    #           # Remove "Trt: " or any text before colon
+    #           x <- str_replace(x, "^Trt:\\s*", "")
+    #         }
+    #         # If numeric values with extra text, extract first number
+    #         if (all(grepl("\\d", x))) {
+    #           x <- as.numeric(str_extract(x, "\\d+"))
+    #         }
+    #         x
+    #       }
+    #     )
+    #   )
+    
+    return(df_final3)
+  }
+  
+  survival_table_clean <- reorder_metrics_table(survival_table, metadata_cols, survival_cols, preferred_order)
+  endpoint_table_clean <- reorder_metrics_table(endpoint_table, metadata_cols, endpoint_cols, preferred_order)
+  phase2_table_clean <- reorder_metrics_table(phase2_table, metadata_cols, phase2_cols, preferred_order)
+  trt_table_clean <- reorder_metrics_table(trt_table, metadata_cols, trt_cols, preferred_order)
+  time_table_clean <- reorder_metrics_table(time_table, metadata_cols, time_cols, preferred_order)
+  training_table_clean <- reorder_metrics_table(training_table, metadata_cols, training_cols, preferred_order)
+
+  datasets1 <- list(
+    survival_table_clean,
+    endpoint_table_clean,
+    phase2_table_clean,
+    trt_table_clean,
+    time_table_clean,
+    training_table_clean
+  )
+  
+  labels <- c(
+    "survival_table_final",
+    "endpoint_table_final",
+    "phase2_table_final",
+    "trt_table_final",
+    "time_table_final",
+    "training_table_final"
+  )
+  
+  names(datasets1) <- labels
+  
+  # Optional: digits per table
+  digits_list <- c(4, 2, 2, 2, 2, 2)
+  
+  # Optional: captions per table
+  captions <- c(
+    "Simulation Metadata: Survival Value Function",
+    "Simulation Metadata: Competing Risks Value Function",
+    "Simulation Metadata: Phase 2 Metrics",
+    "Simulation Metadata: Treatment 1 Proportions",
+    "Simulation Metadata: Time Metrics",
+    "Simulation Metadata: Training Dataset Proportions"
+  )
+  if (generate_failure_method == "simple_exp"){
+    gen_lab = "Exponential"
+  } else{
+    gen_lab = "Fine-Gray"
+  }
+  captions1 <- sprintf("%s %s", gen_lab, captions)
+  
    } # end of crit.tot for-loop
 
 message("End of CR02.Simulation_Summary.R")
 
-# # Extract the legend from one plot
-# legend <- get_legend(p.list[[1]] + theme(legend.position = "bottom"))
-#
-# # Combine plots side by side
-# combined <- plot_grid(p.1, p.2, align = "v", ncol = 2)
-#
-# # Add the legend underneath
-# final_plot <- plot_grid(combined,
-#                         legend,
-#                         ncol = 1,
-#                         rel_heights = c(1, 0.1))
-#
-# # Display the plot
-# print(final_plot)
+# Open a text file for writing
+sink(sprintf("%s/simulation_metadata_%s.txt",dir_fig,gen_lab))
+# Loop over tables and print LaTeX code wrapped in landscape
+for (i in seq_along(datasets1)) {
+  latex_table <- kable(
+    datasets1[[i]],
+    format = "latex",
+    booktabs = TRUE,
+    digits = digits_list[i],
+    caption = captions1[i]
+  ) %>%
+    kable_styling(latex_options = c("repeat_header")) %>%
+    collapse_rows(columns = 1:4, valign = "top")
+  
+  cat("\\begin{landscape}\n")
+  cat(latex_table)
+  cat("\n\\end{landscape}\n\n")
+}
+sink()
