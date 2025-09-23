@@ -1,4 +1,4 @@
-solo.plot = 0
+solo.plot = 1
 local = 1
 if (local == 1){
    setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
@@ -367,11 +367,19 @@ for (crit.no in 1:crit.tot){
 
 
       if (solo.plot == 1){
-        solo.result.comb1 = result.comb1 %>%
-          filter(design %in% design.filter[1]) %>%
-          filter(setting %in% "ncov=5",
-                 n %in% "N=1000",
-                 censor %in% "Low Censoring (20%)")
+        if (generate_failure_method == "fine_gray"){
+          solo.result.comb1 = result.comb1 %>%
+            filter(design %in% design.filter[1]) %>%
+            filter(setting %in% "ncov=10",
+                   n %in% "N=1000",
+                   censor %in% "Low Censoring (20%)")
+        } else{
+          solo.result.comb1 = result.comb1 %>%
+            filter(design %in% design.filter[1]) %>%
+            filter(setting %in% "ncov=5",
+                   n %in% "N=1000",
+                   censor %in% "Low Censoring (20%)")
+        }
 
         if (generate_failure_method == "fine_gray"){
           solo.result.comb1 = solo.result.comb1 %>%
