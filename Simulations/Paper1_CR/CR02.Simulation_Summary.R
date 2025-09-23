@@ -3,12 +3,15 @@
 
 # BE SURE TO CHANGE LOCAL = 1 BOT HERE AND IN CR00.SIMULATION_PARAMETERS.R BEFORE RUNNING PLOTS
 
+message("install knitr, kableExtra, and stringr if needed")
 library(knitr)
 library(kableExtra)
 library(stringr)
 
 solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
+meta_save = TRUE # for the metadata tables, which should still be modifed as needed in latex
+
 if (local == 1){
   # set to your location where the R scripts are located
    setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
@@ -697,10 +700,10 @@ for (crit.no in 1:crit.tot){
   
   names(datasets1) <- labels
   
-  # Optional: digits per table
-  digits_list <- c(4, 2, 2, 2, 2, 2)
+  # Named vectors for digits and captions
+  digits_list <- c(4, 2, 2, 2, 3, 2)
+  names(digits_list) <- names(datasets1)
   
-  # Optional: captions per table
   captions <- c(
     "Simulation Metadata: Survival Value Function",
     "Simulation Metadata: Competing Risks Value Function",
@@ -709,33 +712,52 @@ for (crit.no in 1:crit.tot){
     "Simulation Metadata: Time Metrics",
     "Simulation Metadata: Training Dataset Proportions"
   )
-  if (generate_failure_method == "simple_exp"){
-    gen_lab = "Exponential"
-  } else{
-    gen_lab = "Fine-Gray"
+  names(captions) <- names(datasets1)
+  
+  # Add generator label
+  if (generate_failure_method == "simple_exp") {
+    gen_lab <- "Exponential"
+  } else {
+    gen_lab <- "Fine-Gray"
   }
   captions1 <- sprintf("%s %s", gen_lab, captions)
+  names(captions1) <- names(datasets1)
+  
+  # --- Drop survival_ and endpoint_ everywhere by name ---
+  drop_names <- c("survival_table_final", "endpoint_table_final")
+  datasets2   <- datasets1[!(names(datasets1)   %in% drop_names)]
+  digits_list2 <- digits_list[!(names(digits_list) %in% drop_names)]
+  captions2 <- captions1[!(names(captions1)  %in% drop_names)]
   
    } # end of crit.tot for-loop
 
-message("End of CR02.Simulation_Summary.R")
-
-# Open a text file for writing
-sink(sprintf("%s/simulation_metadata_%s.txt",dir_fig,gen_lab))
-# Loop over tables and print LaTeX code wrapped in landscape
-for (i in seq_along(datasets1)) {
-  latex_table <- kable(
-    datasets1[[i]],
-    format = "latex",
-    booktabs = TRUE,
-    digits = digits_list[i],
-    caption = captions1[i]
-  ) %>%
-    kable_styling(latex_options = c("repeat_header")) %>%
-    collapse_rows(columns = 1:4, valign = "top")
+if (meta_save){
+  latex_data = datasets2
+  captions_data = captions2
+  digits_data = digits_list2
   
-  cat("\\begin{landscape}\n")
-  cat(latex_table)
-  cat("\n\\end{landscape}\n\n")
+  # Open a text file for writing
+  sink(sprintf("%s/simulation_metadata_%s.txt",dir_fig,gen_lab))
+  # Loop over tables and print LaTeX code wrapped in landscape
+  for (i in seq_along(latex_data)) {
+    latex_table <- kable(
+      latex_data[[i]],
+      format = "latex",
+      booktabs = TRUE,
+      digits = digits_data[i],
+      caption = captions_data[i],
+      align    = rep("c", ncol(latex_data[[i]]))  # force all columns centered
+    ) %>%
+      kable_styling(latex_options = c("repeat_header")) %>%
+      collapse_rows(columns = 1:4, valign = "middle")
+    
+    cat("\\begin{landscape}\n")
+    cat(latex_table)
+    cat("\n\\end{landscape}\n\n")
+  }
+  sink()
+} else{
+  print('not saving metadata')
 }
-sink()
+
+message("End of CR02.Simulation_Summary.R")
