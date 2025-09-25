@@ -10,7 +10,7 @@ library(stringr)
 
 solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
-meta_save = TRUE # for the metadata tables, which should still be modifed as needed in latex
+meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
 
 if (local == 1){
   # set to your location where the R scripts are located
@@ -63,8 +63,14 @@ beta.levels = c(1,2)
 beta.labels = c(sprintf("%s Covariates",ncov.list$beta1),
              sprintf("%s Covariates",ncov.list$beta2))
 
+if (generate_failure_method == "fine_gray"){
+  methodtitle = "FineGray"
+} else{
+  methodtitle = "SimpleExp"
+}
+
 file_naming = function(lab.date, file_lab, crit.no){
-  paste0(dir_fig,"/CR02.",file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
+  paste0(dir_fig,"/CR02.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
 }
 
 if (endpoint == "CR"){
@@ -365,7 +371,9 @@ for (crit.no in 1:crit.tot){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
         ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
                p.list[[Phase.no]],
-               width = 12, height = 10)
+               width = 12, height = 10,
+               dpi = 150             # lower DPI for smaller file
+               )
       }
 
 
@@ -434,7 +442,9 @@ for (crit.no in 1:crit.tot){
           ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
           ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
                  p.list.solo[[Phase.no]],
-                 width = 12, height = 10)
+                 width = 12, height = 10,
+                 dpi = 150             # lower DPI for smaller file
+                 )
         }
       }
 
@@ -474,7 +484,9 @@ for (crit.no in 1:crit.tot){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
     ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
            p.grid1,
-           width = 20, height = 10)
+           width = 20, height = 10,
+           dpi = 150             # lower DPI for smaller file
+           )
   }
 
   if (solo.plot == 1){
@@ -512,7 +524,9 @@ for (crit.no in 1:crit.tot){
     save_plot(file.name.saved.solo, p.grid1.solo, base_height = 10, base_width = 20)
     ggsave(file.name.saved.solo %>% gsub(".eps", ".png", .), #save as png too
            p.grid1.solo,
-           width = 20, height = 10)
+           width = 20, height = 10,
+           dpi = 150             # lower DPI for smaller file
+           )
   }
   
   colMeans_df0 <- do.call(rbind, colMeans_list)

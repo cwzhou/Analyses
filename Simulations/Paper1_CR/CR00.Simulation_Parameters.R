@@ -6,7 +6,7 @@
 # local = 1 # uncomment for CR02.Simulation_Summary.R plots # comment for running sims
 local = 1 # local = 0 for cluster
 parallel = 0 # parallel = 0 for NOT parallel code
-revision = 0 #jasa revision round 1
+revision = 1 #jasa revision round 1
 
 init_seed = 2025 #init_seed = 353 was used for revision = 1
 

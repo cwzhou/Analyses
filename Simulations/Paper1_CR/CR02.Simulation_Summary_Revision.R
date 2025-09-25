@@ -3,7 +3,7 @@
 # AND MAKE SURE YOU HAVE THE RIGHT GENERATE_FAILURE_METHOD IN CR00 TOO.
 solo.plot = 1
 local = 1
-saving_eps = TRUE#TRUE
+saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -84,8 +84,13 @@ design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
 beta.levels = c(1)#,2)
 beta.labels = c(sprintf("%s Covariates",ncov.list$beta1))
 
+if (generate_failure_method == "fine_gray"){
+  methodtitle = "FineGray"
+} else{
+  methodtitle = "SimpleExp"
+}
 file_naming = function(lab.date, file_lab, crit.no){
-  paste0(dir_fig,"/CR02.",file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
+  paste0(dir_fig,"/CR02.Revision.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
 }
 
 if (endpoint == "CR"){
@@ -338,7 +343,9 @@ for (crit.no in 1:crit.tot){
       ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
       ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
              p.list[[Phase.no]],
-             width = 12, height = 10)
+             width = 12, height = 10,
+             dpi = 150             # lower DPI for smaller file
+      )
     }
     
     
@@ -405,7 +412,9 @@ for (crit.no in 1:crit.tot){
         ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
         ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
                p.list.solo[[Phase.no]],
-               width = 12, height = 10)
+               width = 12, height = 10,
+               dpi = 150             # lower DPI for smaller file
+        )
       }
     }
     
@@ -446,7 +455,9 @@ for (crit.no in 1:crit.tot){
   }
   ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
          p.grid1,
-         width = 20, height = 10)
+         width = 20, height = 10,
+         dpi = 150             # lower DPI for smaller file
+  )
   
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
@@ -480,7 +491,9 @@ for (crit.no in 1:crit.tot){
     save_plot(file.name.saved.solo, p.grid1.solo, base_height = 10, base_width = 20)
     ggsave(file.name.saved.solo %>% gsub(".eps", ".png", .), #save as png too
            p.grid1.solo,
-           width = 20, height = 10)
+           width = 20, height = 10,
+           dpi = 150             # lower DPI for smaller file
+    )
   }
   
 } # end of crit.tot for-loop

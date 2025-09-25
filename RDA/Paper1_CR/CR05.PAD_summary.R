@@ -6,7 +6,7 @@ library(ggplot2); library(cowplot)
 # add in other comparator methods
 
 # Specify date of the outputs and all_cause (T/F)
-date = Sys.Date()#"2024-08-25";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
+date = "2025-09-24" #Sys.Date()#"2024-08-25";#"2024-03-03";#"2024-02-26"; #"2024-01-28" #Sys.Date()
 
 mthd0 = c("CZMK", "CSK", "PMCR", "AIPWE", "ZOM", "CSKzom", "observed")
 labs0 = c("itrSurv", "dtrSurv (2023)", "PMCR (2021)", "AIPWE (2021)",
@@ -114,9 +114,9 @@ for (crit1 in 1:length(possible_crits1)) {
         # label.padding = unit(0.25, "lines")  # Padding around the label
         col = "black",
         position = position_dodge(width = 0.9),  # Adjust the position to avoid overlap
-        vjust = -3.2,
-        hjust = -0.2,
-        size = 3,
+        vjust = -5.5,
+        hjust = 0.5,#-0.2,
+        size = 3.5,
         fontface = "bold",  # Make the text bold
         ) +
       theme_bw() + 
@@ -127,9 +127,9 @@ for (crit1 in 1:length(possible_crits1)) {
       # ylim(c(if (crit == "mean") { if (all_cause) 2000 else 2200} else { if (all_cause) 0.45 else 0.6}, NA)) +
       ylab(if (crit == "mean" | crit == "area"){
         if (endpoint_type == "OS"){
-          "Mean truncated \noverall survival (days)"
-        } else{
-          "Mean truncated \ndeath survival (days)"
+          "Area Under Survival Curve (days) \nDeath or Amputation"
+        } else {
+          "Area Under Survival Curve (days) \nDeath"
         }
         } else{
           if (endpoint_type == "PC"){
@@ -141,7 +141,7 @@ for (crit1 in 1:length(possible_crits1)) {
       guides(col = "none", group = "none") + 
       scale_y_continuous(
         breaks = c(50, 100, 150, 200, 250),  # Define the breaks you want
-        limits = c(24, 270)                 # Set y-axis limits if needed
+        limits = c(24, 276)                 # Set y-axis limits if needed
       )
   }
 
@@ -153,7 +153,7 @@ for (crit1 in 1:length(possible_crits1)) {
             align = "v",
             nrow = 1, ncol = 2,
             common.legend = TRUE,
-            axis = "v")
+            axis = "v"); p.grid
   # p.grid2 <- plot_grid(p.grid,
   #                      get_legend(p1[[crit1]]),
   #                      align = "v", nrow = 2,
@@ -163,5 +163,6 @@ for (crit1 in 1:length(possible_crits1)) {
            gsub("output/", "figure/", .) %>%
            gsub("Values", "Figure", .) %>%
            gsub("\\.rds", "\\.png", .),
-         width = 10, height = 4)
+         width = 10, height = 4,
+         dpi = 150)             # lower DPI for smaller file)
 }
