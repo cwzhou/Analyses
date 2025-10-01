@@ -105,13 +105,14 @@ Follow the steps below before running:
    - `saving_rds`: Set true if you want to save .rds files to use for figures
    - `generate_failure_method`: Set to either "simple_exp" or "fine_gray".
    - `local`: Set to `1` for running on a local machine or `0` for running on a cluster.
-   - `parallel`: Set to `1` to enable parallel processing using the `parallel` package in R, or set to `0` for non-parallel execution.
+   - `parallel`: Set to `1` to enable parallel processing using the `parallel` package in R, or set to `0` for non-parallel execution. (NOTE: `parallel = 0` is recommended, thus using CR00.Simulation_Body_noparallel.R, see Section 2. below for multi-core parallelization on a single machine even when `parallel = 0`).
    - Other parameters (e.g., `n.sim` for the number of simulations): Modify according to the simulation needs for various simulation scenarios for the for the specified `generate_failure_method` setting.
-   - For the sensitivity analysis in the manuscript, set parameter `revision = 1` to get the simulation that mimicks features of the real-data analysis; the current code for non-parallel running on a Desktop is set to change multiplier and set `n.sim = 1000` and `n.eval = 10,000`. Everything else follows from that, but requires multiple submissions to get the 25 multipliers for 1000 simulations. Use `generate_failure_method = fine_gray`.
+   - For the sensitivity analysis in the manuscript, set parameter `revision = 1` to get the simulation that mimicks features of the real-data analysis; the current code for non-parallel running on a Desktop is set to change multiplier and set `n.sim = 1000` and `n.eval = 10,000`. Everything else follows from that, but requires multiple submissions to get the 25 multipliers for 1000 simulations. Use `generate_failure_method = fine_gray`. You must use `CR02.Simulation_Summary_Revision.R` where `revision = 1` for plotting.
 
 2. **Cluster Computing**  
-   If running on a cluster, submit the jobs using the provided bash script:
+   If running on a cluster or for multi-core parallelization on a single machine/node, submit the jobs using the provided bash script:
    - **`CR_S2value.sh`**: This script submits all simulation jobs to a Slurm scheduler. It will automatically handle the execution of each simulation scenario for the specified `generate_failure_method` setting.
+   - *This is the recommended way to replicate simulation results.*
 
 3. **Running Specific Simulations**  
    To run specific simulations manually, use the script **`CR01.Simulation_Run.R`**, which runs individual simulation settings that can be customized as needed for the specified `generate_failure_method` setting.
