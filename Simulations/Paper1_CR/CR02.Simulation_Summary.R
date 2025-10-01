@@ -8,7 +8,7 @@ library(knitr)
 library(kableExtra)
 library(stringr)
 
-solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
+solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
 meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
 
@@ -19,8 +19,9 @@ if (local == 1){
    setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
  }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
+revision = 0
 
-saving_eps = !TRUE
+saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -372,7 +373,7 @@ for (crit.no in 1:crit.tot){
         ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
                p.list[[Phase.no]],
                width = 12, height = 10,
-               dpi = 150             # lower DPI for smaller file
+               dpi = 100             # lower DPI for smaller file
                )
       }
 
@@ -443,7 +444,7 @@ for (crit.no in 1:crit.tot){
           ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
                  p.list.solo[[Phase.no]],
                  width = 12, height = 10,
-                 dpi = 150             # lower DPI for smaller file
+                 dpi = 100             # lower DPI for smaller file
                  )
         }
       }
@@ -485,7 +486,7 @@ for (crit.no in 1:crit.tot){
     ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
            p.grid1,
            width = 20, height = 10,
-           dpi = 150             # lower DPI for smaller file
+           dpi = 100             # lower DPI for smaller file
            )
   }
 
@@ -525,7 +526,7 @@ for (crit.no in 1:crit.tot){
     ggsave(file.name.saved.solo %>% gsub(".eps", ".png", .), #save as png too
            p.grid1.solo,
            width = 20, height = 10,
-           dpi = 150             # lower DPI for smaller file
+           dpi = 100             # lower DPI for smaller file
            )
   }
   
