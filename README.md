@@ -125,7 +125,7 @@ Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Si
 
  ---
 
-#### RDA (Analysis Code)
+### RDA (Analysis Code)
 
 The `~/RDA/Paper1_CR` folder contains the analysis code for the PAD observational cohort study. Although the data from the PAD cohort is not publicly available, the code provided here allows users to reproduce the analysis. Follow these steps:
 
