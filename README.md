@@ -96,10 +96,7 @@ To run the simulations, the following scripts must be downloaded from Github:
 	8. `CR02.Simulation_Summary.R`, and 
 	9. (if interested) `CR02.Simulation_Summary_Revision.R`.
 
-NOTE: See **2. Cluster Computing** section below to replicate the figures in the paper.
-
-**First, go to the working directory the scripts are saved and set this as the working directory.
-Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Simulation_Summary.R` or `CR02.Simulation_Summary_Revision.R`. Make sure date_folder matches the date folder in the output saved.**
+**NOTE: See *2. Cluster Computing* section below to replicate the figures in the paper.**
 
 Follow the steps below before running:
 1. **Edit Simulation Parameters**  
@@ -110,6 +107,9 @@ Follow the steps below before running:
    - `parallel`: Set to `1` to enable parallel processing using the `parallel` package in R, or set to `0` for non-parallel execution. (*NOTE: `parallel = 0` is recommended, thus using CR00.Simulation_Body_noparallel.R, see Section 2. below for multi-core parallelization on a single machine even when `parallel = 0`*).
    - Other parameters (e.g., `n.sim` for the number of simulations): Modify according to the simulation needs for various simulation scenarios for the for the specified `generate_failure_method` setting.
    - For the sensitivity analysis in the manuscript, set parameter `revision = 1` to get the simulation that mimicks features of the real-data analysis; the current code for non-parallel running on a Desktop is set to change multiplier and set `n.sim = 1000` and `n.eval = 10,000`. Everything else follows from that, but requires multiple submissions to get the 25 multipliers for 1000 simulations. Use `generate_failure_method = fine_gray`. You must use `CR02.Simulation_Summary_Revision.R` where `revision = 1` for plotting.
+  
+First, go to the working directory the scripts are saved and set this as the working directory.
+Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Simulation_Summary.R` or `CR02.Simulation_Summary_Revision.R`. Make sure date_folder matches the date folder in the output saved.
 
 2. **Cluster Computing**  
    If running on a cluster or for multi-core parallelization on a single machine/node, submit the jobs using the provided bash script:
