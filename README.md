@@ -96,6 +96,8 @@ To run the simulations, the following scripts must be downloaded from Github:
 	8. `CR02.Simulation_Summary.R`, and 
 	9. (if interested) `CR02.Simulation_Summary_Revision.R`.
 
+NOTE: See **2. Cluster Computing** section below to replicate the figures in the paper.
+
 **First, go to the working directory the scripts are saved and set this as the working directory.
 Then, run `CR01.Simulation_Run.R`. Let it finish running before running `CR02.Simulation_Summary.R` or `CR02.Simulation_Summary_Revision.R`. Make sure date_folder matches the date folder in the output saved.**
 
@@ -112,6 +114,7 @@ Follow the steps below before running:
 2. **Cluster Computing**  
    If running on a cluster or for multi-core parallelization on a single machine/node, submit the jobs using the provided bash script:
    - **`CR_S2value.sh`**: This script submits all simulation jobs to a Slurm scheduler. It will automatically handle the execution of each simulation scenario for the specified `generate_failure_method` setting.
+   - First, edit `CR00.Simulation_Parameters.R` appropiately and choose the desired `generate_failure_method`, and setting `revision = 0`. Then run the bash code `bash CR_S2value.sh` after installing `itrSurv` and required dependencies for the comparison packages. Lastly, run `CR02.Simulation_Summary.R` to obtain figures.
    - *This is the recommended way to replicate simulation results.*
 
 3. **Running Specific Simulations**  
