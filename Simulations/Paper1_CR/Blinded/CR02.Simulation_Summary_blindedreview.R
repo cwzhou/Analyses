@@ -12,7 +12,7 @@ solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot pa
 local = 1
 meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
 
-source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
+source("CR00.Simulation_Parameters_blindedreview.R") # change local in this script to 0 for cluster
 revision = 0
 
 saving_eps = TRUE
@@ -163,11 +163,6 @@ for (crit.no in 1:crit.tot){
           full <- readRDS(fn.i)
           a <- full$statistics
           true2_sum <- full$true_P2_eval
-          # n.sim = full$settings$n.sim
-          # tol1 = full$settings$tol1[1]
-          # if (crit.no == 1){
-          # source("SM02.Plots_For_P2Subset_byTrt.R")
-          # }
         } else if (file.exists(gsub("\\.rds", "_tmp.rds", fn.i))) {
           # print(sprintf("_TMP.RDS exists: %s", fn.i))
           full <- NULL

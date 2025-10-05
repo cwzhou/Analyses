@@ -11,7 +11,7 @@ sensitivity = 0 # if 1 then runs sensitivity analysis in supplementary material
 init_seed = 2025 #init_seed = 353 was used for sensitivity = 1
 
 #### libraries and functions
-source("F01.Simulation_Functions.R") # calls libraries
+source("F01.Simulation_Functions_blindedreview.R") # calls libraries
 
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 

@@ -1,9 +1,9 @@
 # Title: Libraries and Functions for Simulation Scripts
 # Date: 07.02.2023
 
-source("F00.Simulation_Libraries.R")
-source("F02.ComparatorMethod_Functions.R")
-source("F01.DynamicsCR.R")
+source("F00.Simulation_Libraries_blindedreview.R")
+source("F02.ComparatorMethod_Functions_blindedreview.R")
+source("F01.DynamicsCR_blindedreview.R")
 # Functions -----------------------------------------------------------------
 gdata_CR <- function(N=10,
                      u1 = NULL,

@@ -31,29 +31,7 @@ Dynamics <-
            # seed1 = seed1
   ) {
     # message("Starting F01.DynamicsCR.R")
-    # N = arg.obs$N
-    # at.risk = arg.obs$at.risk; ncov = arg.obs$ncov; corr = arg.obs$corr;
-    # at.risk = rep(1, N)
-    # N = arg.obs$N; n.phases = arg.obs$n.phases; tau = arg.obs$tau;
-    # tick = arg.obs$tick; hidden_data = arg.obs$hidden_data; printFlag = arg.obs$printFlag;
-    # predHazardFn = arg.obs$predHazardFn; predPropensityFn = arg.obs$predPropensityFn;
-    # predCensorFn = arg.obs$predCensorFn; surv.previous = rep(0, N)
-    # rho = NULL; omega = NULL; covariate = NULL;
-    # Sig = diag(ncov) + 0.2 - diag(ncov) * 0.2
-    # censor_time = trunc_cens_time
-
-    # message("N:",N)
-    # message("n.phases:",n.phases)
-    # message("tau:", tau)
-    # message("covariate:", covariate)
-    # message("ncov:", ncov)
-    # message("mass_p:", mass_p)
-    # message("full_data:", full_data)
-    # message("censor_time:", censor_time)
-    # message("policy:", policy)
-    # message("seed1: ", seed1)
-    # set.seed(seed1)
-    # print(N)
+    
     nphases = 2
     if (length(at.risk) == 1) at.risk = rep(at.risk, N)
     if (length(at.risk) != N)  stop("length of at.risk should match.")

@@ -7,12 +7,7 @@ saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
-if (local == 1){
-  setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
-} else{
-  setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
-}
-source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
+source("CR00.Simulation_Parameters_blindedreview.R") # change local in this script to 0 for cluster
 
 library(ggplot2)
 library(tidyr)

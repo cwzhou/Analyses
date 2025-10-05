@@ -18,16 +18,14 @@ library(cowplot)
 # for pmcr:
 library(rgenoud)
 library(rpart)
-
-# if (local == 1){
-#   message("Local Machine")
-#   library(beepr)
-#   # beep()
-# }
-
 # for aipwe:
 library(purrr)
 library(cmprsk)
 library(Rglpk)
+
+if (local == 1){
+  message("Local Machine")
+  library(beepr)
+}
 
 message("End of F00.Simulation_Libraries.R")

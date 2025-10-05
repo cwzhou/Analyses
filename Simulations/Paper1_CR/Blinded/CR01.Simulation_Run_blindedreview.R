@@ -8,7 +8,7 @@ start_time <- Sys.time()
 
 # single machine/multi-node (using CR_S2value.sh)
 # call on parameters which calls on library
-source("CR00.Simulation_Parameters.R")
+source("CR00.Simulation_Parameters_blindedreview.R")
 print(sim_deets)
 source("CR00.Simulation_Body_noparallel_blindedreview.R")
 final_results = result
