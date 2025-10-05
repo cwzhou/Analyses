@@ -1,6 +1,4 @@
 # Title: Functions for Comparator Methods Script
-# Description: [Brief description of the purpose and objectives of the simulation]
-# Author: Christina Zhou
 # Date: 01.21.2024
 ##############################################################################################
 ##############################################################################################

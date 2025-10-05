@@ -1,4 +1,4 @@
-# MAKE SURE CR00.SIMULATION_PARAMETERS.R HAS REVISION = 1
+# MAKE SURE CR00.SIMULATION_PARAMETERS.R HAS SENSITIVITY = 1
 # AND ALSO LOCAL = 1
 # AND MAKE SURE YOU HAVE THE RIGHT GENERATE_FAILURE_METHOD IN CR00 TOO.
 solo.plot = 1
@@ -37,7 +37,7 @@ final_tbl <- map_dfr(date_seq, function(d) {
   } else{
     date_str <- format(d, "%Y-%m-%d")
   }
-  file_path <- file.path("./output", "fine_gray/revision", date_str, file_name)
+  file_path <- file.path("./output", "fine_gray/sensitivity", date_str, file_name)
   
   dat_list <- readRDS(file_path)
   dat = dat_list$statistics
@@ -90,7 +90,7 @@ if (generate_failure_method == "fine_gray"){
   methodtitle = "SimpleExp"
 }
 file_naming = function(lab.date, file_lab, crit.no){
-  paste0(dir_fig,"/CR02.Revision.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
+  paste0(dir_fig,"/CR02.Sensitivity.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
 }
 
 if (endpoint == "CR"){
@@ -359,7 +359,7 @@ for (crit.no in 1:crit.tot){
       if (generate_failure_method == "fine_gray"){
         solo.result.comb1 = solo.result.comb1 %>%
           filter(cause1prob %in% "Fine-Gray probability mass: 0.2")
-        if (revision == 1){
+        if (sensitivity == 1){
           p0.solo <-
             solo.result.comb1 %>%
             ggplot(aes(x = method, y = value, group = method, color = method))

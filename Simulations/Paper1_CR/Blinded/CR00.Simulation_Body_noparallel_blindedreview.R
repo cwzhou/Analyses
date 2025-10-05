@@ -329,16 +329,6 @@ for (sim in n.sim_start:n.sim_end){
   result[row_index, "obs_endpoint"] <- endpoint_val.fn(obs.data.rep)
   result[row_index, "obs_trt1"] <- trt1.fn(obs.data.rep)
   
-  # # A = -1; B = 1
-  # # within method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-  # A_mean = obs.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-  # B_mean = obs.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-  # A_mean_cr = obs.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-  # B_mean_cr = obs.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-  # # AB_diff = A_mean - B_mean
-  # trt_result[sim_count, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("obs", A_mean, B_mean, A_mean_cr, B_mean_cr)
-  # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
-  
   result[row_index, "time.obs"] <- tt(2, reset = TRUE, unit = "min")["elapsed"] #result["time.obs"]
   # # print(flowchart(obs.data$output)) # if i fix this in 02_Simulation_Functions.R for CR then I can use, otherwise delete.
   # # transforming data from an array format to a data.frame format
@@ -426,14 +416,6 @@ for (sim in n.sim_start:n.sim_end){
       result[row_index,"czmk_trt1"] = trt1.fn(czmk.data.rep)
     }
     
-    # # within czmk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    # A_mean = czmk.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    # B_mean = czmk.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    # A_mean_cr = czmk.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    # B_mean_cr = czmk.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    # trt_result[sim_count+1, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("czmk", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
-    
     result[row_index, "time.czmk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.czmk"]
     arg.czmk$policy <- NULL; gc()
     rm(czmk.data.rep); gc()
@@ -482,14 +464,6 @@ for (sim in n.sim_start:n.sim_end){
       result[row_index, "csk_endpoint"] = endpoint_val.fn(csk.data.rep) # result["csk_endpoint"]
       result[row_index,"csk_trt1"] = trt1.fn(csk.data.rep)
      }
-    # # within csk method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    # A_mean = csk.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    # B_mean = csk.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    # A_mean_cr = csk.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    # B_mean_cr = csk.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    # # AB_diff = A_mean - B_mean
-    # trt_result[sim_count+2, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("csk", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     
     result[row_index, "time.csk"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.csk"]
     arg.csk$policy <- NULL; gc()
@@ -556,13 +530,6 @@ for (sim in n.sim_start:n.sim_end){
       result[row_index, "pmcr_endpoint"] = endpoint_val.fn(pmcr.data.rep) #result["pmcr_endpoint"]
       result[row_index,"pmcr_trt1"] = trt1.fn(pmcr.data.rep)
       }
-    # # within pmcr method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    # A_mean = pmcr.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    # B_mean = pmcr.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    # A_mean_cr = pmcr.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    # B_mean_cr = pmcr.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    # trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("pmcr", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     
     result[row_index, "time.pmcr"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.pmcr"]
     arg.pmcr$policy <- NULL; gc()
@@ -607,14 +574,6 @@ for (sim in n.sim_start:n.sim_end){
       result[row_index,"aipwe_trt1"] = trt1.fn(aipwe.data.rep)
     }
     
-    # # within aipwe method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-    # A_mean = aipwe.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-    # B_mean = aipwe.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-    # A_mean_cr = aipwe.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-    # B_mean_cr = aipwe.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-    # trt_result[sim_count+3, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("aipwe", A_mean, B_mean, A_mean_cr, B_mean_cr)
-    # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
-    
     result[row_index, "time.aipwe"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result["time.aipwe"]
     arg.aipwe$policy <- NULL; gc()
     rm(aipwe.data.rep); gc()
@@ -653,17 +612,6 @@ for (sim in n.sim_start:n.sim_end){
       result[row_index,"zom_survival"] = overall_survival_val.fn(zom.data.rep) #result["zom_survival"]
       result[row_index,"zom_endpoint"] = endpoint_val.fn(zom.data.rep) #result["zom_endpoint"]
       result[row_index,"zom_trt1"] = trt1.fn(zom.data.rep)
-      # result[row_index, "zom_percent.censor"] <- mean(zom.data.rep$status==0, na.rm = TRUE)
-      # result[row_index, paste0("zom_cause.", 1:n.causes)] <-
-      #   sapply(1:n.causes, function(s) mean(zom.data.rep$status == s))
-      
-      # # within zom method, mean survival time from those who have action -1 and mean survival time for those who have action 1
-      # A_mean = zom.data.rep %>% filter(action == -1) %>% overall_survival_val.fn()
-      # B_mean = zom.data.rep %>% filter(action == 1) %>% overall_survival_val.fn()
-      # A_mean_cr = zom.data.rep %>% filter(action == -1) %>% endpoint_val.fn()
-      # B_mean_cr = zom.data.rep %>% filter(action == 1) %>% endpoint_val.fn()
-      # trt_result[sim_count+4, c("method", "surv_A", "surv_B", "endpoint_A", "endpoint_B")] = c("zom", A_mean, B_mean, A_mean_cr, B_mean_cr)
-      # rm(A_mean); rm(B_mean); rm(A_mean_cr); rm(B_mean_cr)
     }
     result[row_index,"time.zom"] <- tt(2, reset = TRUE, units = "mins")["elapsed"] #result[row_index, "time.zom"]
     arg.zom$policy <- NULL; gc()
@@ -722,89 +670,6 @@ for (sim in n.sim_start:n.sim_end){
   p2.df$OSeval = c(m11,m21,m31,m41,mz1,mo1)
   p2.df$CIFeval = c(m1,m2,m3,m4,mz,mo)
   
-  # realistic_train_truth <<- merge(train0.data, train1.data, by = "subj.id") %>%
-  #   mutate(status = status.x,
-  #          event.time = ifelse(event.time.x > event.time.y, event.time.x, event.time.y),
-  #          action = ifelse(event.time.x > event.time.y, action.x, action.y)) %>%
-  #   dplyr::select(-c(at.risk.x, at.risk.y, Z1.x,Z1.y,Z2.x,Z2.y,
-  #                    # failure_t1.x, failure_t2.x, failure_t1.y, failure_t2.y,
-  #                    status.x, status.y))
-  # realistic_train_truth_list[[sim]] = realistic_train_truth
-  #
-  # train_truth <<- merge(train0.data, train1.data, by = "subj.id") %>%
-  #   dplyr::select(-c(at.risk.x, at.risk.y, Z1.x,Z1.y,#Z2.x,Z2.y,
-  #                    # failure_t1.x, failure_t2.x, failure_t1.y, failure_t2.y
-  #                    )) %>%
-  #   mutate(best.action = ifelse(event.time.x > event.time.y, action.x, action.y),
-  #          best.status = ifelse(event.time.x > event.time.y, status.x, status.y),
-  #          best.time = ifelse(event.time.x > event.time.y, event.time.x, event.time.y))  %>%
-  #   dplyr::select(-c(action.x, action.y)) %>%
-  #   mutate(obs.time0 = round(event.time.x,2),
-  #          obs.time1 = round(event.time.y,2),
-  #          status0 = status.x,
-  #          status1 = status.y
-  #   ) %>%
-  #   dplyr::select(subj.id, best.time, best.action, best.status,
-  #                 obs.time0, obs.time1, status0, status1)
-  #
-  # test_truth <<- merge(test0.data.rep, test1.data.rep, by = "subj.id") %>%
-  #   dplyr::select(-c(Z1.x,Z1.y,Z2.x,Z2.y,
-  #                    # failure_t1.x, failure_t2.x, failure_t1.y, failure_t2.y
-  #                    )) %>%
-  #   mutate(best.action.OS = ifelse(OS_eval.x > OS_eval.y, action.x, action.y),
-  #          best.time.OS = ifelse(OS_eval.x > OS_eval.y, OS_eval.x, OS_eval.y),
-  #          best.action.CIF = ifelse(CIF_eval.x < CIF_eval.y, action.x, action.y),
-  #          best.time.CIF = ifelse(CIF_eval.x < CIF_eval.y, CIF_eval.x, CIF_eval.y))  %>%
-  #   dplyr::select(-c(action.x, action.y)) %>%
-  #   mutate(OS_eval0 = round(OS_eval.x,2),
-  #          OS_eval1 = round(OS_eval.y,2),
-  #          CIF_eval0 = round(CIF_eval.x,2),
-  #          CIF_eval1 = round(CIF_eval.y,2),
-  #          best.action = ifelse(best.action.OS == best.action.CIF, as.numeric(best.action.OS), 9999)
-  #   ) %>%
-  #   dplyr::select(subj.id, best.time.OS, best.action.OS, best.time.CIF, best.action.CIF,
-  #                 OS_eval0, OS_eval1,
-  #                 CIF_eval0, CIF_eval1,
-  #                 best.action)
-  #best.status, obs.time0, obs.time1, status0, status1)
-  
-  # View(cbind(true = test_truth$best.action, czmk = rep_czmk$action, csk = rep_csk$action, pmcr = rep_pmcr$action, zom = rep_zom$action, obs = rep_obs$action))
-  #
-  # realistic_test_truth <<- merge(test0.data.rep, test1.data.rep, by = "subj.id") %>%
-  #   mutate(status = status.x,
-  #          event.time = ifelse(event.time.x > event.time.y, event.time.x, event.time.y),
-  #          action = ifelse(event.time.x > event.time.y, action.x, action.y)) %>%
-  #   dplyr::select(-c(Z1.x,Z1.y,Z2.x,Z2.y,
-  #                    # failure_t1.x, failure_t2.x, failure_t1.y, failure_t2.y,
-  #                    status.x, status.y))
-  # realistic_test_truth_list[[sim]] = realistic_test_truth
-  
-  
-  # #OS
-  # r00[sim, "sim"] = sim
-  # r00[sim, "obs_training_os_trtprop"] = mean(train_truth$best.action == obs_1$action)
-  # if (!skip.czmk) {r00[sim, "czmk_training_os_trtprop"] = mean(train_truth$best.action == policy_czmk@phaseResults[["FinalOptimalTx_Recc"]])}
-  # if (!skip.csk) {r00[sim, "csk_training_os_trtprop"] = mean(train_truth$best.action == policy_csk@stageResults[[1]]@optimal@optimalTx)}
-  # # if (!skip.pmcr) {r00[sim, "pmcr_training_os_trtprop"] = mean(train_truth$best.action == policy_csk@stageResults[[1]]@optimal@optimalTx)}
-  # if (!skip.zom) {r00[sim, "zom_training_os_trtprop"] = mean(train_truth$best.action == policy_zom@phaseResults[["FinalOptimalTx_Recc"]])}
-  # #CAUSE1
-  # train_cause1_index = data.df %>% filter(status == 1) %>% dplyr::select(subj.id) %>% unlist() %>% as.vector()
-  # train_truth1 = train_truth %>% filter(subj.id %in% train_cause1_index) %>% dplyr::select(-c(best.status, status0, status1, obs.time0, obs.time1))
-  # r00[sim, "obs_training_cause1_trtprop"] = mean(train_truth1$best.action == obs_1$action[train_cause1_index])
-  # if (!skip.czmk) {r00[sim, "czmk_training_cause1_trtprop"] = mean(train_truth1$best.action == policy_czmk@phaseResults[["FinalOptimalTx_Recc"]][train_cause1_index])}
-  # if (!skip.csk) {r00[sim, "csk_training_cause1_trtprop"] = mean(train_truth1$best.action == policy_csk@stageResults[[1]]@optimal@optimalTx[train_cause1_index])}
-  # if (!skip.zom) {r00[sim, "zom_training_cause1_trtprop"] = mean(train_truth1$best.action == policy_zom@phaseResults[["FinalOptimalTx_Recc"]][train_cause1_index])}
-  #
-  # #OS
-  # r00[sim, "obs_testing_os_trtprop"] = mean(test_truth$best.action == rep_obs$action)
-  # if (!skip.czmk) {r00[sim, "czmk_testing_os_trtprop"] = mean(test_truth$best.action == rep_czmk$action)}
-  # if (!skip.csk) {r00[sim, "csk_testing_os_trtprop"] = mean(test_truth$best.action == rep_csk$action)}
-  # if (!skip.zom) {r00[sim, "zom_testing_os_trtprop"] = mean(test_truth$best.action == rep_zom$action)}
-  
-  
-  # print("sourcing SM01.")
-  # source("SM01.True_ContinueP2_Ratios_Eval.R")
-  
   ### saving and cleaning
   if (savingrds == TRUE){
     message('saving rds tmp')
@@ -822,22 +687,4 @@ end_time = Sys.time()
 
 message("End of Script: CR00_Simulation_Body.R.")
 sprintf("Overall Time Took: %s", round(end_time - start_time,2))
-
-
-# # Reshape the data into long format
-# df_long <- melt(r00, id = "sim")
-# # Extract method, A, and B from variable column
-# df_long2 <- transform(df_long,
-#                       method = sub("^(.*?)_.*$", "\\1", variable),
-#                       data_type = sub("^.*?_(.*?)_.*$", "\\1", variable),
-#                       endpoint_type = sub("^.*?_.*?_(.*?)_.*$", "\\1", variable),
-#                       ignore = sub("^.*_([^_]+)$", "\\1", variable),
-#                       proptrt = value)
-#
-# # Create the final data frame
-# df_long3 <- df_long2[, c("sim","method", "data_type", "endpoint_type", "proptrt")]
-# df_long3$method = factor(df_long3$method, levels = c("czmk", "csk", "zom", "obs"))
-# df_long3$data_type = factor(df_long3$data_type, levels = c("training","testing"))
-# df_long3$endpoint_type = factor(df_long3$endpoint_type, levels = c("os", "cause1"))
-# # View(df_long3 %>% arrange(sim, endpoint_type, data_type,method))
 

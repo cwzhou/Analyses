@@ -12,12 +12,6 @@ solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot pa
 local = 1
 meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
 
-if (local == 1){
-  # set to your location where the R scripts are located
-   setwd("~/Desktop/UNC_BIOS_PhD/DissertationPhD/Thesis/Code/Analyses/Simulations/Paper1_CR")
- } else{
-   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
- }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 revision = 0
 

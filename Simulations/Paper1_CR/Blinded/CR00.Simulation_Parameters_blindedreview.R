@@ -13,8 +13,6 @@ init_seed = 2025 #init_seed = 353 was used for sensitivity = 1
 #### libraries and functions
 source("F01.Simulation_Functions.R") # calls libraries
 
-# sbatch -p general -N 1 --mem 15G -n 1 -t 6-11:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript CR01.Simulation_Run.R"
-
 savingrds = TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
 #10 and 20 are local for sensitivity = 1 and 100 sims; 2025-07-21 is cluster for sensitivity = 1 1000 sims, 10000 neval 
@@ -369,7 +367,6 @@ if (endpoint == "CR"){
                 n.methods = n.methods,
                 arg = list(arg), default, ncauses[[arg3]],
                 censor[[arg2]],
-                # cause1_prob[[arg9]],
                 betas[[arg4]],
                 ncov = ncov.list[[arg4]],
                 propensity[[arg5]],
@@ -415,7 +412,7 @@ if (savingrds) {
 }
 
 if (local == 0){
-  dir_rds_tmp = sprintf("/work/users/c/w/cwzhou/Proj1/output/%s/%s",
+  dir_rds_tmp = sprintf("/work/users/Proj1/output/%s/%s",
                         generate_failure_method,
                         date_folder)
   if (savingrds == TRUE){
