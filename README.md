@@ -59,13 +59,13 @@ install.packages(c(
 ```
 Some parts of the code may use `beep()` function from `beepr` package when `local = 1`. Comment out if you don't want to use the `beep()` function.
 
-The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He et al, 2021), PMCR (Zhou et al, 2021), the zero-order model, and observed policy. Refer to the manuscript for references and details on these methods. See `F02.ComparatorMethod_Functions.R` script with helper functions to implement these methods. For dtrSurv, R package dtrSurv must be installed before running. For PMCR, Rpackages rgenoud, Rglpk, and rpart must be installed before running. For AIPWE, R packages purrr, Rglpk, and cmprsk must be installed before running. If you do not install, script `F00.Libraries.R` will produce errors that the packages are not installed. Either install these packages, or comment out the `library()` functions in `F00.Libraries.R` and set `skip_method` to FALSE for those methods.
+The analysis compares to 4 other methods: dtrSurv (Cho et al, 2023), AIPWE (He et al, 2021), PMCR (Zhou et al, 2021), the zero-order model, and observed policy. Refer to the manuscript for references and details on these methods. See `F02.ComparatorMethod_Functions.R` script with helper functions to implement these methods. For dtrSurv, R package dtrSurv and it's dependencies (such as randomForestSRC and randomForest) must be installed before running. For PMCR, Rpackages rgenoud, Rglpk, and rpart must be installed before running. For AIPWE, R packages purrr, Rglpk, and cmprsk must be installed before running. If you do not install, script `F00.Libraries.R` will produce errors that the packages are not installed. Either install these packages, or comment out the `library()` functions in `F00.Libraries.R` and set `skip_method` to FALSE for those methods.
 
 Note that these methods do not always run or converge, and **removing them using the `skip_method` vector in `CR00.Simulation_Parameters.R` may be helpful to run the analysis for itrSurv.**
 
 ```r
 install_comparator_packages <- function() {
-  pkgs <- c("dtrSurv", "rgenoud", "rpart", "purrr", "cmprsk", "Rglpk")
+  pkgs <- c("dtrSurv", "randomForest", "randomForestSRC", "rgenoud", "rpart", "purrr", "cmprsk", "Rglpk")
   
   # Check which are not installed
   missing_pkgs <- pkgs[!(pkgs %in% installed.packages()[, "Package"])]

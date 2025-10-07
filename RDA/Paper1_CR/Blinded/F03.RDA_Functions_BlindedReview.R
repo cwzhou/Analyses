@@ -8,43 +8,6 @@ create_model_formulas <- function(outcome, covariates, formula = TRUE) {
   return(formula_object)
 }
 
-# single stage
-weights_leuk <- function(data, lvls1) {
-  # stage 1 was randomized
-  propensity1 = sapply(lvls1, function(x) mean(data$A == x))
-  propensity1 = sapply(data$A, function(s) propensity1[lvls1 == s])
-
-  # IPCW
-  Sc.hat1 <- coxph(Surv(T.1, 1 - d.1) ~ age, data = data) # Only 1 censored, so regress on only one var.
-  Sc.hat1 <- exp( - predict(Sc.hat1, type = "expected"))
-  Sc.hat <- Sc.hat1
-  weight.censor = data$delta/Sc.hat
-  return(list(propensity = propensity, weight.censor = weight.censor))
-}
-
-# used in weights_aric
-St2 <- function(surv,
-                time,
-                t.eval,
-                tau = Inf, exponential.tail = TRUE) {
-  # tau is a placeholder for compatibility
-  time = c(0, time)
-  surv =  c(1, surv)
-  max.t = max(time)
-  min.s = min(surv)
-  if (t.eval > max.t) {
-    if (exponential.tail) {
-      S.t = 1 - (1-min.s)^(t.eval / max.t)
-    } else {
-      S.t = min.s
-    }
-  } else {
-    # t.eval < max.t
-    S.t = approxfun(time, surv)(t.eval)
-  }
-  return(S.t)
-}
-
 weights_rda <- function(data, weight.formula.list, covariates, event_indicator_string) {
   require(dplyr)
   require(randomForest)
