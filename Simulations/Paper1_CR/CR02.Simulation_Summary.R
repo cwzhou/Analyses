@@ -8,7 +8,7 @@ library(knitr)
 library(kableExtra)
 library(stringr)
 
-solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
+solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
 meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
 
@@ -21,7 +21,7 @@ if (local == 1){
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 revision = 0
 
-saving_eps = TRUE
+saving_eps = !TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -245,7 +245,7 @@ for (crit.no in 1:crit.tot){
         method = factor(method,
                         levels = method.nm.simple1,
                         labels = method.nm.abc),
-        censor = factor(prop,
+        censor = factor(censor,
                         levels = censor.levels,
                         labels = censor.labels),
         ncauses = factor(ncauses,
