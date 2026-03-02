@@ -160,10 +160,10 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "AUC(OEFS)"
+      Phase_lab_1 = "OEFS Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "AUC(PC CIF)"
+      Phase_lab_1 = "PC CI Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv

@@ -8,9 +8,9 @@ library(knitr)
 library(kableExtra)
 library(stringr)
 
-solo.plot = 0 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
+solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
-meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
+meta_save = TRUE # for the metadata tables, which should still be modifed as needed in latex
 
 if (local == 1){
   # set to your location where the R scripts are located
@@ -21,7 +21,7 @@ if (local == 1){
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 revision = 0
 
-saving_eps = !TRUE
+saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -147,7 +147,7 @@ for (crit.no in 1:crit.tot){
       Phase_lab_1 = "OEFS Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "PC Cumulative Incidence Curve"
+      Phase_lab_1 = "PC CI Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv
@@ -493,7 +493,7 @@ for (crit.no in 1:crit.tot){
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
     if (generate_failure_method == "fine_gray"){
-      y_limits = c(220,700)
+      y_limits = c(220,780)
     } else{
       y_limits = c(200,800)
     }

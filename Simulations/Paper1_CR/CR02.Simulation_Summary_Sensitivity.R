@@ -168,7 +168,7 @@ for (crit.no in 1:crit.tot){
       Phase_lab_1 = "OEFS Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "PC Cumulative Incidence Curve"
+      Phase_lab_1 = "PC CI Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv

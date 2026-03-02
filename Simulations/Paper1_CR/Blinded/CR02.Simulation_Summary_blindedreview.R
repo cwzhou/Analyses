@@ -138,10 +138,10 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "Overall Event-Free Survival Curve"
+      Phase_lab_1 = "OEFS Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "Priority Cause Cumulative Incidence Curve"
+      Phase_lab_1 = "PC CI Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv
