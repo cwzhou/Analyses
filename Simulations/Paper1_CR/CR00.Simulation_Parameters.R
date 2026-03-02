@@ -3,6 +3,9 @@
 # in cr01 t0_pmcr is set to 0.2 regardless of other parameters.
 
 local = 1 # local = 0 for cluster
+if (local == 1){
+  manual = 1
+}
 parallel = 0 # parallel = 0 for NOT parallel code
 sensitivity = 0 # if 1 then runs sensitivity analysis in supplementary material 
 # NOTE: If sensitivity = 1 then you must use CR02.Simulation_Summary_Sensitivity.R later
@@ -143,6 +146,12 @@ if (length(arg) < 9) {
 names(arg)[1:9] = c("endpoint", "censor", "ncauses", "beta",
                     "propensity", "size", "crit_surv",
                     "crit_endpoint", "cause1prob")
+if (manual == 1){
+arg =             c(    1,           1,        1,      1, 
+                        2,           1,        1,
+                        1,                   1)
+}
+
 print("arg:")
 print(arg)
 
@@ -527,3 +536,4 @@ if (sensitivity == 1){
     n.sim_end    = n.sim_end
   )
 }
+

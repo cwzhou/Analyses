@@ -346,7 +346,7 @@ for (crit.no in 1:crit.tot){
     
     if (solo.plot == 1){
       solo.result.comb1 = result.comb1 %>%
-        filter(design %in% design.filter[1]) %>%
+        filter(design %in% design.filter[2]) %>% # RCT
         filter(setting %in% "30 Covariates",
                n %in% "N=300",
                censor %in% "Average 56% Censoring")
@@ -475,7 +475,7 @@ for (crit.no in 1:crit.tot){
                               get_legend(p.list.solo[[2]] +
                                            theme(legend.direction = "horizontal",
                                                  legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
-                                                 legend.text = element_text(size = 20), # Adjust the size of the legend text
+                                                 legend.text = element_text(size = 12), # Adjust the size of the legend text
                                                  legend.spacing.x = unit(0.1, "cm")) +
                                            guides(color = guide_legend(nrow = 1, title = "Methods", size=1))),
                               align = "vh",

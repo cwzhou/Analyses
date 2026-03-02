@@ -144,10 +144,10 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "Overall Event-Free Survival Curve"
+      Phase_lab_1 = "OEFS Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "Priority Cause Cumulative Incidence Curve"
+      Phase_lab_1 = "PC Cumulative Incidence Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv
@@ -306,7 +306,7 @@ for (crit.no in 1:crit.tot){
     rm(result.stat.sd)
     file.name.phase = file_naming(lab.date, Phase_lab, crit.no)
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
-    design.filter = c("Trt: Dependent","Trt: Independent")
+    design.filter = c("Trt: Dependent","Trt: Independent") # obs; rct
     if (crit.no == 1){
       ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
     } else {
@@ -381,7 +381,7 @@ for (crit.no in 1:crit.tot){
       if (solo.plot == 1){
         if (generate_failure_method == "fine_gray"){
           solo.result.comb1 = result.comb1 %>%
-            filter(design %in% design.filter[1]) %>%
+            filter(design %in% design.filter[2]) %>% # RCT (trt independent)
             filter(setting %in% "10 Covariates",
                    n %in% "N=1000",
                    censor %in% "Low (20%)")
@@ -470,8 +470,8 @@ for (crit.no in 1:crit.tot){
   p.grid1 <- plot_grid(p.grid,
                        get_legend(p.list[[2]] +
                                     theme(legend.direction = "horizontal",
-                                          legend.key.size = unit(2, "cm"),    # Adjust the size of the legend keys
-                                          legend.text = element_text(size = 20), # Adjust the size of the legend text
+                                          legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
+                                          legend.text = element_text(size = 12), # Adjust the size of the legend text
                                           legend.spacing.x = unit(0.1, "cm")) +
                                     guides(color = guide_legend(nrow = 1, title = "Methods"))),
                       align = "vh",
@@ -513,8 +513,8 @@ for (crit.no in 1:crit.tot){
     p.grid1.solo <- plot_grid(p.grid.solo,
                               get_legend(p.list.solo[[2]] +
                                            theme(legend.direction = "horizontal",
-                                                 legend.key.size = unit(2, "cm"),    # Adjust the size of the legend keys
-                                                 legend.text = element_text(size = 20), # Adjust the size of the legend text
+                                                 legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
+                                                 legend.text = element_text(size = 12), # Adjust the size of the legend text
                                                  legend.spacing.x = unit(0.1, "cm")) +
                                            guides(color = guide_legend(nrow = 1, title = "Methods"))),
                               align = "vh",

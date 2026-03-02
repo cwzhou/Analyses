@@ -1,11 +1,11 @@
 set.seed(2026)
 revision = 0
-tol_arg = mean_tol1[1]
+tol_arg = 0.07 #mean_tol1[1]
 
 ## ---------------------------------
 ## Large Monte Carlo population
 ## ---------------------------------
-n_mc <- 100000 # very large sample
+n_mc <- 5000#100000 # very large sample
 
 # Generate covariates from true DGM
 arg.mc = arg_list
