@@ -217,7 +217,7 @@ for (crit.no in 1:crit.tot){
         method = factor(method,
                         levels = method.nm.simple1,
                         labels = method.nm.abc),
-        censor = factor(prop,
+        censor = factor(censor,
                         levels = censor.levels,
                         labels = censor.labels),
         ncauses = factor(ncauses,
