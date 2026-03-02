@@ -3,7 +3,7 @@
 # AND MAKE SURE YOU HAVE THE RIGHT GENERATE_FAILURE_METHOD IN CR00 TOO.
 solo.plot = 1
 local = 1
-saving_eps = TRUE
+saving_eps = !TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
@@ -12,6 +12,7 @@ if (local == 1){
 } else{
   setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
 }
+# MAKE SURE CR00.SIMULATION_PARAMETERS.R HAS SENSITIVITY = 1
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
 
 library(ggplot2)
@@ -37,7 +38,7 @@ final_tbl <- map_dfr(date_seq, function(d) {
   } else{
     date_str <- format(d, "%Y-%m-%d")
   }
-  file_path <- file.path("./output", "fine_gray/sensitivity", date_str, file_name)
+  file_path <- file.path("./output", "fine_gray/revision_sensitivity", date_str, file_name)
   
   dat_list <- readRDS(file_path)
   dat = dat_list$statistics
@@ -48,7 +49,7 @@ final_tbl <- map_dfr(date_seq, function(d) {
   dat1 %>% mutate(date = date_str)
   final_tbl = dat1
 }); dim(final_tbl)
-View(final_tbl)
+# View(final_tbl)
 
 (n.sim = nrow(final_tbl))
 
@@ -90,7 +91,7 @@ if (generate_failure_method == "fine_gray"){
   methodtitle = "SimpleExp"
 }
 file_naming = function(lab.date, file_lab, crit.no){
-  paste0(dir_fig,"/CR02.Sensitivity.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
+  paste0(dir_fig,"/CR02.Revision_Sensitivity.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
 }
 
 if (endpoint == "CR"){
@@ -150,7 +151,7 @@ p.list <- p.list.solo <- list()
 for (crit.no in 1:crit.tot){
   message("%%%%%%%%%%%% crit.no", crit.no, " %%%%%%%%%%%%%%%%%")
   if (crit.no == 1){
-    crit_lab = "Truncated mean"
+    crit_lab = "Area Under"
     crit_lab_1 = "a"
     # y_limits = y_limits_mean
   } else{
@@ -164,10 +165,10 @@ for (crit.no in 1:crit.tot){
   for (Phase.no in 1:2){
     if (Phase.no == 1){
       Phase_lab = "survival"
-      Phase_lab_1 = "AUC(OEFS)"
+      Phase_lab_1 = "OEFS Curve"
     } else{
       Phase_lab = "endpoint"
-      Phase_lab_1 = "AUC(PC CIF)"
+      Phase_lab_1 = "PC Cumulative Incidence Curve"
     }
     if (Phase.no == 1){
       crit = crit_surv
@@ -234,7 +235,7 @@ for (crit.no in 1:crit.tot){
                         labels = design.labels),
         crit.label = factor(crit,
                             levels = 1:2,
-                            labels = c("1" = sprintf("Mean Truncated %s", crit_lab),
+                            labels = c("1" = sprintf("Truncated Area Under %s", crit_lab),
                                        "2" = sprintf("%s probability at t=%s, Curve(%s)", crit_lab, t0, t0)
                             )))
     #end of result.comb
@@ -280,7 +281,13 @@ for (crit.no in 1:crit.tot){
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
     design.filter = c("Trt: Covariate Dependent","Trt: Covariate Independent")
     if (crit.no == 1){
-      ylabs = Phase_lab_1
+      if (Phase_lab == "survival"){
+        ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
+      } else if (Phase_lab == "endpoint"){
+        ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
+      } else{
+        stop("Phase not defined.")
+      }
     } else {
       stop("crit.no not defined")
     }
@@ -351,7 +358,7 @@ for (crit.no in 1:crit.tot){
     
     if (solo.plot == 1){
       solo.result.comb1 = result.comb1 %>%
-        filter(design %in% design.filter[1]) %>%
+        filter(design %in% design.filter[1]) %>% # observed (b/c mimicking PAD dataset)
         filter(setting %in% "30 Covariates",
                n %in% "N=300",
                censor %in% "Average 56% Censoring")
@@ -439,7 +446,7 @@ for (crit.no in 1:crit.tot){
   p.grid1 <- plot_grid(p.grid,
                        get_legend(p.list[[2]] +
                                     theme(legend.direction = "horizontal",
-                                          legend.key.size = unit(2, "cm"),    # Adjust the size of the legend keys
+                                          legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
                                           legend.text = element_text(size = 12), # Adjust the size of the legend text
                                           legend.spacing.x = unit(0.1, "cm")) +
                                     guides(color = guide_legend(nrow = 1, title = "Methods"))),
@@ -452,12 +459,12 @@ for (crit.no in 1:crit.tot){
   
   if (saving_eps == TRUE){
     save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
+    ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
+           p.grid1,
+           width = 20, height = 10,
+           dpi = 150             # lower DPI for smaller file
+    )
   }
-  ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
-         p.grid1,
-         width = 20, height = 10,
-         dpi = 150             # lower DPI for smaller file
-  )
   
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
@@ -480,7 +487,7 @@ for (crit.no in 1:crit.tot){
                               get_legend(p.list.solo[[2]] +
                                            theme(legend.direction = "horizontal",
                                                  legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
-                                                 legend.text = element_text(size = 20), # Adjust the size of the legend text
+                                                 legend.text = element_text(size = 12), # Adjust the size of the legend text
                                                  legend.spacing.x = unit(0.1, "cm")) +
                                            guides(color = guide_legend(nrow = 1, title = "Methods", size=1))),
                               align = "vh",

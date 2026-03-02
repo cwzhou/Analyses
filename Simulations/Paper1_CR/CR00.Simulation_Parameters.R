@@ -138,7 +138,7 @@ arg <- commandArgs(trailingOnly = TRUE)
 if (length(arg) < 9) {
   arg = c(1, 1, 1, 1, 1, 1, 1, 1, 1) # by default
   if (sensitivity == 1){
-    arg = c(1, 2, 1, 1, 1, 1, 1, 1, 1) # for sensitivity like rda
+    arg = c(1, 2, 1, 1, 1, 1, 1, 1, 1) # for sensitivity like rda (observational prop)
   }
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))

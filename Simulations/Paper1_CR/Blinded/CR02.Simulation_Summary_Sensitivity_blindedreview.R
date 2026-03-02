@@ -7,6 +7,7 @@ saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
 testing_out = 1
 
+# MAKE SURE CR00.SIMULATION_PARAMETERS.R HAS SENSITIVITY = 1
 source("CR00.Simulation_Parameters_blindedreview.R") # change local in this script to 0 for cluster
 
 library(ggplot2)
@@ -32,7 +33,7 @@ final_tbl <- map_dfr(date_seq, function(d) {
   } else{
     date_str <- format(d, "%Y-%m-%d")
   }
-  file_path <- file.path("./output", "fine_gray/sensitivity", date_str, file_name)
+  file_path <- file.path("./output", "fine_gray/revision_sensitivity", date_str, file_name)
   
   dat_list <- readRDS(file_path)
   dat = dat_list$statistics
@@ -77,7 +78,7 @@ n.labels = c(sprintf("N=%s",size$small.sample.size$n),
 design.levels = c(1,2)
 design.labels = c("Trt: Covariate Dependent","Trt: Covariate Independent")
 beta.levels = c(1)#,2)
-beta.labels = c(sprintf("%s Covariates",ncov.list$beta1))
+beta.labels = c(sprintf("%s Covariates",ncov.list$beta1)) # should be 30 covariates if CR00 was set with sensitivity = 1
 
 if (generate_failure_method == "fine_gray"){
   methodtitle = "FineGray"
@@ -85,7 +86,7 @@ if (generate_failure_method == "fine_gray"){
   methodtitle = "SimpleExp"
 }
 file_naming = function(lab.date, file_lab, crit.no){
-  paste0(dir_fig,"/CR02.Sensitivity.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
+  paste0(dir_fig,"/CR02.Revision_Sensitivity.",methodtitle, "_", file_lab,"_", gsub("-", "", lab.date), "_crit", crit.no, ".eps")
 }
 
 if (endpoint == "CR"){
@@ -145,7 +146,7 @@ p.list <- p.list.solo <- list()
 for (crit.no in 1:crit.tot){
   message("%%%%%%%%%%%% crit.no", crit.no, " %%%%%%%%%%%%%%%%%")
   if (crit.no == 1){
-    crit_lab = "Truncated mean"
+    crit_lab = "Area Under"
     crit_lab_1 = "a"
     # y_limits = y_limits_mean
   } else{
@@ -275,7 +276,13 @@ for (crit.no in 1:crit.tot){
     file.name.phase.solo = file_naming(lab.date, sprintf("solo.%s",Phase_lab), crit.no)
     design.filter = c("Trt: Covariate Dependent","Trt: Covariate Independent")
     if (crit.no == 1){
-      ylabs = Phase_lab_1
+      if (Phase_lab == "survival"){
+        ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
+      } else if (Phase_lab == "endpoint"){
+        ylabs = sprintf("Truncated %s %s", crit_lab, Phase_lab_1)
+      } else{
+        stop("Phase not defined.")
+      }
     } else {
       stop("crit.no not defined")
     }
