@@ -229,8 +229,8 @@ Dynamics <-
       print("policy is null: generating treatment from rbinom with propensity")
       propensity = predPropensityFn(covariate = covariate)
       
-      if (revision == 1){
-        message("CSK in revision setting can't handle when only 1 patient a group")
+      if (sensitivity == 1){
+        message("CSK in sensitivity setting can't handle when only 1 patient a group")
         repeat{
           action <- suppressWarnings(rbinom(N, 1, propensity) * 2 - 1)
           action[at.risk == 0] <- NA
