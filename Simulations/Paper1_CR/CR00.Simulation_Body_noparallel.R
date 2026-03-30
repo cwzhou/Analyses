@@ -442,8 +442,8 @@ for (sim in n.sim_start:n.sim_end){
   cat("\n******************************\n")
   # estimation
   cat("3. csk - Cho et al for Simulation",sim, ":",generate_failure_method,"\n")
-  n.stages = 1
   if (!skip.csk) {
+    n.stages = 1
     if ("package:itrSurv" %in% search()) {
       detach("package:itrSurv", unload = TRUE, character.only = TRUE)
     }
