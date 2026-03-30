@@ -1,3 +1,4 @@
+# must run CR00.Simulation_Parameters.R and CR00.Simulation_Body.R first
 set.seed(2026)
 revision = 0
 tol_arg = 0.07 #mean_tol1[1]
@@ -8,7 +9,7 @@ tol_arg = 0.07 #mean_tol1[1]
 n_mc <- 5000#100000 # very large sample
 
 # Generate covariates from true DGM
-arg.mc = arg_list
+arg.mc = arg_list # from CR00.Simulation_Body.R
 arg.mc$ctype = 99 # no censoring
 arg.mc$N <- n_mc
 arg.mc$u1 = runif(n_mc)
@@ -52,10 +53,10 @@ library(dplyr)
 mc.data <- bind_cols(
   data0,
   data1 %>%
-    select(event_time_action1, status_action1,
+    dplyr::select(event_time_action1, status_action1,
            failure_time_cause1_action1, failure_time_cause2_action1)
 ) %>%
-  select(subj.id, Z1, Z2,
+  dplyr::select(subj.id, Z1, Z2, #Z3,Z4,Z5,Z6,Z7,Z8,Z9,Z10,Z11,
          event_time_action0, event_time_action1,
          status_action0, status_action1,
          failure_time_cause1_action0, failure_time_cause2_action0,
@@ -173,7 +174,7 @@ mc.data5 <- mc.data4 %>%
   )
 
 mc.data_final <- mc.data5 %>%
-  select(subj.id, Z1, Z2, final_trt, adv_to_ph2,
+  dplyr::select(subj.id, Z1, Z2, final_trt, adv_to_ph2,
          event_time_final, cif_time_final, status_final,
          failure_time_cause1_final, failure_time_cause2_final)
 
