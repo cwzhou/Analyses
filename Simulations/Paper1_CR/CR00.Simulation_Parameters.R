@@ -100,7 +100,7 @@ if (sensitivity == 1){
       n.eval = n.eval
     )
   } else{
-    n.eval = 10000
+    n.eval = 8000
     n.sim = 1
     date_folder = "2026-02-24"
     n.sim_start = 1
@@ -122,7 +122,7 @@ mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't w
 prob_tol1 = c(0.15, 0.01) # IGNORE THIS, WE DONT USE, but keep in code since fortran isn't updated to ignore
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") 
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
@@ -164,8 +164,8 @@ if (length(arg) < 9) {
     arg = c(1, 2, 1, 1, 1, 1, 1, 1, 1) # for sensitivity like rda
   }
   if (true_opt_flag){
-    arg = c(1, 1, 1, 1, 
-            2, 1, 1, 1, 1) # for RCT (treatment independent)
+    arg = c(1, 1, 1, 2, #beta changes between 1 and 2 for low and high covariates
+            2, 1, 1, 1, 1) # prop arg is always 2 for RCT (treatment independent)
   }
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
                   toString(arg)))
