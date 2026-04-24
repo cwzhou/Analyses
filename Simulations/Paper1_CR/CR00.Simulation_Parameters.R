@@ -20,7 +20,7 @@ source("F01.Simulation_Functions.R") # calls libraries
 
 # sbatch -p general -N 1 --mem 15G -n 1 -t 6-11:00:00 --mail-type=end --mail-user=cwzhou@email.unc.edu --wrap="Rscript CR01.Simulation_Run.R"
 
-savingrds = TRUE
+savingrds = !TRUE
 # date_folder = "2024-09-09" # "2024-08-31" #Sys.Date() 
 #10 and 20 are local for sensitivity = 1 and 100 sims; 2025-07-21 is cluster for sensitivity = 1 1000 sims, 10000 neval 
 #"2025-02-10" this is the original submission 
@@ -122,7 +122,7 @@ mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't w
 prob_tol1 = c(0.15, 0.01) # IGNORE THIS, WE DONT USE, but keep in code since fortran isn't updated to ignore
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") 
-generate_failure_method = generate_failure_method[1]
+generate_failure_method = generate_failure_method[2]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)

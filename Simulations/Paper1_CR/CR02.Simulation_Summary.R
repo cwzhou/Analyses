@@ -523,16 +523,16 @@ for (crit.no in 1:crit.tot){
       Phase = c(1, 1, 2, 2),
       setting = c("2 Covariates", "10 Covariates",
                   "2 Covariates", "10 Covariates"),
-      yintercept = c(374.67, 111,
-                     222.88, 222)
+      yintercept = c(374.67, 446.7,
+                     222.88, 269.12)
     )
-  } else if (generate_failure_method == "simplex") {
+  } else if (generate_failure_method == "simple_exp") {
     true_optimal_values <- data.frame(
       Phase = c(1, 1, 2, 2),
       setting = c("3 Covariates", "5 Covariates",   
                   "3 Covariates", "5 Covariates"), 
-      yintercept = c(150, 265.12,
-                     140, 92.95)  # placeholders
+      yintercept = c(170.08, 265.12,
+                     120.35, 92.95)  # placeholders
     )
   }
   
@@ -626,7 +626,8 @@ for (crit.no in 1:crit.tot){
   if (solo.plot == 1){
     # y_limits = c(0.3,2.5)
     if (generate_failure_method == "fine_gray"){
-      y_limits = c(220,780)
+      y_limits = c(220,400)
+      y_limits2 = c(320,730)
     } else{
       y_limits = c(160,280)
       y_limits2 = c(80,130)
