@@ -19,11 +19,11 @@ if (local == 1){
    setwd("/nas/longleaf/home/cwzhou/Dissertation/Analyses/Simulations/Paper1_CR")
  }
 source("CR00.Simulation_Parameters.R") # change local in this script to 0 for cluster
-revision = 0
+# revision = 0
 
 saving_eps = TRUE
 crit.tot = 1 # total number of critical values (for now - just mean!!)
-testing_out = 1
+# testing_out = 1
 
 lab.date = "2025-09-22" # use the date that saved your results for CR01.Simulation_Run.R
 
@@ -282,7 +282,7 @@ for (crit.no in 1:crit.tot){
         mutate(progress = paste(training_cause.1, training_cause.2, sep = " / "))
       result.stat.sd <-
         result.comb1 %>%
-        aggregate(value ~ method + ncauses + censor + cause1prob + setting + n + design +
+        aggregate(value ~ method + ncauses + censor + setting + cause1prob + n + design +
                     crit + crit.label , data = .,
                   FUN = function(x) round(sd(x, na.rm = TRUE), 3)) %>%
         rename(sd = value)
@@ -322,7 +322,7 @@ for (crit.no in 1:crit.tot){
         result.comb1 %>%
         dplyr::filter(design %in% design.filter, crit == crit.no) %>%
         ggplot(aes(x = method, y = value, group = method, color = method)) +
-        facet_grid(cause1prob + setting ~ censor + n + design, scales = "free_y")
+        facet_grid(setting + cause1prob ~ censor + n + design, scales = "free_y")
     } else{
       p0 <-
         result.comb1 %>%
@@ -364,15 +364,15 @@ for (crit.no in 1:crit.tot){
                      geom = 'text',
                      col = "black",
                      vjust = -1.1,
-                     size = 2.5) +
+                     size = 4) +
       # Expand y-axis limits to prevent labels from being cut off
       scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
 
       if (saving_eps == TRUE){
         ggsave(file.name.phase, p.list[[Phase.no]], device="eps", width = 12, height = 10)
         ggsave(file.name.saved %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
-               p.list[[Phase.no]],
-               width = 12, height = 10,
+               p.list[[Phase.no]] + theme(legend.position = "bottom"),
+               width = 22, height = 12,
                dpi = 100             # lower DPI for smaller file
                )
       }
@@ -392,100 +392,233 @@ for (crit.no in 1:crit.tot){
                    n %in% "N=1000",
                    censor %in% "Low (20%)")
         }
-
-        if (generate_failure_method == "fine_gray"){
-          solo.result.comb1 = solo.result.comb1 %>%
+        
+        # --- Build base plot (no facet yet) ---
+        if (generate_failure_method == "fine_gray"){  
+          solo.result.comb1 <- solo.result.comb1 %>%
             filter(cause1prob %in% "Fine-Gray mass: 0.8")
-          p0.solo <-
-            solo.result.comb1 %>%
-            ggplot(aes(x = method, y = value, group = method, color = method)) +
-            facet_grid(cause1prob + setting ~ censor + n + design)# , scales = "free_y")
-        } else{
-          p0.solo <-
-            solo.result.comb1 %>%
-            ggplot(aes(x = method, y = value, group = method, color = method)) +
-            facet_grid(setting ~ censor + n + design, scales = "free_y")
         }
-        p.solo = p0.solo +
-          geom_boxplot() +
-          geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
-          scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
-          ylab(ylabs) +
-          theme_bw() #+
-        # theme(legend.position = "bottom")
-        rng = suppressWarnings(layer_scales(p.solo)$y$range$range)
-        rng[3] = rng[2] - rng[1]
-        rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
-        rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
-        p.list.solo[[Phase.no]] <-
-          p.solo +
-          stat_summary(aes(x = as.numeric(method),
-                           y = value),
-                       fun = mean,
-                       geom = 'point',
-                       col = "black",
-                       shape = "square",
-                       size = 1) +
-          stat_summary(aes(x = as.numeric(method),
-                           y = value,
-                           label = round(..y.., 2),
-          ),
-          fun = mean,
-          geom = 'text',
-          col = "black",
-          vjust = -1.1,
-          size = 2.5) +
-          scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
-                             # Expand y-axis limits to prevent labels from being cut off
-                             expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
+        
+        p0.base <- solo.result.comb1 %>%
+          ggplot(aes(x = method, y = value, group = method, color = method))
+        
+        # --- Define the two variants ---
+        plot_variants <- list(
+          solo = function(p){
+            if (generate_failure_method == "fine_gray"){
+              p + facet_grid(setting + cause1prob ~ censor + n + design)
+            } else {
+              p + facet_grid(setting ~ censor + n + design, scales = "free_y")
+            }
+          },
+          solo.nofacet = function(p) p
+        )
+        
+        # --- Loop over both versions ---
+        for (nm in names(plot_variants)) {
+          
+          p0 <- plot_variants[[nm]](p0.base)
+          
+          p.solo <- p0 +
+            geom_boxplot() +
+            geom_jitter(width = 0.1, height = 0) +
+            scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
+            ylab(ylabs) +
+            theme_bw()
+          
+          rng <- suppressWarnings(layer_scales(p.solo)$y$range$range)
+          rng[3] <- rng[2] - rng[1]
+          rng[4] <- rng[3] * 0.4 + rng[2]
+          rng[5] <- rng[3] * 0.2 + rng[2]
+          
+          p.final <- p.solo +
+            stat_summary(aes(x = as.numeric(method), y = value),
+                         fun = mean, geom = 'point',
+                         col = "black", shape = "square", size = 1) +
+            stat_summary(aes(x = as.numeric(method), y = value,
+                             label = round(..y.., 2)),
+                         fun = mean, geom = 'text',
+                         col = "black", vjust = -4, size = 5) +
+            scale_y_continuous(
+              breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
+              expand = expansion(mult = c(0, 0.1))
+            )
+          
+          # store separately if needed
+          p.list.solo[[paste0(Phase.no, "_", nm)]] <- p.final
+          
+          # --- Save ---
+          if (saving_eps == TRUE){
+            
+            file.eps <- gsub("\\.eps$", paste0("_", nm, ".eps"), file.name.phase.solo)
+            file.png <- gsub("\\.eps$", paste0("_", nm, sprintf("_Phase%s.png", Phase.no)),
+                             file.name.saved.solo)
+            
+            ggsave(file.eps, p.final, device = "eps", width = 12, height = 10)
+            ggsave(file.png, p.final, width = 12, height = 8, dpi = 100)
+          }
+        }
 
-        if (saving_eps == TRUE){
-          ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
-          ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
-                 p.list.solo[[Phase.no]],
-                 width = 12, height = 10,
-                 dpi = 100             # lower DPI for smaller file
-                 )
-        }
-      }
+        # if (generate_failure_method == "fine_gray"){
+        #   solo.result.comb1 = solo.result.comb1 %>%
+        #     filter(cause1prob %in% "Fine-Gray mass: 0.8")
+        #   p0.solo.nofacet <- solo.result.comb1 %>%
+        #     ggplot(aes(x = method, y = value, group = method, color = method)) 
+        #   p0.solo <- p0.solo.nofacet +
+        #     facet_grid(setting + cause1prob ~ censor + n + design)# , scales = "free_y")
+        # } else{
+        #   p0.solo.nofacet <-
+        #     solo.result.comb1 %>%
+        #     ggplot(aes(x = method, y = value, group = method, color = method))
+        #   p0.solo <- p0.solo.nofacet +
+        #     facet_grid(setting ~ censor + n + design, scales = "free_y")
+        # }
+        # p.solo = p0.solo +
+        #   geom_boxplot() +
+        #   geom_jitter(width = 0.1, height = 0) + # EPS does not support alpha.
+        #   scale_color_discrete(labels = paste0(method.nm.abc, ": ", method.nm.formal)) +
+        #   ylab(ylabs) +
+        #   theme_bw() #+
+        # # theme(legend.position = "bottom")
+        # rng = suppressWarnings(layer_scales(p.solo)$y$range$range)
+        # rng[3] = rng[2] - rng[1]
+        # rng[4] = rng[3] * 0.4 + rng[2] # y coordinate for censoring %
+        # rng[5] = rng[3] * 0.2 + rng[2] # y coordinate for flowchart
+        # p.list.solo[[Phase.no]] <-
+        #   p.solo +
+        #   stat_summary(aes(x = as.numeric(method),
+        #                    y = value),
+        #                fun = mean,
+        #                geom = 'point',
+        #                col = "black",
+        #                shape = "square",
+        #                size = 1) +
+        #   stat_summary(aes(x = as.numeric(method),
+        #                    y = value,
+        #                    label = round(..y.., 2),
+        #   ),
+        #   fun = mean,
+        #   geom = 'text',
+        #   col = "black",
+        #   vjust = -3,
+        #   size = 3) +
+        #   scale_y_continuous(breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
+        #                      # Expand y-axis limits to prevent labels from being cut off
+        #                      expand = expansion(mult = c(0, 0.1)))  # Add 10% padding above
+        # 
+        # if (saving_eps == TRUE){
+        #   ggsave(file.name.phase.solo, p.list.solo[[Phase.no]], device="eps", width = 12, height = 10)
+        #   ggsave(file.name.saved.solo %>% gsub(".eps", sprintf("_Phase%s.png", Phase.no), .) , #save as png too
+        #          p.list.solo[[Phase.no]],
+        #          width = 12, height = 8,
+        #          dpi = 100             # lower DPI for smaller file
+        #          )
+        # } # end of saving_eps
+      } # end of solo.plot
 
     } # end of Phase.no for-loop
 
-
-  p.1 = p.list[[1]] +
+  if (generate_failure_method == "fine_gray") {
+    true_optimal_values <- data.frame(
+      Phase = c(1, 1, 2, 2),
+      setting = c("2 Covariates", "10 Covariates",
+                  "2 Covariates", "10 Covariates"),
+      yintercept = c(374.67, 111,
+                     222.88, 222)
+    )
+  } else if (generate_failure_method == "simplex") {
+    true_optimal_values <- data.frame(
+      Phase = c(1, 1, 2, 2),
+      setting = c("3 Covariates", "5 Covariates",   
+                  "3 Covariates", "5 Covariates"), 
+      yintercept = c(150, 265.12,
+                     140, 92.95)  # placeholders
+    )
+  }
+  
+  p.1 <- p.list[[1]] +
     theme(legend.position = "none",
-          axis.title.x=element_blank()) #+
-    # ylim(y_limits)
-  p.2 = p.list[[2]] +
+          axis.title.x = element_blank()) +
+    geom_hline(
+      data = subset(true_optimal_values, Phase == 1),
+      aes(yintercept = yintercept),
+      linetype = "dotted",
+      color = "black",
+      linewidth = 2.5,
+      inherit.aes = FALSE
+    )
+  
+  p.2 <- p.list[[2]] +
     theme(legend.position = "none",
-          axis.title.x=element_blank()) #+
-    # ylim(y_limits)
+          axis.title.x = element_blank()) +
+    geom_hline(
+      data = subset(true_optimal_values, Phase == 2),
+      aes(yintercept = yintercept),
+      linetype = "dotted",
+      color = "black",
+      linewidth = 2.5,
+      inherit.aes = FALSE
+    )
 
-  p.grid <- plot_grid(p.1,
-                      p.2,
-                      align = "vh",
-                      axis = "tblr",
-                      nrow = 1, ncol = 2)#,
-                      # common.legend = FALSE)
-  p.grid1 <- plot_grid(p.grid,
-                       get_legend(p.list[[2]] +
-                                    theme(legend.direction = "horizontal",
-                                          legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
-                                          legend.text = element_text(size = 12), # Adjust the size of the legend text
-                                          legend.spacing.x = unit(0.1, "cm")) +
-                                    guides(color = guide_legend(nrow = 1, title = "Methods"))),
-                      align = "vh",
-                      axis = "tblr",
-                      ncol = 1,
-                      nrow = 2,
-                      rel_heights = c(1, 0.1))
-  #we can ignore the warning message about return_all
+  # p.1 = p.list[[1]] +
+  #   theme(legend.position = "none",
+  #         axis.title.x=element_blank()) #+
+  #   # ylim(y_limits)
+  # p.2 = p.list[[2]] +
+  #   theme(legend.position = "none",
+  #         axis.title.x=element_blank()) #+
+  #   # ylim(y_limits)
+
+  # p.grid <- plot_grid(p.1,
+  #                     p.2,
+  #                     align = "vh",
+  #                     axis = "tblr",
+  #                     nrow = 1, ncol = 2)#,
+  #                     # common.legend = FALSE)
+  # p.grid1 <- plot_grid(p.grid,
+  #                      get_legend(p.list[[2]] +
+  #                                   theme(legend.direction = "horizontal",
+  #                                         legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
+  #                                         legend.text = element_text(size = 12), # Adjust the size of the legend text
+  #                                         legend.spacing.x = unit(0.1, "cm")) +
+  #                                   guides(color = guide_legend(nrow = 1, title = "Methods"))),
+  #                     align = "vh",
+  #                     axis = "tblr",
+  #                     ncol = 1,
+  #                     nrow = 2,
+  #                     rel_heights = c(1, 0.1))
+  # #we can ignore the warning message about return_all
+  
+  legend_plot <- p.list[[2]] +
+    guides(color = guide_legend(nrow = 1, title = "Methods")) +
+    theme(
+      legend.direction = "horizontal",
+      legend.key.size = unit(3, "cm"),
+      legend.text = element_text(size = 12),
+      legend.spacing.x = unit(0.1, "cm")
+    )
+  
+  legend <- cowplot::get_legend(legend_plot)
+  
+  p.grid <- cowplot::plot_grid(
+    p.1, p.2,
+    align = "vh",
+    axis = "tblr",
+    nrow = 1
+  )
+  
+  p.grid1 <- cowplot::plot_grid(
+    p.grid,
+    legend,
+    ncol = 1,
+    rel_heights = c(1, 0.1)
+  )
 
   if (saving_eps == TRUE){
-    save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 20)
+    save_plot(file.name.saved, p.grid1, base_height = 10, base_width = 24)
     ggsave(file.name.saved %>% gsub(".eps", ".png", .), #save as png too
            p.grid1,
-           width = 20, height = 10,
+           width = 40, height = 15,
            dpi = 100             # lower DPI for smaller file
            )
   }
@@ -495,16 +628,27 @@ for (crit.no in 1:crit.tot){
     if (generate_failure_method == "fine_gray"){
       y_limits = c(220,780)
     } else{
-      y_limits = c(200,800)
+      y_limits = c(160,280)
+      y_limits2 = c(80,130)
     }
-    p.1.solo = p.list.solo[[1]] +
+    # p.1.solo = p.list.solo[[1]] +
+    #   theme(legend.position = "none",
+    #         axis.title.x=element_blank()) +
+    # ylim(y_limits)
+    # p.2.solo = p.list.solo[[2]] +
+    #   theme(legend.position = "none",
+    #         axis.title.x=element_blank()) +
+    # ylim(y_limits)
+    p.1.solo <- p.list.solo[["1_solo"]] +
       theme(legend.position = "none",
-            axis.title.x=element_blank()) +
-    ylim(y_limits)
-    p.2.solo = p.list.solo[[2]] +
+            axis.title.x = element_blank()) +
+      ylim(y_limits)
+    
+    p.2.solo <- p.list.solo[["2_solo"]] +
       theme(legend.position = "none",
-            axis.title.x=element_blank()) +
-    ylim(y_limits)
+            axis.title.x = element_blank()) +
+      ylim(y_limits2)
+    
     p.grid.solo <- plot_grid(p.1.solo,
                              p.2.solo,
                              align = "vh",
@@ -525,7 +669,7 @@ for (crit.no in 1:crit.tot){
     save_plot(file.name.saved.solo, p.grid1.solo, base_height = 10, base_width = 20)
     ggsave(file.name.saved.solo %>% gsub(".eps", ".png", .), #save as png too
            p.grid1.solo,
-           width = 20, height = 10,
+           width = 12, height = 8,
            dpi = 100             # lower DPI for smaller file
            )
   }

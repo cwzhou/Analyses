@@ -11,7 +11,7 @@ sensitivity = 0 # if 1 then runs sensitivity analysis in supplementary material
 # NOTE: If sensitivity = 1 then you must use CR02.Simulation_Summary_Sensitivity.R later
 # NOTE: If sensitivity = 0 then you must use CR02.Simulation_Summary.R later
 
-true_opt_flag = TRUE
+true_opt_flag = !TRUE
 
 init_seed = 2025 #init_seed = 353 was used for sensitivity = 1
 
@@ -122,7 +122,7 @@ mean_tol1 = c(0.1,0) #c(0.07,0) # this is for differences in years so we don't w
 prob_tol1 = c(0.15, 0.01) # IGNORE THIS, WE DONT USE, but keep in code since fortran isn't updated to ignore
 combo_tol1 = c(mean_tol1[1], prob_tol1[1], mean_tol1[2], prob_tol1[2])
 generate_failure_method = c("simple_exp","fine_gray") 
-generate_failure_method = generate_failure_method[2]
+generate_failure_method = generate_failure_method[1]
 
 if (generate_failure_method == "simple_exp"){
   crit_t0_eval = 1 #1 year (we dont use days bc its calculated using the rates which was for years)
@@ -164,7 +164,7 @@ if (length(arg) < 9) {
     arg = c(1, 2, 1, 1, 1, 1, 1, 1, 1) # for sensitivity like rda
   }
   if (true_opt_flag){
-    arg = c(1, 1, 1, 2, #beta changes between 1 and 2 for low and high covariates
+    arg = c(1, 1, 1, 1, #beta changes between 1 and 2 for low and high covariates
             2, 1, 1, 1, 1) # prop arg is always 2 for RCT (treatment independent)
   }
   warning(sprintf("commandArgs was not provided. Set as c(%s).",
