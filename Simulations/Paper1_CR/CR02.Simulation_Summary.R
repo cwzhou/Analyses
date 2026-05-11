@@ -10,7 +10,7 @@ library(stringr)
 
 solo.plot = 1 # if u want solo plot (only for fine-gray in paper; adjust plot parameters if using for simple-exp)
 local = 1
-meta_save = TRUE # for the metadata tables, which should still be modifed as needed in latex
+meta_save = !TRUE # for the metadata tables, which should still be modifed as needed in latex
 
 if (local == 1){
   # set to your location where the R scripts are located
@@ -140,6 +140,7 @@ for (crit.no in 1:crit.tot){
   }
   file.name.saved = file_naming(lab.date, "SimulationResults", crit.no)
   file.name.saved.solo = file_naming(lab.date, "solo.SimulationResults", crit.no)
+  file.name.saved.solo.nofacet = file_naming(lab.date, "solo.nofacet.SimulationResults", crit.no)
   message(file.name.saved)
   for (Phase.no in 1:2){
     if (Phase.no == 1){
@@ -438,7 +439,7 @@ for (crit.no in 1:crit.tot){
             stat_summary(aes(x = as.numeric(method), y = value,
                              label = round(..y.., 2)),
                          fun = mean, geom = 'text',
-                         col = "black", vjust = -4, size = 5) +
+                         col = "black", vjust = -3, size = 5) +
             scale_y_continuous(
               breaks = function(x) seq(floor(min(x)), ceiling(max(x)), by = 200),
               expand = expansion(mult = c(0, 0.1))
@@ -526,6 +527,9 @@ for (crit.no in 1:crit.tot){
       yintercept = c(374.67, 446.7,
                      222.88, 269.12)
     )
+    
+    true_optimal_values_solo = subset(true_optimal_values,
+                                      setting == "10 Covariates")
   } else if (generate_failure_method == "simple_exp") {
     true_optimal_values <- data.frame(
       Phase = c(1, 1, 2, 2),
@@ -534,6 +538,9 @@ for (crit.no in 1:crit.tot){
       yintercept = c(170.08, 265.12,
                      120.35, 92.95)  # placeholders
     )
+    
+    true_optimal_values_solo = subset(true_optimal_values,
+                                      setting == "5 Covariates")
   }
   
   p.1 <- p.list[[1]] +
@@ -624,7 +631,6 @@ for (crit.no in 1:crit.tot){
   }
 
   if (solo.plot == 1){
-    # y_limits = c(0.3,2.5)
     if (generate_failure_method == "fine_gray"){
       y_limits = c(220,400)
       y_limits2 = c(320,730)
@@ -632,23 +638,52 @@ for (crit.no in 1:crit.tot){
       y_limits = c(160,280)
       y_limits2 = c(80,130)
     }
-    # p.1.solo = p.list.solo[[1]] +
-    #   theme(legend.position = "none",
-    #         axis.title.x=element_blank()) +
-    # ylim(y_limits)
-    # p.2.solo = p.list.solo[[2]] +
-    #   theme(legend.position = "none",
-    #         axis.title.x=element_blank()) +
-    # ylim(y_limits)
+    
+    # expand limits if true values exceed them
+    if (exists("true_optimal_values_solo") && nrow(true_optimal_values_solo) > 0) {
+      
+      y_limits <- range(
+        c(y_limits,
+          true_optimal_values_solo$yintercept[
+            true_optimal_values_solo$Phase == 1
+          ]),
+        na.rm = TRUE
+      )
+      
+      y_limits2 <- range(
+        c(y_limits2,
+          true_optimal_values_solo$yintercept[
+            true_optimal_values_solo$Phase == 2
+          ]),
+        na.rm = TRUE
+      )
+    }
+    
     p.1.solo <- p.list.solo[["1_solo"]] +
       theme(legend.position = "none",
             axis.title.x = element_blank()) +
-      ylim(y_limits)
+      ylim(y_limits) +
+      geom_hline(
+        data = subset(true_optimal_values_solo, Phase == 1),
+        aes(yintercept = yintercept),
+        linetype = "dotted",
+        color = "black",
+        linewidth = 2.5,
+        inherit.aes = FALSE
+      )
     
     p.2.solo <- p.list.solo[["2_solo"]] +
       theme(legend.position = "none",
             axis.title.x = element_blank()) +
-      ylim(y_limits2)
+      ylim(y_limits2) +
+      geom_hline(
+        data = subset(true_optimal_values_solo, Phase == 2),
+        aes(yintercept = yintercept),
+        linetype = "dotted",
+        color = "black",
+        linewidth = 2.5,
+        inherit.aes = FALSE
+      )
     
     p.grid.solo <- plot_grid(p.1.solo,
                              p.2.solo,
@@ -667,9 +702,53 @@ for (crit.no in 1:crit.tot){
                               ncol = 1,
                               nrow = 2,
                               rel_heights = c(1, 0.1))
+    
     save_plot(file.name.saved.solo, p.grid1.solo, base_height = 10, base_width = 20)
     ggsave(file.name.saved.solo %>% gsub(".eps", ".png", .), #save as png too
            p.grid1.solo,
+           width = 12, height = 8,
+           dpi = 100             # lower DPI for smaller file
+    )
+    
+    strip_off <- theme(
+      strip.text = element_blank(),
+      strip.background = element_blank()
+    )
+    
+    panel_clean <- theme(
+      panel.spacing = unit(0, "lines")
+      # panel.border = element_blank()
+    )
+    
+    p.1.solo.nofacet = p.1.solo +
+      strip_off +
+      panel_clean 
+    
+    p.2.solo.nofacet = p.2.solo +
+      strip_off +
+      panel_clean 
+    
+    p.grid.solo.nofacet <- plot_grid(p.1.solo.nofacet,
+                             p.2.solo.nofacet,
+                             align = "vh",
+                             axis = "tblr",
+                             nrow = 1, ncol = 2)
+    p.grid1.solo.nofacet <- plot_grid(p.grid.solo.nofacet,
+                              get_legend(p.list.solo[[2]] +
+                                           theme(legend.direction = "horizontal",
+                                                 legend.key.size = unit(1, "cm"),    # Adjust the size of the legend keys
+                                                 legend.text = element_text(size = 12), # Adjust the size of the legend text
+                                                 legend.spacing.x = unit(0.1, "cm")) +
+                                           guides(color = guide_legend(nrow = 1, title = "Methods"))),
+                              align = "vh",
+                              axis = "tblr",
+                              ncol = 1,
+                              nrow = 2,
+                              rel_heights = c(1, 0.1))
+    
+    save_plot(file.name.saved.solo.nofacet, p.grid1.solo.nofacet, base_height = 10, base_width = 20)
+    ggsave(file.name.saved.solo.nofacet %>% gsub(".eps", ".png", .), #save as png too
+           p.grid1.solo.nofacet,
            width = 12, height = 8,
            dpi = 100             # lower DPI for smaller file
            )
